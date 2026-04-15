@@ -23,6 +23,15 @@ import { useSettings } from '../SettingsProvider';
 const Sidebar = () => {
   const pathname = usePathname();
   const { settings } = useSettings();
+  const [isAdmin, setIsAdmin] = React.useState(false);
+  
+  React.useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      setIsAdmin(user.role === 'ADMIN');
+    }
+  }, []);
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
@@ -36,6 +45,8 @@ const Sidebar = () => {
     { name: 'Suppliers', icon: Building2, path: '/suppliers' },
     { name: 'Analytics', icon: BarChart3, path: '/analytics' },
     { name: 'Reports', icon: FileText, path: '/reports' },
+    // Only show Users to Admin
+    ...(isAdmin ? [{ name: 'Users', icon: Users, path: '/users' }] : []),
   ];
 
   return (
@@ -80,16 +91,18 @@ const Sidebar = () => {
       </div>
 
       <div className="p-4 border-t border-[#E5E7EB] space-y-1">
-        <Link href="/dashboard/settings">
-          <div className={`flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-colors ${
-            pathname === '/dashboard/settings'
-              ? 'bg-[#E0E7FF] text-blue-700 font-medium'
-              : 'text-[#4B5563] hover:bg-gray-100 hover:text-[#111827]'
-          }`}>
-            <Settings className={`w-5 h-5 ${pathname === '/dashboard/settings' ? 'text-blue-600' : 'text-[#6B7280]'}`} />
-            <span className="text-[15px]">Settings</span>
-          </div>
-        </Link>
+        {isAdmin && (
+          <Link href="/dashboard/settings">
+            <div className={`flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-colors ${
+              pathname === '/dashboard/settings'
+                ? 'bg-[#E0E7FF] text-blue-700 font-medium'
+                : 'text-[#4B5563] hover:bg-gray-100 hover:text-[#111827]'
+            }`}>
+              <Settings className={`w-5 h-5 ${pathname === '/dashboard/settings' ? 'text-blue-600' : 'text-[#6B7280]'}`} />
+              <span className="text-[15px]">Settings</span>
+            </div>
+          </Link>
+        )}
         <div 
           onClick={() => {
             localStorage.removeItem('token');

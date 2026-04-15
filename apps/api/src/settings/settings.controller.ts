@@ -6,7 +6,6 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 
 @Controller('settings')
-@UseGuards(JwtAuthGuard)
 export class SettingsController {
     constructor(private readonly settingsService: SettingsService) { }
 
@@ -16,6 +15,7 @@ export class SettingsController {
     }
 
     @Put()
+    @UseGuards(JwtAuthGuard)
     updateSettings(@Body() data: any) {
         return this.settingsService.updateSettings(data);
     }
@@ -26,6 +26,7 @@ export class SettingsController {
     }
 
     @Patch('payment-methods/:id/toggle')
+    @UseGuards(JwtAuthGuard)
     togglePaymentMethod(@Param('id') id: string) {
         return this.settingsService.togglePaymentMethod(id);
     }

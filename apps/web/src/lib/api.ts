@@ -393,4 +393,40 @@ export const uploadSettingsLogo = async (file: File) => {
   return response.data;
 };
 
+// ── Users Management ────────────────────────────────────────────────────────
+export const getUsers = async (params: {
+  search?: string;
+  role?: string;
+  isActive?: boolean;
+} = {}) => {
+  const response = await api.get('/users', { params });
+  return response.data;
+};
+
+export const getUserById = async (id: string) => {
+  const response = await api.get(`/users/${id}`);
+  return response.data;
+};
+
+export const createUser = async (data: any) => {
+  const response = await api.post('/users', data);
+  return response.data;
+};
+
+export const updateUser = async (id: string, data: any) => {
+  const response = await api.put(`/users/${id}`, data);
+  return response.data;
+};
+
+export const toggleUserStatus = async (id: string) => {
+  const response = await api.patch(`/users/${id}/status`);
+  return response.data;
+};
+
+export const logout = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  window.location.href = '/login';
+};
+
 export default api;

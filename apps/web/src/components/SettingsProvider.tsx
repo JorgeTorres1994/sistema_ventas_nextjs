@@ -36,12 +36,13 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
     const refreshSettings = async () => {
         try {
+            // We still try to fetch (since we made GET settings public)
             const [s, p] = await Promise.all([
-                getSettings(),
-                getPaymentMethods()
+                getSettings().catch(() => null),
+                getPaymentMethods().catch(() => [])
             ]);
-            setSettings(s);
-            setPaymentMethods(p);
+            if (s) setSettings(s);
+            if (p) setPaymentMethods(p);
         } catch (error) {
             console.error('Failed to load settings:', error);
         } finally {
