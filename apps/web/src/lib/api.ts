@@ -205,4 +205,42 @@ export const adjustInventoryStock = async (data: {
   return response.data;
 };
 
+// --- Customer Management ---
+
+export const getCustomers = async (params: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  isActive?: boolean;
+} = {}) => {
+  const response = await api.get('/customers', { params });
+  return response.data;
+};
+
+export const getCustomerById = async (id: string) => {
+  const response = await api.get(`/customers/${id}`);
+  return response.data;
+};
+
+export const createCustomer = async (data: {
+  name: string;
+  dni: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+}) => {
+  const response = await api.post('/customers', data);
+  return response.data;
+};
+
+export const updateCustomer = async (id: string, data: any) => {
+  const response = await api.patch(`/customers/${id}`, data);
+  return response.data;
+};
+
+export const toggleCustomerStatus = async (id: string) => {
+  const response = await api.patch(`/customers/${id}/status`);
+  return response.data;
+};
+
 export default api;

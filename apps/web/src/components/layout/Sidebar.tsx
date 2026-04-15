@@ -13,7 +13,8 @@ import {
   FileText, 
   Settings,
   MonitorSmartphone,
-  Boxes
+  Boxes,
+  Users2
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -24,7 +25,7 @@ const Sidebar = () => {
     { name: 'Terminal POS', icon: MonitorSmartphone, path: '/pos' },
     { name: 'Sales', icon: Wallet, path: '/sales' },
     { name: 'Orders', icon: ShoppingCart, path: '/orders' },
-    { name: 'Customers', icon: Users, path: '/customers' },
+    { name: 'Customers', icon: Users2, path: '/customers' },
     { name: 'Products', icon: Package, path: '/products' },
     { name: 'Inventory', icon: Boxes, path: '/inventory' },
     { name: 'Analytics', icon: BarChart3, path: '/analytics' },
