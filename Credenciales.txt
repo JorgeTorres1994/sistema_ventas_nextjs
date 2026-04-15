@@ -1,0 +1,22 @@
+Nombre	Correo Electrónico	Contraseña	Rol
+Jorge Torres	admin@admin.com	admin123	ADMIN
+Admin Test	testadmin@sistema.com	admin123	ADMIN
+
+Comandos: 
+npm run dev:api
+npm run dev:web
+
+
+--- INSTRUCCIONES DE EJECUCIÓN ---
+1. Base de Datos: He creado la carpeta "BD" en la raíz del proyecto.
+   - Importa el archivo BD/sistema_ventas.sql en tu postgres (usando PgAdmin o psql).
+2. Configurar Acceso: Abre apps/api/.env y coloca tu contraseña de postgres en DATABASE_URL.
+3. Ejecutar Sistema (Abrir dos terminales):
+   - Terminal 1 (Backend): npm run dev:api  (Puerto 3005)
+   - Terminal 2 (Frontend): npm run dev:web  (Puerto 3000)
+
+
+Abre dos terminales nuevas y ejecuta:
+
+Terminal 1: npm run dev:api (Backend en http://localhost:3005)
+Terminal 2: npm run dev:web (Frontend en http://localhost:3000)
