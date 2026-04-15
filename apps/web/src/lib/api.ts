@@ -312,6 +312,10 @@ export const createPurchase = async (data: {
   shippingCost: number;
   total: number;
 }) => {
+  const response = await api.post('/purchases', data);
+  return response.data;
+};
+
 // ── Cash Register ──────────────────────────────────────────────────────────────
 export const getCashStatus = async () => {
   const response = await api.get('/cash');
