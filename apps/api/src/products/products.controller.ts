@@ -29,10 +29,7 @@ export class ProductsController {
 
     @Get(':id')
     async findOne(@Param('id') id: string) {
-        const product = await this.prisma.product.findUnique({
-            where: { id },
-            include: { category: true }
-        });
+        const product = await this.productsService.findOne(id);
         if (!product) throw new Error('Product not found');
         return product;
     }

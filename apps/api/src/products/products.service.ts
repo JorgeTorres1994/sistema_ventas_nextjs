@@ -66,6 +66,13 @@ export class ProductsService {
         });
     }
 
+    async findOne(id: string): Promise<any> {
+        return this.prisma.product.findUnique({
+            where: { id },
+            include: { category: true }
+        });
+    }
+
     async update(
         id: string,
         data: {
