@@ -45,7 +45,6 @@ const Sidebar = () => {
     { name: 'Productos', icon: Package, path: '/products' },
     { name: 'Inventario', icon: Boxes, path: '/inventory' },
     { name: 'Proveedores', icon: Building2, path: '/suppliers' },
-    { name: 'Estadísticas', icon: BarChart3, path: '/analytics' },
     { name: 'Reportes', icon: FileText, path: '/reports' },
     // Only show Users to Admin
     ...(isAdmin ? [{ name: 'Usuarios', icon: Users, path: '/users' }] : []),
