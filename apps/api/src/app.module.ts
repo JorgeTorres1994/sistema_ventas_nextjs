@@ -14,6 +14,7 @@ import { SuppliersModule } from './suppliers/suppliers.module.js';
 import { PurchasesModule } from './purchases/purchases.module.js';
 import { CashierModule } from './cashier/cashier.module';
 import { CashRegistersModule } from './cash-registers/cash-registers.module';
+import { InventoryModule } from './inventory/inventory.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { CashRegistersModule } from './cash-registers/cash-registers.module';
     PurchasesModule,
     CashierModule,
     CashRegistersModule,
+    InventoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

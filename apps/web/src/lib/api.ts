@@ -166,4 +166,43 @@ export const uploadProductImage = async (file: File) => {
   }
 };
 
+// --- Inventory Management ---
+
+export const getInventoryStock = async (params: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  categoryId?: string;
+  stockStatus?: string;
+  sortBy?: string;
+  sortOrder?: string;
+} = {}) => {
+  const response = await api.get('/inventory', { params });
+  return response.data;
+};
+
+export const getInventoryMovements = async (params: {
+  page?: number;
+  limit?: number;
+  productId?: string;
+  type?: string;
+  reason?: string;
+  startDate?: string;
+  endDate?: string;
+} = {}) => {
+  const response = await api.get('/inventory/movements', { params });
+  return response.data;
+};
+
+export const adjustInventoryStock = async (data: {
+  productId: string;
+  quantity: number;
+  type: 'IN' | 'OUT';
+  reason?: string;
+  note?: string;
+}) => {
+  const response = await api.post('/inventory/adjust', data);
+  return response.data;
+};
+
 export default api;
