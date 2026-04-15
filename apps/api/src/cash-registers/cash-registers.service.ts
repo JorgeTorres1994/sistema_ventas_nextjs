@@ -1,98 +1,110 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../prisma.service.js';
 
 @Injectable()
 export class CashRegistersService {
-    constructor(private prisma: PrismaService) {}
+    constructor(private prisma: PrismaService) { }
 
     async openRegister(userId: string, openingBalance: number, notes?: string) {
-        // Check if there's already an open register for this user
-        const existingOpen = await this.prisma.cashRegister.findFirst({
+        const active = await this.prisma.cashRegister.findFirst({
             where: { userId, status: 'OPEN' }
         });
 
-        if (existingOpen) {
-            throw new BadRequestException('El usuario ya tiene un turno de caja abierto.');
+        if (active) {
+            throw new BadRequestException('Ya existe una caja abierta para este usuario.');
         }
 
         return this.prisma.cashRegister.create({
             data: {
                 userId,
                 openingBalance,
-                notes
+                notes,
+                status: 'OPEN',
             }
         });
     }
 
     async getCurrentRegister(userId: string) {
-        return this.prisma.cashRegister.findFirst({
+        const register = await this.prisma.cashRegister.findFirst({
             where: { userId, status: 'OPEN' },
             include: {
-                sales: {
-                    include: { items: true, customer: true }
-                }
-            }
-        });
-    }
-
-    async getRegisterSummary(id: string) {
-        const register = await this.prisma.cashRegister.findUnique({
-            where: { id },
-            include: {
-                sales: {
-                    include: { payments: true }
+                cashMovements: {
+                    orderBy: { createdAt: 'desc' }
                 }
             }
         });
 
-        if (!register) throw new NotFoundException('Caja no encontrada.');
+        if (!register) return null;
 
-        // Calculate expected balance: openingBalance + all cash sales payments amount
-        let cashSalesSum = 0;
-        let cardSalesSum = 0;
+        // Calculate current balances from movements
+        const movements = await this.prisma.cashMovement.findMany({
+            where: { cashRegisterId: register.id }
+        });
 
-        for (const sale of register.sales) {
-            for (const payment of sale.payments) {
-                const amount = Number(payment.amount);
-                if (payment.method === 'EFECTIVO' || payment.method === 'CASH') {
-                    cashSalesSum += amount;
-                } else {
-                    cardSalesSum += amount;
-                }
-            }
-        }
+        const totalIn = movements
+            .filter(m => m.type === 'IN')
+            .reduce((sum, m) => sum + Number(m.amount), 0);
+        const totalOut = movements
+            .filter(m => m.type === 'OUT')
+            .reduce((sum, m) => sum + Number(m.amount), 0);
 
-        const expectedBalance = Number(register.openingBalance) + cashSalesSum;
+        const currentBalance = Number(register.openingBalance) + totalIn - totalOut;
 
         return {
             ...register,
-            calculatedExpectedBalance: expectedBalance,
-            cashSalesSum,
-            cardSalesSum,
-            totalSalesCount: register.sales.length
+            currentBalance,
+            totalIn,
+            totalOut
         };
     }
 
-    async closeRegister(id: string, closingBalance: number, notes?: string) {
-        const summary = await this.getRegisterSummary(id);
-        
-        if (summary.status === 'CLOSED') {
-            throw new BadRequestException('Esta caja ya está cerrada.');
+    async addMovement(userId: string, data: { type: 'IN' | 'OUT'; amount: number; description: string }) {
+        const register = await this.prisma.cashRegister.findFirst({
+            where: { userId, status: 'OPEN' }
+        });
+
+        if (!register) {
+            throw new BadRequestException('Debes abrir la caja antes de registrar movimientos.');
         }
 
-        // Append closing notes if any
-        const newNotes = summary.notes 
-            ? `${summary.notes}\n[CIERRE]: ${notes || ''}` 
-            : `[CIERRE]: ${notes || ''}`;
+        return this.prisma.cashMovement.create({
+            data: {
+                cashRegisterId: register.id,
+                type: data.type,
+                amount: data.amount,
+                description: data.description,
+            }
+        });
+    }
+
+    async getMovements(userId: string) {
+        const register = await this.prisma.cashRegister.findFirst({
+            where: { userId, status: 'OPEN' }
+        });
+
+        if (!register) return [];
+
+        return this.prisma.cashMovement.findMany({
+            where: { cashRegisterId: register.id },
+            orderBy: { createdAt: 'desc' }
+        });
+    }
+
+    async closeRegister(userId: string, closingBalance: number, notes?: string) {
+        const status = await this.getCurrentRegister(userId);
+        
+        if (!status) {
+            throw new BadRequestException('No hay ninguna caja abierta para cerrar.');
+        }
 
         return this.prisma.cashRegister.update({
-            where: { id },
+            where: { id: status.id },
             data: {
                 status: 'CLOSED',
                 closingDate: new Date(),
                 closingBalance,
-                expectedBalance: summary.calculatedExpectedBalance,
-                notes: newNotes.trim()
+                expectedBalance: status.currentBalance,
+                notes: notes ? `${status.notes || ''} | [CIERRE]: ${notes}` : status.notes
             }
         });
     }

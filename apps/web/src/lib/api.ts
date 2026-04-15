@@ -312,7 +312,29 @@ export const createPurchase = async (data: {
   shippingCost: number;
   total: number;
 }) => {
-  const response = await api.post('/purchases', data);
+// ── Cash Register ──────────────────────────────────────────────────────────────
+export const getCashStatus = async () => {
+  const response = await api.get('/cash');
+  return response.data;
+};
+
+export const openCash = async (data: { openingBalance: number; notes?: string }) => {
+  const response = await api.post('/cash/open', data);
+  return response.data;
+};
+
+export const closeCash = async (data: { closingBalance: number; notes?: string }) => {
+  const response = await api.post('/cash/close', data);
+  return response.data;
+};
+
+export const getCashMovements = async () => {
+  const response = await api.get('/cash/movements');
+  return response.data;
+};
+
+export const createCashMovement = async (data: { type: 'IN' | 'OUT'; amount: number; description: string }) => {
+  const response = await api.post('/cash/movements', data);
   return response.data;
 };
 

@@ -1,9 +1,13 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service.js';
+import { CashRegistersService } from '../cash-registers/cash-registers.service.js';
 
 @Injectable()
 export class SalesService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private cashService: CashRegistersService
+    ) { }
 
     async createSale(
         userId: string,
@@ -97,7 +101,7 @@ export class SalesService {
                 const taxAmount = total - subtotal;
 
                 // 4. Create the sale and its items
-                return tx.sale.create({
+                const sale = await tx.sale.create({
                     data: {
                         userId,
                         customerId: finalCustomerId,
@@ -123,6 +127,20 @@ export class SalesService {
                         customer: true,
                     },
                 });
+
+                // 5. If payment is in CASH, log automatic movement
+                if ((paymentMethod === 'CASH' || paymentMethod === 'EFECTIVO') && finalAmountPaid > 0) {
+                    await tx.cashMovement.create({
+                        data: {
+                            cashRegisterId: openRegister.id,
+                            type: 'IN',
+                            amount: finalAmountPaid,
+                            description: `Venta POS #${sale.id.slice(0, 8).toUpperCase()}`,
+                        }
+                    });
+                }
+
+                return sale;
             });
         } catch (error) {
             console.error('Error in createSale:', error);
@@ -242,6 +260,25 @@ export class SalesService {
                         referenceId: sale.id,
                     },
                 });
+            }
+
+            // 3. If it was a CASH sale, register reversal movement
+            const cashPayment = sale.payments?.find(p => p.method === 'CASH' || p.method === 'EFECTIVO');
+            if (cashPayment && Number(cashPayment.amount) > 0) {
+                const openRegister = await tx.cashRegister.findFirst({
+                    where: { userId: sale.userId, status: 'OPEN' }
+                });
+                
+                if (openRegister) {
+                    await tx.cashMovement.create({
+                        data: {
+                            cashRegisterId: openRegister.id,
+                            type: 'OUT',
+                            amount: cashPayment.amount,
+                            description: `Anulación Venta #${sale.id.slice(0, 8).toUpperCase()}`,
+                        }
+                    });
+                }
             }
 
             return { message: 'Venta anulada exitosamente' };

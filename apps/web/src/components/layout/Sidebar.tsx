@@ -24,6 +24,7 @@ const Sidebar = () => {
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
     { name: 'Terminal POS', icon: MonitorSmartphone, path: '/pos' },
+    { name: 'Cash Register', icon: Wallet, path: '/cash' },
     { name: 'Sales', icon: Wallet, path: '/sales' },
     { name: 'Purchases', icon: ShoppingCart, path: '/purchases' },
     { name: 'Customers', icon: Users2, path: '/customers' },
