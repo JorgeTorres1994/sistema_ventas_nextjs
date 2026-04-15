@@ -15,6 +15,7 @@ import { PurchasesModule } from './purchases/purchases.module.js';
 import { CashierModule } from './cashier/cashier.module.js';
 import { CashRegistersModule } from './cash-registers/cash-registers.module.js';
 import { InventoryModule } from './inventory/inventory.module.js';
+import { SettingsModule } from './settings/settings.module.js';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { InventoryModule } from './inventory/inventory.module.js';
     CashierModule,
     CashRegistersModule,
     InventoryModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

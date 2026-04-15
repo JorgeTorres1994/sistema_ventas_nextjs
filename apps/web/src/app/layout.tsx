@@ -12,6 +12,8 @@ export const metadata: Metadata = {
   description: "Precision tools for the digital era.",
 };
 
+import { SettingsProvider } from "@/components/SettingsProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -25,7 +27,11 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        <SettingsProvider>
+          {children}
+        </SettingsProvider>
+      </body>
     </html>
   );
 }

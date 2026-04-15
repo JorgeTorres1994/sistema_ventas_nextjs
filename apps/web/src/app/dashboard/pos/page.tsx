@@ -6,6 +6,7 @@ import PosTopBar from '@/components/pos/PosTopBar';
 import PosProductGrid from '@/components/pos/PosProductGrid';
 import PosCartPanel from '@/components/pos/PosCartPanel';
 import { getProducts, createSale } from '@/lib/api';
+import { useSettings } from '@/components/SettingsProvider';
 
 interface Product {
   id: string;
@@ -96,6 +97,8 @@ export default function PosPage() {
     setTimeout(() => setNotification(null), 3000);
   };
 
+  const { settings } = useSettings();
+
   const handleCompleteSale = async () => {
     setIsProcessing(true);
     try {
@@ -105,7 +108,7 @@ export default function PosPage() {
       }));
       
       const subtotal = cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
-      const taxRate = 0.08; 
+      const taxRate = (settings?.taxRate || 18) / 100; 
       const total = subtotal + (subtotal * taxRate);
 
       // We explicitly bypass customer requirement in UI, backend fallback will handle it

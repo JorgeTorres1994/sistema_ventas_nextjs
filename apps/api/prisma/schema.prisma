@@ -218,3 +218,24 @@ model AuditLog {
 
   user           User?     @relation(fields: [userId], references: [id])
 }
+
+model Setting {
+  id           String   @id @default(uuid())
+  businessName String?  @default("Lumen Ledger")
+  logoUrl      String?
+  address      String?
+  phone        String?
+  email        String?
+  taxRate      Decimal  @default(18) @db.Decimal(5, 2)
+  currency     String   @default("USD")
+  dateFormat   String   @default("MM/DD/YYYY")
+  updatedAt    DateTime @updatedAt
+}
+
+model PaymentMethod {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

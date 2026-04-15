@@ -1,28 +1,4 @@
-import React from 'react';
-
-interface Product {
-  id: string;
-  name: string;
-  price: string | number;
-  imageUrl?: string;
-  stock: number;
-}
-
-interface CartItem {
-  product: Product;
-  quantity: number;
-}
-
-interface PosCartPanelProps {
-  cart: CartItem[];
-  paymentMethod: string;
-  setPaymentMethod: (method: string) => void;
-  onClearCart: () => void;
-  onUpdateQuantity: (productId: string, delta: number) => void;
-  onRemoveItem: (productId: string) => void;
-  onCompleteSale: () => void;
-  isProcessing: boolean;
-}
+import { useSettings } from '@/components/SettingsProvider';
 
 export default function PosCartPanel({
   cart,
@@ -34,10 +10,12 @@ export default function PosCartPanel({
   onCompleteSale,
   isProcessing
 }: PosCartPanelProps) {
+  const { settings, paymentMethods } = useSettings();
+
   // Calculations
   const subtotal = cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
-  const taxRate = 0.08; // 8% exact design match
-  const taxAmount = subtotal * taxRate;
+  const taxPercent = settings?.taxRate || 18;
+  const taxAmount = subtotal * (taxPercent / 100);
   const total = subtotal + taxAmount;
 
   return (
@@ -133,7 +111,7 @@ export default function PosCartPanel({
             <span className="font-bold text-gray-700">${subtotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-between items-center text-sm font-medium text-gray-500">
-            <span>Tax (8%)</span>
+            <span>Tax ({taxPercent}%)</span>
             <span className="font-bold text-gray-700">${taxAmount.toFixed(2)}</span>
           </div>
           <div className="flex justify-between items-end pt-3">
@@ -148,27 +126,21 @@ export default function PosCartPanel({
         <div className="mb-8">
           <p className="text-[10px] font-bold tracking-widest text-gray-500 uppercase mb-3">Payment Method</p>
           <div className="grid grid-cols-3 gap-3">
-            <button
-              onClick={() => setPaymentMethod('CASH')}
-              className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-colors ${paymentMethod === 'CASH' ? 'border-primary bg-primary/5 text-primary' : 'border-white bg-white text-gray-600 hover:border-gray-200 shadow-sm'}`}
-            >
-              <span className="material-symbols-outlined mb-1">payments</span>
-              <span className="text-[11px] font-bold">Cash</span>
-            </button>
-            <button
-              onClick={() => setPaymentMethod('CARD')}
-              className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-colors ${paymentMethod === 'CARD' ? 'border-primary bg-primary/5 text-primary' : 'border-white bg-white text-gray-600 hover:border-gray-200 shadow-sm'}`}
-            >
-              <span className="material-symbols-outlined mb-1">credit_card</span>
-              <span className="text-[11px] font-bold">Card</span>
-            </button>
-            <button
-              onClick={() => setPaymentMethod('DIGITAL')}
-              className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-colors ${paymentMethod === 'DIGITAL' ? 'border-primary bg-primary/5 text-primary' : 'border-white bg-white text-gray-600 hover:border-gray-200 shadow-sm'}`}
-            >
-              <span className="material-symbols-outlined mb-1">account_balance_wallet</span>
-              <span className="text-[11px] font-bold">Digital</span>
-            </button>
+            {paymentMethods.filter(m => m.isActive).map((method) => {
+              const methodKey = method.name === 'Efectivo' ? 'CASH' : method.name === 'Tarjeta' ? 'CARD' : 'DIGITAL';
+              const icon = method.name === 'Efectivo' ? 'payments' : method.name === 'Tarjeta' ? 'credit_card' : 'account_balance_wallet';
+              
+              return (
+                <button
+                  key={method.id}
+                  onClick={() => setPaymentMethod(methodKey)}
+                  className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-colors ${paymentMethod === methodKey ? 'border-primary bg-primary/5 text-primary' : 'border-white bg-white text-gray-600 hover:border-gray-200 shadow-sm'}`}
+                >
+                  <span className="material-symbols-outlined mb-1">{icon}</span>
+                  <span className="text-[11px] font-bold">{method.name === 'Billetera Digital' ? 'Digital' : method.name === 'Tarjeta' ? 'Card' : 'Cash'}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 

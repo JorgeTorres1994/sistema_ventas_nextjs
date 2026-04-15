@@ -363,4 +363,34 @@ export const getReportsTransactions = async (params: any) => {
   return response.data;
 };
 
+// ── Settings ────────────────────────────────────────────────────────────────
+export const getSettings = async () => {
+  const response = await api.get('/settings');
+  return response.data;
+};
+
+export const updateSettings = async (data: any) => {
+  const response = await api.put('/settings', data);
+  return response.data;
+};
+
+export const getPaymentMethods = async () => {
+  const response = await api.get('/settings/payment-methods');
+  return response.data;
+};
+
+export const togglePaymentMethod = async (id: string) => {
+  const response = await api.patch(`/settings/payment-methods/${id}/toggle`);
+  return response.data;
+};
+
+export const uploadSettingsLogo = async (file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await api.post('/settings/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+};
+
 export default api;

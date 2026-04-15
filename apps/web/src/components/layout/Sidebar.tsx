@@ -18,8 +18,11 @@ import {
   Building2
 } from 'lucide-react';
 
+import { useSettings } from '../SettingsProvider';
+
 const Sidebar = () => {
   const pathname = usePathname();
+  const { settings } = useSettings();
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
@@ -39,11 +42,17 @@ const Sidebar = () => {
     <aside className="w-64 border-r border-[#E5E7EB] h-screen bg-[#F9FAFB] flex flex-col justify-between fixed left-0 top-0">
       <div>
         <div className="flex items-center gap-3 p-6 mb-2">
-          <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
-            <BarChart3 className="text-white w-6 h-6" />
-          </div>
+          {settings?.logoUrl ? (
+            <img src={`http://localhost:3005${settings.logoUrl}`} alt="Logo" className="w-10 h-10 rounded-lg object-cover" />
+          ) : (
+            <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
+              <BarChart3 className="text-white w-6 h-6" />
+            </div>
+          )}
           <div>
-            <h1 className="font-bold text-[#111827] text-lg leading-tight">Analytics Pro</h1>
+            <h1 className="font-bold text-[#111827] text-md leading-tight truncate w-32" title={settings?.businessName || 'Analytics Pro'}>
+              {settings?.businessName || 'Analytics Pro'}
+            </h1>
             <p className="text-sm text-[#6B7280]">Enterprise Plan</p>
           </div>
         </div>
@@ -71,10 +80,16 @@ const Sidebar = () => {
       </div>
 
       <div className="p-4 border-t border-[#E5E7EB] space-y-1">
-        <div className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer text-[#4B5563] hover:bg-gray-100 hover:text-[#111827] transition-colors">
-          <Settings className="w-5 h-5 text-[#6B7280]" />
-          <span className="text-[15px]">Settings</span>
-        </div>
+        <Link href="/dashboard/settings">
+          <div className={`flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-colors ${
+            pathname === '/dashboard/settings'
+              ? 'bg-[#E0E7FF] text-blue-700 font-medium'
+              : 'text-[#4B5563] hover:bg-gray-100 hover:text-[#111827]'
+          }`}>
+            <Settings className={`w-5 h-5 ${pathname === '/dashboard/settings' ? 'text-blue-600' : 'text-[#6B7280]'}`} />
+            <span className="text-[15px]">Settings</span>
+          </div>
+        </Link>
         <div 
           onClick={() => {
             localStorage.removeItem('token');
