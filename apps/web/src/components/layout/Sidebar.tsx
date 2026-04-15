@@ -25,7 +25,7 @@ const Sidebar = () => {
     { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
     { name: 'Terminal POS', icon: MonitorSmartphone, path: '/pos' },
     { name: 'Sales', icon: Wallet, path: '/sales' },
-    { name: 'Orders', icon: ShoppingCart, path: '/orders' },
+    { name: 'Purchases', icon: ShoppingCart, path: '/purchases' },
     { name: 'Customers', icon: Users2, path: '/customers' },
     { name: 'Products', icon: Package, path: '/products' },
     { name: 'Inventory', icon: Boxes, path: '/inventory' },

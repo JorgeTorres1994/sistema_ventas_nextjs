@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
-import { PurchasesService } from './purchases.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Controller, Get, Post, Body, Param, UseGuards, Query } from '@nestjs/common';
+import { PurchasesService } from './purchases.service.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 
 @Controller('purchases')
 @UseGuards(JwtAuthGuard)
@@ -8,13 +8,33 @@ export class PurchasesController {
     constructor(private readonly purchasesService: PurchasesService) { }
 
     @Post()
-    create(@Body() createPurchaseDto: any) {
+    create(@Body() createPurchaseDto: {
+        supplierId: string;
+        items: { productId: string; quantity: number; costPrice: number }[];
+        status?: 'PENDING' | 'COMPLETED' | 'CANCELLED';
+    }) {
         return this.purchasesService.create(createPurchaseDto);
     }
 
     @Get()
-    findAll() {
-        return this.purchasesService.findAll();
+    findAll(
+        @Query('page') page: string = '1',
+        @Query('limit') limit: string = '10',
+        @Query('status') status?: string,
+        @Query('supplierId') supplierId?: string,
+        @Query('search') search?: string,
+        @Query('startDate') startDate?: string,
+        @Query('endDate') endDate?: string,
+    ) {
+        return this.purchasesService.findAll({
+            page: Number(page),
+            limit: Number(limit),
+            status,
+            supplierId,
+            search,
+            startDate,
+            endDate,
+        });
     }
 
     @Get(':id')

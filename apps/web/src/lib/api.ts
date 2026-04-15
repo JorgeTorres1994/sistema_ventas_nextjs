@@ -281,4 +281,33 @@ export const toggleSupplierStatus = async (id: string) => {
   return response.data;
 };
 
+// --- Purchase Management ---
+
+export const getPurchases = async (params: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    supplierId?: string;
+    search?: string;
+    startDate?: string;
+    endDate?: string;
+} = {}) => {
+  const response = await api.get('/purchases', { params });
+  return response.data;
+};
+
+export const getPurchaseById = async (id: string) => {
+  const response = await api.get(`/purchases/${id}`);
+  return response.data;
+};
+
+export const createPurchase = async (data: {
+  supplierId: string;
+  items: { productId: string; quantity: number; costPrice: number }[];
+  status?: 'PENDING' | 'COMPLETED' | 'CANCELLED';
+}) => {
+  const response = await api.post('/purchases', data);
+  return response.data;
+};
+
 export default api;
