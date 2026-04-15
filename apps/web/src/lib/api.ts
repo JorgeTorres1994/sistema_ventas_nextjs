@@ -243,4 +243,42 @@ export const toggleCustomerStatus = async (id: string) => {
   return response.data;
 };
 
+// --- Supplier Management ---
+
+export const getSuppliers = async (params: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  isActive?: boolean;
+} = {}) => {
+  const response = await api.get('/suppliers', { params });
+  return response.data;
+};
+
+export const getSupplierById = async (id: string) => {
+  const response = await api.get(`/suppliers/${id}`);
+  return response.data;
+};
+
+export const createSupplier = async (data: {
+  name: string;
+  dniRuc: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+}) => {
+  const response = await api.post('/suppliers', data);
+  return response.data;
+};
+
+export const updateSupplier = async (id: string, data: any) => {
+  const response = await api.patch(`/suppliers/${id}`, data);
+  return response.data;
+};
+
+export const toggleSupplierStatus = async (id: string) => {
+  const response = await api.patch(`/suppliers/${id}/status`);
+  return response.data;
+};
+
 export default api;

@@ -14,7 +14,8 @@ import {
   Settings,
   MonitorSmartphone,
   Boxes,
-  Users2
+  Users2,
+  Building2
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -28,6 +29,7 @@ const Sidebar = () => {
     { name: 'Customers', icon: Users2, path: '/customers' },
     { name: 'Products', icon: Package, path: '/products' },
     { name: 'Inventory', icon: Boxes, path: '/inventory' },
+    { name: 'Suppliers', icon: Building2, path: '/suppliers' },
     { name: 'Analytics', icon: BarChart3, path: '/analytics' },
     { name: 'Reports', icon: FileText, path: '/reports' },
   ];

@@ -168,6 +168,25 @@ async function main() {
     console.log(`Customer ensured: ${c.name}`);
   }
 
+  // 3b. Demo Suppliers
+  const demoSuppliers = [
+    { name: 'Lumina Tech Solutions', dniRuc: '20534219800', email: 's.jenkins@lumina.io', phone: '+1 415 555 0100', address: 'Silicon Valley, CA' },
+    { name: 'Vanguard Apparel', dniRuc: '20455588301', email: 'm.rossi@vanguard.co', phone: '+39 06 6869101', address: 'Via Roma, Milan', isActive: false },
+    { name: 'Nexus Logistics', dniRuc: '20199944011', email: 'e.vance@nexus.com', phone: '+44 20 7946 0958', address: 'London, UK' },
+    { name: 'Aether Optics', dniRuc: '20938477544', email: 'wu.d@aether.net', phone: '+86 10 5555 0000', address: 'Beijing, China' },
+  ];
+
+  const supplierRecords: any[] = [];
+  for (const s of demoSuppliers) {
+    const record = await prisma.supplier.upsert({
+      where: { dniRuc: s.dniRuc },
+      update: {},
+      create: { ...s },
+    });
+    supplierRecords.push(record);
+    console.log(`Supplier ensured: ${s.name}`);
+  }
+
   // 4. Ensure a User exists to assign the Sale
   let defaultUser = await prisma.user.findFirst();
   if (!defaultUser) {
@@ -204,6 +223,40 @@ async function main() {
                     ]
                 }
             } as any
+        });
+    }
+  }
+
+  // 6. Create some dummy Purchases for Suppliers to show stats
+  const lumina = supplierRecords.find(s => s.name === 'Lumina Tech Solutions');
+  
+  if (lumina && products.length > 0) {
+    const existingPurchase = await prisma.purchase.findFirst({ where: { supplierId: lumina.id } });
+    if (!existingPurchase) {
+        console.log('Creating demo purchase for Lumina...');
+        await prisma.purchase.create({
+            data: {
+                supplierId: lumina.id,
+                total: 12400.00,
+                status: 'COMPLETED',
+                items: {
+                    create: [
+                        { productId: products[0].id, quantity: 50, costPrice: 150.00 },
+                    ]
+                }
+            }
+        });
+        await prisma.purchase.create({
+            data: {
+                supplierId: lumina.id,
+                total: 4250.00,
+                status: 'PENDING',
+                items: {
+                    create: [
+                        { productId: products[1].id, quantity: 10, costPrice: 425.00 },
+                    ]
+                }
+            }
         });
     }
   }
