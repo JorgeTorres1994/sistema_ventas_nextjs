@@ -148,6 +148,66 @@ async function main() {
     }
   }
 
+  // 3. Demo Customers
+  const demoCustomers = [
+    { name: 'Elena Rodriguez', dni: '48.291.002-K', email: 'elena.rod@example.com', phone: '+34 612 901 882', address: 'Calle Mayor 12, Madrid' },
+    { name: 'Marcus Thorne', dni: '33.551.990-A', email: 'm.thorne@tech-sphere.io', phone: '+44 7700 90021', address: '221B Baker St, London' },
+    { name: 'Sarah Jenkins', dni: '19.202.445-Z', email: 's.jenkins@creative.com', phone: '+1 212 555 0198', address: '5th Ave 101, New York' },
+    { name: 'Dr. Linda Gray', dni: '10.003.882-M', email: 'linda.gray@medical.org', phone: '+49 30 1234567', address: 'Alexanderplatz 1, Berlin' },
+    { name: 'Julianne Sterling', dni: '45.112.887-L', email: 'j.sterling@lumen.io', phone: '+1 (555) 902-4411', address: 'Silicon Valley, CA' },
+  ];
+
+  const customerRecords: any[] = [];
+  for (const c of demoCustomers) {
+    const record = await prisma.customer.upsert({
+      where: { dni: c.dni },
+      update: {},
+      create: { ...c, isActive: true },
+    });
+    customerRecords.push(record);
+    console.log(`Customer ensured: ${c.name}`);
+  }
+
+  // 4. Ensure a User exists to assign the Sale
+  let defaultUser = await prisma.user.findFirst();
+  if (!defaultUser) {
+    defaultUser = await prisma.user.create({
+      data: {
+        email: 'admin@nexus.com',
+        password: 'password123', // In a real app use hashing, but for seed it works
+        name: 'Super Admin',
+        role: 'ADMIN',
+      }
+    });
+    console.log('Created default admin user for seeding.');
+  }
+
+  // 5. Create some dummy Sales/Movements so metrics show up
+  const products = await prisma.product.findMany();
+  const elena = customerRecords.find(c => c.name === 'Elena Rodriguez');
+  
+  if (elena && products.length > 0) {
+    const existingSale = await prisma.sale.findFirst({ where: { customerId: elena.id } });
+    if (!existingSale) {
+        console.log('Creating demo sale for Elena...');
+        await prisma.sale.create({
+            data: {
+                customerId: elena.id,
+                userId: defaultUser.id,
+                total: 1299.00,
+                amountPaid: 1299.00,
+                status: 'PAID', // Correct PaymentStatus enum
+                items: {
+                    create: [
+                        { productId: products[0].id, quantity: 1, price: products[0].price },
+                        { productId: products[1].id, quantity: 1, price: products[1].price },
+                    ]
+                }
+            } as any
+        });
+    }
+  }
+
   console.log('Seeding complete!');
 }
 
