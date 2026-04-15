@@ -342,4 +342,25 @@ export const createCashMovement = async (data: { type: 'IN' | 'OUT'; amount: num
   return response.data;
 };
 
+// ── Reports ──────────────────────────────────────────────────────────────────
+export const getReportsSummary = async (params: any) => {
+  const response = await api.get('/reports/summary', { params });
+  return response.data;
+};
+
+export const getReportsCharts = async (params: any) => {
+  const response = await api.get('/reports/charts', { params });
+  return response.data;
+};
+
+export const getReportsTopProducts = async (params: any) => {
+  const response = await api.get('/reports/top-products', { params });
+  return response.data;
+};
+
+export const getReportsTransactions = async (params: any) => {
+  const response = await api.get('/reports/transactions', { params });
+  return response.data;
+};
+
 export default api;

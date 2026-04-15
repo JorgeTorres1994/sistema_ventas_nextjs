@@ -5,120 +5,153 @@ import { PrismaService } from '../prisma.service.js';
 export class ReportsService {
     constructor(private prisma: PrismaService) { }
 
-    async getDashboardStats() {
-        const currentDate = new Date();
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(currentDate.getDate() - 30);
-        
-        const sixtyDaysAgo = new Date();
-        sixtyDaysAgo.setDate(currentDate.getDate() - 60);
+    async getSummary(filters: { startDate?: string; endDate?: string; type?: string; customerId?: string }) {
+        const { where } = this.getFilters(filters);
 
-        // Fetch sales for current period (last 30 days) and previous period (days 30-60)
-        const [currentSales, previousSales, categoryStats, recentSalesData] = await Promise.all([
-            this.prisma.sale.findMany({
-                where: { createdAt: { gte: thirtyDaysAgo } },
-            }),
-            this.prisma.sale.findMany({
-                where: { createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } },
-            }),
-            this.prisma.saleItem.groupBy({
-                by: ['productId'],
-                _sum: { quantity: true, price: true },
-            }),
-            // Recent orders mapped with relation
-            this.prisma.sale.findMany({
-                take: 5,
-                orderBy: { createdAt: 'desc' },
-                include: {
-                    customer: { select: { name: true } },
-                    items: {
-                        include: { product: { select: { name: true } } }
-                    }
-                }
-            })
-        ]);
+        const sales = await this.prisma.sale.findMany({
+            where,
+            include: {
+                items: { include: { product: true } }
+            }
+        });
 
-        // Calculate KPI values
-        const currentRevenue = currentSales.reduce((acc, sale) => acc + Number(sale.total), 0);
-        const previousRevenue = previousSales.reduce((acc, sale) => acc + Number(sale.total), 0);
-        const revenueGrowth = previousRevenue === 0 ? 12.5 : ((currentRevenue - previousRevenue) / previousRevenue) * 100;
+        let totalRevenue = 0;
+        let totalProfit = 0;
+        let totalItems = 0;
 
-        const currentOrders = currentSales.length;
-        const previousOrders = previousSales.length;
-        const ordersGrowth = previousOrders === 0 ? 8.2 : ((currentOrders - previousOrders) / previousOrders) * 100;
+        sales.forEach(sale => {
+            totalRevenue += Number(sale.total);
+            sale.items.forEach(item => {
+                totalItems += item.quantity;
+                const cost = Number(item.product.purchasePrice || 0);
+                totalProfit += (Number(item.price) - cost) * item.quantity;
+            });
+        });
 
-        const currentAvgOrder = currentOrders > 0 ? currentRevenue / currentOrders : 0;
-        const previousAvgOrder = previousOrders > 0 ? previousRevenue / previousOrders : 0;
-        const avgOrderGrowth = previousAvgOrder === 0 ? 4.3 : ((currentAvgOrder - previousAvgOrder) / previousAvgOrder) * 100;
-
-        // Mock conversion rate for aesthetic purposes as typical in dashboards
-        const conversionRate = 3.24;
-        const conversionRateGrowth = -1.1;
-
-        // Revenue Breakdown (Group by Categories manually since we need deep joins)
-        const productsList = await this.prisma.product.findMany({ include: { category: true } });
-        const productMap = new Map();
-        productsList.forEach(p => productMap.set(p.id, p));
-
-        const categoryRevenue = new Map<string, number>();
-        for (const stat of categoryStats) {
-            const productInfo = productMap.get(stat.productId);
-            const categoryName = productInfo?.category?.name || 'Uncategorized';
-            const currentTotal = categoryRevenue.get(categoryName) || 0;
-            const itemRevenue = (stat._sum.quantity || 0) * Number(stat._sum.price || 0);
-            categoryRevenue.set(categoryName, currentTotal + itemRevenue);
-        }
-
-        let formattedBreakdown = Array.from(categoryRevenue.entries())
-            .map(([name, value]) => ({ name, value }))
-            .sort((a, b) => b.value - a.value);
-
-        // Provide fallback data if no category sales yet
-        if (formattedBreakdown.length === 0) {
-            formattedBreakdown = [
-                { name: 'Online Sales', value: 55 },
-                { name: 'In-Store', value: 25 },
-                { name: 'Delivery', value: 12 },
-                { name: 'Subscription', value: 8 }
-            ];
-        } else {
-             formattedBreakdown = formattedBreakdown.slice(0, 4); // Top 4
-        }
-
-        // Process Sales Line Chart (Last 7 days mock vs previous 7 for the curve visually identical to design)
-        const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
-        const curvePointsCurrent = [2400, 3800, 2600, 5200, 2000, 6800, 4800];
-        const curvePointsPrevious = [2800, 3200, 2700, 4800, 2500, 3800, 3000];
-        
-        const weeklyData = days.map((day, i) => ({
-            day,
-            current: curvePointsCurrent[i],
-            previous: curvePointsPrevious[i],
-        }));
-
-        const recentOrders = recentSalesData.map(sale => ({
-            id: `#ORD-${sale.id.substring(0, 4).toUpperCase()}`,
-            customer: sale.customer?.name || 'Walk-in Customer',
-            product: sale.items[0]?.product?.name || 'Multiple Products',
-            amount: Number(sale.total),
-            status: sale.status,
-            date: sale.createdAt
-        }));
+        const avgTicket = sales.length > 0 ? totalRevenue / sales.length : 0;
 
         return {
-            kpis: {
-                revenue: currentRevenue || 128430.00,
-                revenueGrowth,
-                orders: currentOrders || 4320,
-                ordersGrowth,
-                conversionRate,
-                conversionRateGrowth,
-                avgOrderValue: currentAvgOrder || 29.72,
-                avgOrderGrowth
-            },
-            revenueBreakdown: formattedBreakdown,
-            salesOverTime: weeklyData,
-            recentOrders
+            totalSales: sales.length,
+            totalRevenue,
+            totalProfit,
+            avgTicket,
+            totalItems
         };
+    }
+
+    async getCharts(filters: { startDate?: string; endDate?: string }) {
+        const { where } = this.getFilters(filters);
+        
+        const sales = await this.prisma.sale.findMany({
+            where,
+            include: { 
+                items: { include: { product: true } },
+                payments: true
+            },
+            orderBy: { createdAt: 'asc' }
+        });
+
+        // 1. Sales & Profit over time (Daily)
+        const dailyMap = new Map();
+        sales.forEach(sale => {
+            const date = sale.createdAt ? new Date(sale.createdAt).toISOString().split('T')[0] : 'Unknown';
+            const current = dailyMap.get(date) || { date, revenue: 0, profit: 0, volume: 0 };
+            
+            const revenue = Number(sale.total);
+            let profit = 0;
+            sale.items.forEach(item => {
+                const cost = Number(item.product.purchasePrice || 0);
+                profit += (Number(item.price) - cost) * item.quantity;
+            });
+
+            current.revenue += revenue;
+            current.profit += profit;
+            current.volume += 1;
+            dailyMap.set(date, current);
+        });
+
+        // 2. Revenue Distribution by payment method
+        const paymentMap = new Map();
+        sales.forEach(sale => {
+            sale.payments.forEach(p => {
+                const method = p.method || 'CASH';
+                const current = paymentMap.get(method) || 0;
+                paymentMap.set(method, current + Number(p.amount));
+            });
+        });
+
+        return {
+            performance: Array.from(dailyMap.values()),
+            distribution: Array.from(paymentMap.entries()).map(([name, value]) => ({ name, value }))
+        };
+    }
+
+    async getTopProducts(filters: { startDate?: string; endDate?: string }) {
+        const { where } = this.getFilters(filters);
+
+        const saleItems = await this.prisma.saleItem.findMany({
+            where: { sale: where },
+            include: { product: true }
+        });
+
+        const productMap = new Map();
+        saleItems.forEach(item => {
+            const current = productMap.get(item.productId) || { 
+                name: item.product.name, 
+                revenue: 0, 
+                quantity: 0 
+            };
+            current.revenue += Number(item.price) * item.quantity;
+            current.quantity += item.quantity;
+            productMap.set(item.productId, current);
+        });
+
+        return Array.from(productMap.values())
+            .sort((a, b) => b.revenue - a.revenue)
+            .slice(0, 5);
+    }
+
+    async getTransactions(filters: { startDate?: string; endDate?: string }) {
+        const { where } = this.getFilters(filters);
+
+        return this.prisma.sale.findMany({
+            where,
+            take: 10,
+            orderBy: { total: 'desc' },
+            include: {
+                customer: { select: { name: true } },
+                items: {
+                    take: 1,
+                    include: { product: { include: { category: true } } }
+                }
+            }
+        }).then(sales => sales.map(s => ({
+            id: s.id,
+            date: s.createdAt,
+            customer: s.customer?.name || 'Final Consumer',
+            category: s.items[0]?.product?.category?.name || 'General',
+            amount: Number(s.total),
+            status: s.status
+        })));
+    }
+
+    private getFilters(filters: any) {
+        const where: any = {};
+        if (filters.startDate || filters.endDate) {
+            where.createdAt = {};
+            if (filters.startDate) where.createdAt.gte = new Date(filters.startDate);
+            if (filters.endDate) {
+                const end = new Date(filters.endDate);
+                end.setHours(23, 59, 59, 999);
+                where.createdAt.lte = end;
+            }
+        }
+        if (filters.customerId) where.customerId = filters.customerId;
+        return { where };
+    }
+
+    // Retain legacy for dashboard if needed
+    async getDashboardStats() {
+        return this.getSummary({ startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() });
     }
 }
