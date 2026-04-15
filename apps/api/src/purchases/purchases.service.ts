@@ -9,8 +9,18 @@ export class PurchasesService {
         supplierId: string;
         items: { productId: string; quantity: number; costPrice: number }[];
         status?: 'PENDING' | 'COMPLETED' | 'CANCELLED';
+        notes?: string;
+        expectedDelivery?: string;
+        shippingCost?: number;
+        taxAmount?: number;
+        subtotal?: number;
+        total: number;
     }) {
-        const { supplierId, items, status = 'COMPLETED' } = data;
+        const { 
+            supplierId, items, status = 'COMPLETED', 
+            notes, expectedDelivery, shippingCost = 0, 
+            taxAmount = 0, subtotal = 0, total 
+        } = data;
 
         if (!items || items.length === 0) {
             throw new BadRequestException('At least one product is required to register a purchase');
@@ -18,14 +28,17 @@ export class PurchasesService {
 
         // Use a transaction to ensure atomic updates across multiple tables
         return this.prisma.$transaction(async (tx) => {
-            const total = items.reduce((sum, item) => sum + (item.quantity * item.costPrice), 0);
-
             // 1. Create the Purchase record
             const purchase = await tx.purchase.create({
                 data: {
                     supplierId,
                     total,
+                    subtotal,
+                    taxAmount,
+                    shippingCost,
                     status,
+                    notes,
+                    expectedDelivery: expectedDelivery ? new Date(expectedDelivery) : null,
                     items: {
                         create: items.map((item) => ({
                             productId: item.productId,
@@ -44,7 +57,7 @@ export class PurchasesService {
             if (status === 'COMPLETED') {
                 for (const item of items) {
                     // 2. Update Product stock and last purchase price
-                    const product = await tx.product.update({
+                    await tx.product.update({
                         where: { id: item.productId },
                         data: {
                             stock: { increment: item.quantity },
@@ -123,7 +136,9 @@ export class PurchasesService {
                 supplier: true,
                 items: {
                     include: {
-                        product: { select: { name: true, imageUrl: true } }
+                        product: { 
+                            include: { category: true }
+                        }
                     },
                 },
             },

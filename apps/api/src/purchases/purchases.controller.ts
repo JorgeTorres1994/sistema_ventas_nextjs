@@ -12,6 +12,12 @@ export class PurchasesController {
         supplierId: string;
         items: { productId: string; quantity: number; costPrice: number }[];
         status?: 'PENDING' | 'COMPLETED' | 'CANCELLED';
+        notes?: string;
+        expectedDelivery?: string;
+        shippingCost?: number;
+        taxAmount?: number;
+        subtotal?: number;
+        total: number;
     }) {
         return this.purchasesService.create(createPurchaseDto);
     }

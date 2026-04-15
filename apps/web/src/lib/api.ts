@@ -305,6 +305,12 @@ export const createPurchase = async (data: {
   supplierId: string;
   items: { productId: string; quantity: number; costPrice: number }[];
   status?: 'PENDING' | 'COMPLETED' | 'CANCELLED';
+  notes?: string;
+  expectedDelivery?: string;
+  subtotal: number;
+  taxAmount: number;
+  shippingCost: number;
+  total: number;
 }) => {
   const response = await api.post('/purchases', data);
   return response.data;

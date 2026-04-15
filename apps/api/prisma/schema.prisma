@@ -158,12 +158,17 @@ model Payment {
 }
 
 model Purchase {
-  id         String          @id @default(uuid())
-  total      Decimal         @db.Decimal(10, 2)
-  status     PurchaseStatus? @default(COMPLETED)
-  createdAt  DateTime?       @default(now())
-  updatedAt  DateTime        @updatedAt
-  supplierId String
+  id               String          @id @default(uuid())
+  total            Decimal         @db.Decimal(10, 2)
+  subtotal         Decimal?        @default(0) @db.Decimal(10, 2)
+  taxAmount        Decimal?        @default(0) @db.Decimal(10, 2)
+  shippingCost     Decimal?        @default(0) @db.Decimal(10, 2)
+  status           PurchaseStatus? @default(COMPLETED)
+  notes            String?
+  expectedDelivery DateTime?
+  createdAt        DateTime?       @default(now())
+  updatedAt        DateTime        @updatedAt
+  supplierId       String
 
   supplier   Supplier        @relation(fields: [supplierId], references: [id])
   items      PurchaseItem[]
