@@ -56,7 +56,7 @@ export default function SalesSummary({ stats }: SalesSummaryProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-12">
       <SummaryCard 
-        title="Total Revenue" 
+        title="Ingresos Totales" 
         value={`S/ ${stats.totalRevenue.toFixed(2)}`}
         change="+12.5%"
         icon={TrendingUp}
@@ -64,7 +64,7 @@ export default function SalesSummary({ stats }: SalesSummaryProps) {
         iconColor="text-indigo-600"
       />
       <SummaryCard 
-        title="Transactions" 
+        title="Transacciones" 
         value={stats.transactionCount.toString()}
         change="+4.2%"
         icon={ShoppingBag}
@@ -72,7 +72,7 @@ export default function SalesSummary({ stats }: SalesSummaryProps) {
         iconColor="text-orange-600"
       />
       <SummaryCard 
-        title="Average Sale" 
+        title="Venta Promedio" 
         value={`S/ ${stats.avgSale.toFixed(2)}`}
         change="-2.1%"
         isNegative
@@ -81,7 +81,7 @@ export default function SalesSummary({ stats }: SalesSummaryProps) {
         iconColor="text-blue-600"
       />
       <SummaryCard 
-        title="Returns" 
+        title="Cancelaciones" 
         value={stats.returns.toString()}
         change="-8.5%"
         icon={RefreshCcw}

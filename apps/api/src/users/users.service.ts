@@ -42,7 +42,7 @@ export class UsersService {
 
     async toggleStatus(id: string): Promise<User> {
         const user = await this.prisma.user.findUnique({ where: { id } });
-        if (!user) throw new Error('User not found');
+        if (!user) throw new Error('Usuario no encontrado');
         return this.prisma.user.update({
             where: { id },
             data: { isActive: !user.isActive },

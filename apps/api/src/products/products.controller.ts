@@ -30,7 +30,7 @@ export class ProductsController {
     @Get(':id')
     async findOne(@Param('id') id: string) {
         const product = await this.productsService.findOne(id);
-        if (!product) throw new Error('Product not found');
+        if (!product) throw new Error('Producto no encontrado');
         return product;
     }
 

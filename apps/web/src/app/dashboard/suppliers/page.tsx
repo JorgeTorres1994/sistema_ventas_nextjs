@@ -15,21 +15,21 @@ function initials(name: string) {
   return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
 }
 function fmtDate(iso: string) {
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return new Date(iso).toLocaleDateString('es-PE', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 function fmtCurrency(n: number) {
-  return `$${Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+  return `S/ ${Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
 }
 
 // ── Status Badge ───────────────────────────────────────────────────────────────
 function StatusBadge({ isActive }: { isActive: boolean }) {
   return isActive ? (
     <span className="px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center w-max gap-1">
-      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> ACTIVE
+      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> ACTIVO
     </span>
   ) : (
     <span className="px-2.5 py-1 rounded-full text-[11px] font-black bg-amber-50 text-amber-600 border border-amber-100 flex items-center w-max gap-1">
-      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> ON HOLD
+      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> EN ESPERA
     </span>
   );
 }
@@ -115,8 +115,8 @@ function SupplierDetailDrawer({
                 <div className="flex-1 pt-1">
                   <h2 className="text-2xl font-black text-gray-900 leading-tight">{supplier.name}</h2>
                   <p className="text-sm text-gray-500 font-medium mt-1 flex items-center gap-1.5">
-                    <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-bold tracking-wide uppercase">SUPPLIER</span>
-                    Partner since {new Date(supplier.createdAt).getFullYear()}
+                    <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-bold tracking-wide uppercase">PROVEEDOR</span>
+                    Socio desde {new Date(supplier.createdAt).getFullYear()}
                   </p>
                 </div>
               </div>
@@ -125,22 +125,22 @@ function SupplierDetailDrawer({
             {/* Stats */}
             <div className="px-6 py-6 border-b border-gray-100">
               <div className="bg-blue-50/50 rounded-2xl p-5 border border-blue-100 mb-4">
-                <p className="text-[10px] font-black text-blue-900/50 uppercase tracking-widest mb-1">Total Purchases</p>
+                <p className="text-[10px] font-black text-blue-900/50 uppercase tracking-widest mb-1">Total Compras</p>
                 <p className="text-3xl font-black text-gray-900">{fmtCurrency(supplier.stats?.totalSpent ?? 0)}</p>
                 <p className="text-xs text-emerald-600 font-bold mt-2 flex items-center gap-1">
-                  <TrendingUp className="w-3 h-3" /> Active Procurement
+                  <TrendingUp className="w-3 h-3" /> Abastecimiento Activo
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-gray-50 rounded-2xl p-4">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Open Orders</p>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Pedidos Abiertos</p>
                   <p className="text-2xl font-black text-gray-900">
                     {supplier.stats?.purchaseCount?.toString().padStart(2, '0') ?? '00'}
                   </p>
                 </div>
                 <div className="bg-gray-50 rounded-2xl p-4">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Last Purchase</p>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Última Compra</p>
                   <p className="text-sm font-black text-gray-900 leading-tight mt-1">
                     {supplier.stats?.lastPurchase ? fmtDate(supplier.stats.lastPurchase) : '—'}
                   </p>
@@ -151,7 +151,7 @@ function SupplierDetailDrawer({
             {/* Contact Info */}
             <div className="px-6 py-6 space-y-4 border-b border-gray-100">
               <h3 className="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-blue-600" /> Contact Information
+                <Building2 className="w-4 h-4 text-blue-600" /> Información de Contacto
               </h3>
               
               <div className="p-4 bg-gray-50/80 rounded-2xl border border-gray-100/50 space-y-4">
@@ -162,18 +162,18 @@ function SupplierDetailDrawer({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1">Email Address</p>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1">Correo Electrónico</p>
                     <p className="text-sm font-medium text-gray-900 break-words">{supplier.email || '—'}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1">Phone</p>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1">Teléfono</p>
                     <p className="text-sm font-medium text-gray-900">{supplier.phone || '—'}</p>
                   </div>
                 </div>
 
                 {supplier.address && (
                   <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1">Full Address</p>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1">Dirección Completa</p>
                     <p className="text-sm font-medium text-gray-900 leading-relaxed">{supplier.address}</p>
                   </div>
                 )}
@@ -184,9 +184,9 @@ function SupplierDetailDrawer({
             <div className="px-6 py-6 pb-24">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                  <ShoppingBag className="w-4 h-4 text-blue-600" /> Recent Orders
+                  <ShoppingBag className="w-4 h-4 text-blue-600" /> Órdenes Recientes
                 </h3>
-                <button className="text-xs font-bold text-blue-600 hover:text-blue-700">View All</button>
+                <button className="text-xs font-bold text-blue-600 hover:text-blue-700">Ver Todos</button>
               </div>
               
               <div className="rounded-xl overflow-hidden border border-gray-100 bg-white">
@@ -194,8 +194,8 @@ function SupplierDetailDrawer({
                   <thead>
                     <tr className="bg-gray-50/50">
                       <th className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">ID</th>
-                      <th className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Date</th>
-                      <th className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Amount</th>
+                      <th className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Fecha</th>
+                      <th className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Monto</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
@@ -215,7 +215,7 @@ function SupplierDetailDrawer({
                     {(!supplier.purchases || supplier.purchases.length === 0) && (
                       <tr>
                         <td colSpan={3} className="px-4 py-8 text-center bg-gray-50/30">
-                          <p className="text-xs text-gray-400 font-bold">No recent orders</p>
+                          <p className="text-xs text-gray-400 font-bold">Sin órdenes recientes</p>
                         </td>
                       </tr>
                     )}
@@ -226,14 +226,14 @@ function SupplierDetailDrawer({
           </div>
         ) : null}
 
-        {/* Footer */}
+              {/* Footer */}
         {supplier && (
           <div className="absolute bottom-0 left-0 right-0 p-6 bg-white/80 backdrop-blur-md border-t border-gray-100 flex items-center gap-3">
             <button
               onClick={() => supplier && onEdit(supplier)}
               className="flex-1 py-3.5 bg-blue-600 text-white rounded-xl font-black text-sm hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all flex items-center justify-center gap-2"
             >
-              <ShoppingBag className="w-4 h-4" /> Create Purchase Order
+              <ShoppingBag className="w-4 h-4" /> Crear Orden de Compra
             </button>
             <button
               onClick={handleToggle}
@@ -243,7 +243,7 @@ function SupplierDetailDrawer({
                   ? 'bg-rose-50 text-rose-600 hover:bg-rose-100'
                   : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
               }`}
-              title={supplier.isActive ? 'Deactivate Supplier' : 'Activate Supplier'}
+              title={supplier.isActive ? 'Desactivar Proveedor' : 'Activar Proveedor'}
             >
               {toggling ? (
                 <div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
@@ -305,15 +305,15 @@ export default function SuppliersPage() {
         {/* Header */}
         <header className="px-10 py-8 bg-transparent flex items-start justify-between">
           <div>
-            <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Suppliers</h1>
-            <p className="text-base text-gray-500 font-medium">Manage your global vendor network and procurement chains.</p>
+            <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Proveedores</h1>
+            <p className="text-base text-gray-500 font-medium">Gestione su red global de proveedores y cadenas de abastecimiento.</p>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push('/dashboard/suppliers/new')}
               className="flex items-center gap-2 px-6 py-3 bg-blue-600 rounded-xl text-sm font-black text-white hover:bg-blue-700 shadow-lg shadow-blue-200/50 transition-all"
             >
-              <Plus className="w-5 h-5" /> Add Supplier
+              <Plus className="w-5 h-5" /> Agregar Proveedor
             </button>
           </div>
         </header>
@@ -325,7 +325,7 @@ export default function SuppliersPage() {
             <div className="flex items-center gap-3 bg-white border border-gray-100 rounded-2xl px-5 py-3 flex-1 shadow-sm">
               <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
               <input
-                placeholder="Filter by name, region, or category..."
+                placeholder="Filtrar por nombre, región o categoría..."
                 value={searchInput}
                 onChange={e => setSearchInput(e.target.value)}
                 className="bg-transparent text-sm font-medium text-gray-700 outline-none flex-1 placeholder:text-gray-400"
@@ -339,7 +339,7 @@ export default function SuppliersPage() {
 
             <div className="bg-white border border-gray-100 rounded-2xl px-4 py-3 flex items-center gap-2 shadow-sm text-sm font-bold text-gray-600">
                <Calendar className="w-4 h-4 text-gray-400" />
-               <span>Last 30 Days</span>
+               <span>Últimos 30 Días</span>
             </div>
 
             <select
@@ -347,9 +347,9 @@ export default function SuppliersPage() {
               onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
               className="px-5 py-3 bg-white border border-gray-100 rounded-2xl text-sm font-bold text-gray-600 focus:outline-none shadow-sm cursor-pointer"
             >
-              <option value="">Status: All</option>
-              <option value="active">Active</option>
-              <option value="inactive">On Hold</option>
+              <option value="">Estado: Todos</option>
+              <option value="active">Activo</option>
+              <option value="inactive">En Espera</option>
             </select>
           </div>
 
@@ -359,11 +359,11 @@ export default function SuppliersPage() {
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-gray-100 text-[11px] font-black text-gray-400 tracking-widest uppercase">
-                  <th className="px-8 py-5">Supplier Name</th>
-                  <th className="px-6 py-5">Category</th>
-                  <th className="px-6 py-5">Contact Person</th>
-                  <th className="px-6 py-5">Email</th>
-                  <th className="px-6 py-5">Status</th>
+                  <th className="px-8 py-5">Nombre del Proveedor</th>
+                  <th className="px-6 py-5">Categoría</th>
+                  <th className="px-6 py-5">Persona de Contacto</th>
+                  <th className="px-6 py-5">Correo</th>
+                  <th className="px-6 py-5">Estado</th>
                   <th className="px-6 py-5"></th>
                 </tr>
               </thead>
@@ -384,8 +384,8 @@ export default function SuppliersPage() {
                       <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Building2 className="w-8 h-8 text-gray-300" />
                       </div>
-                      <p className="font-black text-lg text-gray-900 mb-1">No suppliers found</p>
-                      <p className="text-sm font-medium text-gray-500">Try adjusting your filters or add a new supplier.</p>
+                      <p className="font-black text-lg text-gray-900 mb-1">No se encontraron proveedores</p>
+                      <p className="text-sm font-medium text-gray-500">Intente ajustar sus filtros o agregue un nuevo proveedor.</p>
                     </td>
                   </tr>
                 ) : (
@@ -428,7 +428,7 @@ export default function SuppliersPage() {
                             onClick={(e) => { e.stopPropagation(); setSelectedId(supplier.id); }}
                             className="px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-xl text-xs font-black transition-colors"
                           >
-                            Details
+                           Detalles
                           </button>
                         </div>
                       </td>
@@ -441,7 +441,7 @@ export default function SuppliersPage() {
             {/* Pagination */}
             <div className="px-8 py-4 border-t border-gray-100 flex items-center justify-between bg-white">
               <p className="text-[11px] font-black text-gray-400 tracking-widest uppercase">
-                Showing {total === 0 ? 0 : (page - 1) * LIMIT + 1} to {Math.min(page * LIMIT, total)} of {total} suppliers
+                Mostrando {total === 0 ? 0 : (page - 1) * LIMIT + 1} a {Math.min(page * LIMIT, total)} de {total} proveedores
               </p>
               <div className="flex items-center gap-2">
                 <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}

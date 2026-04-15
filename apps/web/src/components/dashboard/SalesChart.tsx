@@ -32,8 +32,8 @@ const SalesChart = ({ data, isLoading }: SalesChartProps) => {
       return (
         <div className="bg-gray-900 border-none text-white p-3 rounded-lg shadow-xl text-sm">
           <p className="font-semibold mb-1">{label}</p>
-          <p className="text-blue-400">Current: ${payload[0].value}</p>
-          <p className="text-gray-400">Previous: ${payload[1].value}</p>
+          <p className="text-blue-400">Actual: S/ {payload[0].value}</p>
+          <p className="text-gray-400">Anterior: S/ {payload[1].value}</p>
         </div>
       );
     }
@@ -44,17 +44,17 @@ const SalesChart = ({ data, isLoading }: SalesChartProps) => {
     <div className="bg-white rounded-xl p-6 border border-[#E5E7EB] shadow-sm h-[420px] flex flex-col">
       <div className="flex justify-between items-start mb-6">
         <div>
-          <h2 className="text-xl font-bold text-[#111827] mb-1">Sales Analytics Over Time</h2>
-          <p className="text-[15px] text-[#6B7280]">Gross volume vs. previous month</p>
+          <h2 className="text-xl font-bold text-[#111827] mb-1">Análisis de Ventas</h2>
+          <p className="text-[15px] text-[#6B7280]">Volumen bruto vs. mes anterior</p>
         </div>
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-blue-600"></span>
-            <span className="text-sm font-medium text-[#4B5563]">Current</span>
+            <span className="text-sm font-medium text-[#4B5563]">Actual</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-[#E5E7EB]"></span>
-            <span className="text-sm font-medium text-[#4B5563]">Previous</span>
+            <span className="text-sm font-medium text-[#4B5563]">Anterior</span>
           </div>
         </div>
       </div>

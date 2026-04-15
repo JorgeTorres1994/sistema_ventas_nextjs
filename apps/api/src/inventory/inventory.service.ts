@@ -185,7 +185,7 @@ export class InventoryService {
         // Fetch current product in a transaction
         return this.prisma.$transaction(async (tx) => {
             const product = await tx.product.findUnique({ where: { id: productId } });
-            if (!product) throw new BadRequestException('Product not found');
+            if (!product) throw new BadRequestException('Producto no encontrado');
 
             const newStock = type === 'IN'
                 ? product.stock + quantity

@@ -145,7 +145,7 @@ export class PurchasesService {
         });
 
         if (!purchase) {
-            throw new NotFoundException(`Purchase with ID ${id} not found`);
+            throw new NotFoundException(`Compra con ID ${id} no encontrada`);
         }
 
         return purchase;

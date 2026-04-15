@@ -134,8 +134,8 @@ export default function UsersPage() {
                         {/* Header & Metrics */}
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                             <div>
-                                <h1 className="text-3xl font-extrabold tracking-tight mb-2">Team Directory</h1>
-                                <p className="text-[#6B7280]">Manage access levels and monitor activity for your entire service terminal staff.</p>
+                                <h1 className="text-3xl font-extrabold tracking-tight mb-2">Directorio del Equipo</h1>
+                                <p className="text-[#6B7280]">Gestione niveles de acceso y monitoree la actividad del personal de la terminal de servicio.</p>
                             </div>
                             
                             <div className="flex gap-4">
@@ -144,10 +144,10 @@ export default function UsersPage() {
                                         <Users className="text-blue-600 w-6 h-6" />
                                     </div>
                                     <div>
-                                        <p className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider">Active Staff</p>
+                                        <p className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider">Personal Activo</p>
                                         <div className="flex items-baseline gap-2">
                                             <span className="text-2xl font-bold">{users.filter(u => u.isActive).length}</span>
-                                            <span className="text-xs font-semibold text-green-600">+3 this mo</span>
+                                            <span className="text-xs font-semibold text-green-600">+3 este mes</span>
                                         </div>
                                     </div>
                                 </div>
@@ -156,10 +156,10 @@ export default function UsersPage() {
                                         <UserIcon className="text-gray-400 w-6 h-6" />
                                     </div>
                                     <div>
-                                        <p className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider">Total Members</p>
+                                        <p className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider">Miembros Totales</p>
                                         <div className="flex items-baseline gap-2">
                                             <span className="text-2xl font-bold">{users.length}</span>
-                                            <span className="text-xs font-semibold text-blue-600">Syncing...</span>
+                                            <span className="text-xs font-semibold text-blue-600">Sincronizando...</span>
                                         </div>
                                     </div>
                                 </div>
@@ -173,7 +173,7 @@ export default function UsersPage() {
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                                     <input 
                                         type="text"
-                                        placeholder="Search team members..."
+                                        placeholder="Buscar miembros del equipo..."
                                         className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -185,18 +185,18 @@ export default function UsersPage() {
                                         value={roleFilter}
                                         onChange={(e) => setRoleFilter(e.target.value)}
                                     >
-                                        <option value="">All Roles</option>
+                                        <option value="">Todos los Roles</option>
                                         <option value="ADMIN">Admin</option>
-                                        <option value="USER">User</option>
+                                        <option value="USER">Usuario</option>
                                     </select>
                                     <select 
                                         className="bg-gray-50 border border-gray-100 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-500 focus:ring-2 focus:ring-blue-500 outline-none"
                                         value={statusFilter}
                                         onChange={(e) => setStatusFilter(e.target.value)}
                                     >
-                                        <option value="">All Status</option>
-                                        <option value="active">Active</option>
-                                        <option value="inactive">Inactive</option>
+                                        <option value="">Todos los Estados</option>
+                                        <option value="active">Activo</option>
+                                        <option value="inactive">Inactivo</option>
                                     </select>
                                 </div>
                             </div>
@@ -204,7 +204,7 @@ export default function UsersPage() {
                             <div className="flex gap-3">
                                 <button className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 text-gray-600 border border-gray-100 rounded-xl text-sm font-bold hover:bg-gray-100 transition-colors">
                                     <Download className="w-4 h-4" />
-                                    Export List
+                                    Exportar Lista
                                 </button>
                                 <button 
                                     onClick={() => {
@@ -214,7 +214,7 @@ export default function UsersPage() {
                                     className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
                                 >
                                     <UserPlus className="w-4 h-4" />
-                                    Add User
+                                    Agregar Usuario
                                 </button>
                             </div>
                         </div>
@@ -224,11 +224,11 @@ export default function UsersPage() {
                             <table className="w-full text-left border-collapse">
                                 <thead>
                                     <tr className="bg-gray-50/50">
-                                        <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Member Name</th>
-                                        <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Role</th>
-                                        <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Status</th>
-                                        <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Created At</th>
-                                        <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB] text-right text-gray-900">Actions</th>
+                                        <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Nombre del Miembro</th>
+                                        <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Rol</th>
+                                        <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Estado</th>
+                                        <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Fecha Creación</th>
+                                        <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB] text-right text-gray-900">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -241,7 +241,7 @@ export default function UsersPage() {
                                     ) : users.length === 0 ? (
                                         <tr>
                                             <td colSpan={5} className="px-8 py-20 text-center text-gray-400">
-                                                No team members found matched your criteria.
+                                                No se encontraron miembros del equipo que coincidan con sus criterios.
                                             </td>
                                         </tr>
                                     ) : (
@@ -269,7 +269,7 @@ export default function UsersPage() {
                                                     <div className="flex items-center gap-2">
                                                         <div className={`w-1.5 h-1.5 rounded-full ${user.isActive ? 'bg-green-500' : 'bg-gray-300'}`}></div>
                                                         <span className={`text-xs font-bold ${user.isActive ? 'text-green-700' : 'text-gray-400'}`}>
-                                                            {user.isActive ? 'Active' : 'Inactive'}
+                                                            {user.isActive ? 'Activo' : 'Inactivo'}
                                                         </span>
                                                     </div>
                                                 </td>
@@ -283,14 +283,14 @@ export default function UsersPage() {
                                                         <button 
                                                             onClick={() => openEditModal(user)}
                                                             className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                            title="Edit Permissions"
+                                                            title="Editar Permisos"
                                                         >
                                                             <Shield className="w-4 h-4" />
                                                         </button>
                                                         <button 
                                                             onClick={() => handleToggleStatus(user.id)}
                                                             className={`p-2 rounded-lg transition-colors ${user.isActive ? 'text-gray-400 hover:text-rose-600 hover:bg-rose-50' : 'text-green-400 hover:text-green-600 hover:bg-green-50'}`}
-                                                            title={user.isActive ? 'Suspend Access' : 'Restore Access'}
+                                                            title={user.isActive ? 'Suspender Acceso' : 'Restaurar Acceso'}
                                                         >
                                                             {user.isActive ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
                                                         </button>
@@ -311,8 +311,8 @@ export default function UsersPage() {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
                     <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-white/20 animate-in zoom-in-95 duration-200">
                         <div className="px-8 pt-8 pb-4">
-                            <h3 className="text-xl font-bold mb-2">{isAddModalOpen ? 'Create New Member' : 'Edit Member Details'}</h3>
-                            <p className="text-sm text-gray-400">Ensure account details match terminal registration.</p>
+                            <h3 className="text-xl font-bold mb-2">{isAddModalOpen ? 'Crear Nuevo Miembro' : 'Editar Detalles del Miembro'}</h3>
+                            <p className="text-sm text-gray-400">Asegúrese de que los detalles de la cuenta coincidan con el registro de la terminal.</p>
                         </div>
                         
                         <form onSubmit={isAddModalOpen ? handleCreateUser : handleUpdateUser} className="p-8 space-y-5">
@@ -324,11 +324,11 @@ export default function UsersPage() {
                             )}
 
                             <div>
-                                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">Member Name</label>
+                                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">Nombre del Miembro</label>
                                 <input 
                                     type="text" 
                                     className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
-                                    placeholder="Enter full name"
+                                    placeholder="Ingrese nombre completo"
                                     required
                                     value={formData.name}
                                     onChange={(e) => setFormData({...formData, name: e.target.value})}
@@ -337,11 +337,11 @@ export default function UsersPage() {
 
                             {isAddModalOpen && (
                                 <div>
-                                    <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">Work Email</label>
+                                    <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">Correo de Trabajo</label>
                                     <input 
                                         type="email" 
                                         className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
-                                        placeholder="user@lumenledger.com"
+                                        placeholder="usuario@lumenledger.com"
                                         required
                                         value={formData.email}
                                         onChange={(e) => setFormData({...formData, email: e.target.value})}
@@ -351,7 +351,7 @@ export default function UsersPage() {
 
                             {isAddModalOpen && (
                                 <div>
-                                    <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">Temporary Password</label>
+                                    <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">Contraseña Temporal</label>
                                     <div className="relative">
                                         <Key className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4" />
                                         <input 
@@ -367,7 +367,7 @@ export default function UsersPage() {
                             )}
 
                             <div>
-                                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">System Role</label>
+                                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">Rol del Sistema</label>
                                 <div className="grid grid-cols-2 gap-3">
                                     <button 
                                         type="button"
@@ -383,7 +383,7 @@ export default function UsersPage() {
                                         className={`px-4 py-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${formData.role === 'USER' ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-400'}`}
                                     >
                                         <UserIcon className={`w-5 h-5 ${formData.role === 'USER' ? 'text-white' : 'text-gray-300'}`} />
-                                        <span className="text-xs font-bold">User</span>
+                                        <span className="text-xs font-bold">Usuario</span>
                                     </button>
                                 </div>
                             </div>
@@ -394,13 +394,13 @@ export default function UsersPage() {
                                     onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }}
                                     className="flex-1 py-3 text-gray-500 font-bold hover:bg-gray-50 rounded-2xl transition-colors"
                                 >
-                                    Cancel
+                                    Cancelar
                                 </button>
                                 <button 
                                     type="submit"
                                     className="flex-1 py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-lg shadow-blue-200 hover:bg-blue-700 transition-colors"
                                 >
-                                    {isAddModalOpen ? 'Create Account' : 'Save Changes'}
+                                    {isAddModalOpen ? 'Crear Cuenta' : 'Guardar Cambios'}
                                 </button>
                             </div>
                         </form>

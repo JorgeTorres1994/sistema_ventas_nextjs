@@ -26,7 +26,7 @@ export default function SalesPage() {
   
   // Filters
   const [search, setSearch] = useState('');
-  const [status, setStatus] = useState('All');
+  const [status, setStatus] = useState('Todos');
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
 
   // Stats
@@ -42,7 +42,7 @@ export default function SalesPage() {
     try {
       const data = await getSales({
         search,
-        status: status === 'All' ? undefined : status,
+        status: status === 'Todos' ? undefined : status,
         startDate: dateRange.start,
         endDate: dateRange.end
       });
@@ -72,22 +72,22 @@ export default function SalesPage() {
   }, [fetchSales]);
 
   const handleCancelSale = async (id: string) => {
-    if (window.confirm('Are you sure you want to cancel this sale? This will restore stock levels.')) {
+    if (window.confirm('¿Está seguro de que desea cancelar esta venta? Esto restaurará los niveles de stock.')) {
       try {
         await cancelSale(id);
         fetchSales();
       } catch (error: any) {
-        alert(error.response?.data?.message || 'Failed to cancel sale');
+        alert(error.response?.data?.message || 'Error al cancelar la venta');
       }
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'PAID': return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest">Paid</span>;
-      case 'PENDING': return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-50 text-amber-600 border border-amber-100 uppercase tracking-widest">Pending</span>;
-      case 'PARTIAL': return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-blue-50 text-blue-600 border border-blue-100 uppercase tracking-widest">Partial</span>;
-      case 'CANCELLED': return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-gray-600 text-white border border-gray-700 uppercase tracking-widest">Cancelled</span>;
+      case 'PAID': return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest">Pagado</span>;
+      case 'PENDING': return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-50 text-amber-600 border border-amber-100 uppercase tracking-widest">Pendiente</span>;
+      case 'PARTIAL': return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-blue-50 text-blue-600 border border-blue-100 uppercase tracking-widest">Parcial</span>;
+      case 'CANCELLED': return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-gray-600 text-white border border-gray-700 uppercase tracking-widest">Cancelado</span>;
       default: return null;
     }
   };
@@ -103,13 +103,13 @@ export default function SalesPage() {
             <nav className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
               <span>Lumen Ledger</span>
               <span>/</span>
-              <span className="text-gray-900">Sales</span>
+              <span className="text-gray-900">Ventas</span>
             </nav>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none">Sales Transactions</h1>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none">Transacciones de Venta</h1>
           </div>
           <Link href="/dashboard/pos">
             <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-black text-sm transition-all shadow-lg shadow-indigo-200 flex items-center gap-2">
-              <Plus className="w-5 h-5" /> New Sale
+              <Plus className="w-5 h-5" /> Nueva Venta
             </button>
           </Link>
         </header>
@@ -122,7 +122,7 @@ export default function SalesPage() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input 
                 type="text" 
-                placeholder="Search sales ID or customer..." 
+                placeholder="Buscar ID de venta o cliente..." 
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition-all outline-none text-sm font-medium"
@@ -131,7 +131,7 @@ export default function SalesPage() {
 
             {/* Status Filters */}
             <div className="flex bg-gray-50 p-1.5 rounded-xl border border-gray-100">
-              {['All', 'Paid', 'Pending', 'Partial'].map((s) => (
+              {['Todos', 'Pagado', 'Pendiente', 'Parcial'].map((s) => (
                 <button
                   key={s}
                   onClick={() => setStatus(s)}
@@ -164,19 +164,19 @@ export default function SalesPage() {
               <table className="w-full text-left">
                 <thead>
                   <tr className="bg-gray-50/50 border-b border-gray-100">
-                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Sale ID</th>
-                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Customer</th>
-                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Date & Time</th>
-                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Status</th>
+                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">ID Venta</th>
+                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Cliente</th>
+                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Fecha y Hora</th>
+                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Estado</th>
                     <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-right">Total</th>
-                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-center">Actions</th>
+                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-center">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {loading ? (
-                    <tr><td colSpan={6} className="py-20 text-center text-gray-400 font-bold uppercase tracking-widest animate-pulse">Loading Transaction History...</td></tr>
+                    <tr><td colSpan={6} className="py-20 text-center text-gray-400 font-bold uppercase tracking-widest animate-pulse">Cargando Historial de Transacciones...</td></tr>
                   ) : sales.length === 0 ? (
-                    <tr><td colSpan={6} className="py-20 text-center text-gray-400 font-bold uppercase tracking-widest">No transactions found</td></tr>
+                    <tr><td colSpan={6} className="py-20 text-center text-gray-400 font-bold uppercase tracking-widest">No se encontraron transacciones</td></tr>
                   ) : sales.map((sale) => (
                     <tr key={sale.id} className="hover:bg-indigo-50/20 group transition-colors">
                       <td className="px-8 py-5 font-black text-indigo-600 text-sm">
@@ -188,14 +188,14 @@ export default function SalesPage() {
                             {sale.customer?.name?.[0] || 'W'}
                           </div>
                           <div>
-                            <p className="text-sm font-black text-gray-900 leading-none">{sale.customer?.name || 'Walk-in Customer'}</p>
-                            <p className="text-[10px] font-bold text-gray-400 mt-1">{sale.customer?.email || 'Individual Sale'}</p>
+                            <p className="text-sm font-black text-gray-900 leading-none">{sale.customer?.name || 'Venta al Paso'}</p>
+                            <p className="text-[10px] font-bold text-gray-400 mt-1">{sale.customer?.email || 'Venta Individual'}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-8 py-5">
-                        <p className="text-sm font-bold text-gray-700 leading-none">{new Date(sale.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                        <p className="text-[10px] font-bold text-gray-400 mt-1">{new Date(sale.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
+                        <p className="text-sm font-bold text-gray-700 leading-none">{new Date(sale.createdAt).toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                        <p className="text-[10px] font-bold text-gray-400 mt-1">{new Date(sale.createdAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</p>
                       </td>
                       <td className="px-8 py-5">
                         {getStatusBadge(sale.status)}
@@ -232,7 +232,7 @@ export default function SalesPage() {
 
             {/* Pagination Implementation */}
             <div className="px-8 py-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Showing 1 to {sales.length} of {sales.length} entries</span>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Mostrando 1 a {sales.length} de {sales.length} registros</span>
               <div className="flex items-center gap-1">
                 <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-400 transition-colors cursor-not-allowed">
                   <ChevronLeft className="w-5 h-5" />

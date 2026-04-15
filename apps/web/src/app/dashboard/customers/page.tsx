@@ -16,18 +16,18 @@ function initials(name: string) {
   return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
 }
 function fmtDate(iso: string) {
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return new Date(iso).toLocaleDateString('es-PE', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 function fmtCurrency(n: number) {
-  return `$${Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+  return `S/ ${Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
 }
 
 // ── Status Badge ───────────────────────────────────────────────────────────────
 function StatusBadge({ isActive }: { isActive: boolean }) {
   return isActive ? (
-    <span className="px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-50 text-emerald-700 border border-emerald-100">Active</span>
+    <span className="px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-50 text-emerald-700 border border-emerald-100">Activo</span>
   ) : (
-    <span className="px-2.5 py-1 rounded-full text-[11px] font-black bg-gray-50 text-gray-400 border border-gray-100">Inactive</span>
+    <span className="px-2.5 py-1 rounded-full text-[11px] font-black bg-gray-50 text-gray-400 border border-gray-100">Inactivo</span>
   );
 }
 
@@ -118,32 +118,32 @@ function CustomerDetailDrawer({
             {/* Stats */}
             <div className="px-6 py-5 grid grid-cols-2 gap-4 border-b border-gray-100">
               <div className="bg-gray-50 rounded-2xl p-4">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Spent</p>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Gastado</p>
                 <p className="text-xl font-black text-gray-900">{fmtCurrency(customer.stats?.totalSpent ?? 0)}</p>
                 <p className="text-[10px] text-indigo-500 font-bold mt-1 flex items-center gap-1">
-                  <TrendingUp className="w-3 h-3" /> {customer.stats?.purchaseCount ?? 0} purchases
+                  <TrendingUp className="w-3 h-3" /> {customer.stats?.purchaseCount ?? 0} compras
                 </p>
               </div>
               <div className="bg-gray-50 rounded-2xl p-4">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Last Purchase</p>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Última Compra</p>
                 <p className="text-sm font-black text-gray-900">
-                  {customer.stats?.lastPurchase ? fmtDate(customer.stats.lastPurchase) : 'Never'}
+                  {customer.stats?.lastPurchase ? fmtDate(customer.stats.lastPurchase) : 'Nunca'}
                 </p>
                 <p className="text-[10px] text-gray-400 font-bold mt-1 flex items-center gap-1">
-                  <Calendar className="w-3 h-3" /> Activity record
+                  <Calendar className="w-3 h-3" /> Registro de actividad
                 </p>
               </div>
             </div>
 
             {/* Contact Info */}
             <div className="px-6 py-5 space-y-4 border-b border-gray-100">
-              <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Contact Information</h3>
+              <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Información de Contacto</h3>
               <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
                 <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Mail className="w-4 h-4 text-indigo-600" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Email Address</p>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Correo Electrónico</p>
                   <p className="text-sm font-bold text-gray-900">{customer.email || '—'}</p>
                 </div>
               </div>
@@ -152,7 +152,7 @@ function CustomerDetailDrawer({
                   <Phone className="w-4 h-4 text-emerald-600" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Phone Number</p>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Número de Teléfono</p>
                   <p className="text-sm font-bold text-gray-900">{customer.phone || '—'}</p>
                 </div>
               </div>
@@ -162,7 +162,7 @@ function CustomerDetailDrawer({
                     <MapPin className="w-4 h-4 text-amber-600" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Address</p>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Dirección</p>
                     <p className="text-sm font-bold text-gray-900">{customer.address}</p>
                   </div>
                 </div>
@@ -172,7 +172,7 @@ function CustomerDetailDrawer({
             {/* Recent transactions */}
             <div className="px-6 py-5">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Recent Transactions</h3>
+                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Transacciones Recientes</h3>
                 <span className="text-xs font-bold text-indigo-600">{customer._count?.sales ?? customer.sales?.length ?? 0} total</span>
               </div>
               <div className="space-y-3">
@@ -183,7 +183,7 @@ function CustomerDetailDrawer({
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-black text-gray-800 truncate">
-                        {sale.items?.[0]?.product?.name ?? 'Sale'}
+                        {sale.items?.[0]?.product?.name ?? 'Venta'}
                       </p>
                       <p className="text-xs text-gray-400 font-mono">Ref: #{sale.id.slice(0, 8).toUpperCase()}</p>
                     </div>
@@ -196,7 +196,7 @@ function CustomerDetailDrawer({
                 {(!customer.sales || customer.sales.length === 0) && (
                   <div className="text-center py-6">
                     <ShoppingBag className="w-8 h-8 text-gray-200 mx-auto mb-2" />
-                    <p className="text-sm text-gray-300 font-bold">No transactions yet</p>
+                    <p className="text-sm text-gray-300 font-bold">Sin transacciones aún</p>
                   </div>
                 )}
               </div>
@@ -223,13 +223,13 @@ function CustomerDetailDrawer({
               ) : (
                 <ToggleRight className="w-4 h-4" />
               )}
-              {customer.isActive ? 'Deactivate' : 'Activate'}
+              {customer.isActive ? 'Desactivar' : 'Activar'}
             </button>
             <button
               onClick={() => customer && onEdit(customer)}
               className="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-black text-sm hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all flex items-center justify-center gap-2"
             >
-              <Edit2 className="w-4 h-4" /> Edit Customer
+              <Edit2 className="w-4 h-4" /> Editar Cliente
             </button>
           </div>
         )}
@@ -283,16 +283,16 @@ export default function CustomersPage() {
         {/* Header */}
         <header className="px-8 py-6 bg-white border-b border-gray-100 flex items-start justify-between sticky top-0 z-20">
           <div>
-            <p className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-1">Management</p>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none">Customers</h1>
-            <p className="text-sm text-gray-400 font-medium mt-1">Manage your customer relationships and view transaction history.</p>
+            <p className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-1">Gestión</p>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none">Clientes</h1>
+            <p className="text-sm text-gray-400 font-medium mt-1">Gestione sus relaciones con los clientes y vea el historial de transacciones.</p>
           </div>
           <div className="flex items-center gap-3 mt-1">
             <button
               onClick={() => router.push('/dashboard/customers/new')}
               className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 rounded-xl text-sm font-black text-white hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all"
             >
-              <UserPlus className="w-4 h-4" /> Add Customer
+              <UserPlus className="w-4 h-4" /> Agregar Cliente
             </button>
           </div>
         </header>
@@ -304,7 +304,7 @@ export default function CustomersPage() {
             <div className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 flex-1 min-w-64">
               <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
               <input
-                placeholder="Filter by name, DNI or email..."
+                placeholder="Filtrar por nombre, DNI o correo..."
                 value={searchInput}
                 onChange={e => setSearchInput(e.target.value)}
                 className="bg-transparent text-sm font-medium text-gray-700 outline-none flex-1"
@@ -321,9 +321,9 @@ export default function CustomersPage() {
               onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
               className="px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold text-gray-600 focus:outline-none"
             >
-              <option value="">All Status</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
+              <option value="">Todos los Estados</option>
+              <option value="active">Activo</option>
+              <option value="inactive">Inactivo</option>
             </select>
           </div>
 
@@ -331,18 +331,18 @@ export default function CustomersPage() {
           <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="px-6 py-3 bg-gray-50/50 border-b border-gray-50 flex items-center justify-between">
               <p className="text-xs font-bold text-gray-400">
-                Showing {total === 0 ? 0 : (page - 1) * LIMIT + 1}–{Math.min(page * LIMIT, total)} of {total} customers
+                Mostrando {total === 0 ? 0 : (page - 1) * LIMIT + 1}–{Math.min(page * LIMIT, total)} de {total} clientes
               </p>
             </div>
 
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100">
-                  <th className="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Customer</th>
-                  <th className="px-4 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">DNI / Identity</th>
-                  <th className="px-4 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Contact Info</th>
-                  <th className="px-4 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Status</th>
-                  <th className="px-6 py-4 text-right text-xs font-black text-gray-400 uppercase tracking-widest">Actions</th>
+                  <th className="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Cliente</th>
+                  <th className="px-4 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">DNI / Identidad</th>
+                  <th className="px-4 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Información de Contacto</th>
+                  <th className="px-4 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Estado</th>
+                  <th className="px-6 py-4 text-right text-xs font-black text-gray-400 uppercase tracking-widest">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -360,7 +360,7 @@ export default function CustomersPage() {
                   <tr>
                     <td colSpan={5} className="py-16 text-center">
                       <User className="w-10 h-10 text-gray-200 mx-auto mb-3" />
-                      <p className="font-black text-gray-400">No customers found</p>
+                      <p className="font-black text-gray-400">No se encontraron clientes</p>
                     </td>
                   </tr>
                 ) : (
@@ -377,7 +377,7 @@ export default function CustomersPage() {
                           </div>
                           <div>
                             <p className="font-black text-sm text-gray-900">{customer.name}</p>
-                            <p className="text-xs text-gray-400 font-medium">{customer._count?.sales ?? 0} purchases</p>
+                            <p className="text-xs text-gray-400 font-medium">{customer._count?.sales ?? 0} compras</p>
                           </div>
                         </div>
                       </td>
@@ -398,12 +398,12 @@ export default function CustomersPage() {
                           <button
                             onClick={(e) => { e.stopPropagation(); setSelectedId(customer.id); }}
                             className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs font-black transition-colors">
-                            View
+                            Ver
                           </button>
                           <button
                             onClick={(e) => { e.stopPropagation(); router.push(`/dashboard/customers/${customer.id}/edit`); }}
                             className="px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-lg text-xs font-black transition-colors">
-                            Edit
+                            Editar
                           </button>
                         </div>
                       </td>
@@ -415,7 +415,7 @@ export default function CustomersPage() {
 
             {/* Pagination */}
             <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-              <p className="text-sm font-bold text-gray-400">Page {page} of {totalPages}</p>
+              <p className="text-sm font-bold text-gray-400">Página {page} de {totalPages}</p>
               <div className="flex items-center gap-2">
                 <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
                   className="w-8 h-8 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 disabled:opacity-40 transition-colors">

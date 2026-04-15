@@ -42,7 +42,7 @@ export class UsersController {
     @Roles(Role.ADMIN)
     async findOne(@Param('id') id: string) {
         const user = await this.usersService.findById(id);
-        if (!user) throw new NotFoundException('User not found');
+        if (!user) throw new NotFoundException('Usuario no encontrado');
         const { password, ...result } = user;
         return result;
     }

@@ -62,7 +62,7 @@ export class SettingsService implements OnModuleInit {
 
     async togglePaymentMethod(id: string) {
         const method = await this.prisma.paymentMethod.findUnique({ where: { id } });
-        if (!method) throw new Error('Payment method not found');
+        if (!method) throw new Error('Método de pago no encontrado');
         return this.prisma.paymentMethod.update({
             where: { id },
             data: { isActive: !method.isActive }

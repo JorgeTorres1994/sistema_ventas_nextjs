@@ -17,7 +17,7 @@ interface RecentOrdersProps {
 
 const RecentOrders = ({ orders, isLoading }: RecentOrdersProps) => {
   const formatDate = (dateString: string) => {
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat('es-PE', {
       month: 'short',
       day: 'numeric',
       year: 'numeric'
@@ -25,9 +25,9 @@ const RecentOrders = ({ orders, isLoading }: RecentOrdersProps) => {
   };
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('es-PE', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'PEN',
     }).format(value);
   };
 
@@ -53,9 +53,9 @@ const RecentOrders = ({ orders, isLoading }: RecentOrdersProps) => {
   return (
     <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm flex-1 mt-6 overflow-hidden">
       <div className="p-6 border-b border-[#E5E7EB] flex justify-between items-center">
-        <h2 className="text-xl font-bold text-[#111827]">Recent Orders</h2>
+        <h2 className="text-xl font-bold text-[#111827]">Ventas Recientes</h2>
         <button className="text-sm font-medium text-blue-600 hover:text-blue-700 transition">
-          View All
+          Ver Todo
         </button>
       </div>
       
@@ -63,20 +63,20 @@ const RecentOrders = ({ orders, isLoading }: RecentOrdersProps) => {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
-              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Order ID</th>
-              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Customer</th>
-              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Product</th>
-              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Amount</th>
-              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Status</th>
-              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Date</th>
-              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider text-right">Action</th>
+              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">ID de Orden</th>
+              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Cliente</th>
+              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Producto</th>
+              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Monto</th>
+              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Estado</th>
+              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Fecha</th>
+              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider text-right">Acción</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#E5E7EB]">
             {orders.length === 0 ? (
               <tr>
                 <td colSpan={7} className="py-8 text-center text-[#6B7280] text-sm">
-                  No recent orders found.
+                  No se encontraron ventas recientes.
                 </td>
               </tr>
             ) : orders.map((order, idx) => (
@@ -93,7 +93,9 @@ const RecentOrders = ({ orders, isLoading }: RecentOrdersProps) => {
                       ? 'bg-amber-50 text-amber-700'
                       : 'bg-gray-100 text-gray-700'
                   }`}>
-                    {order.status === 'PAID' ? 'Completed' : order.status}
+                    {order.status === 'PAID' || order.status === 'COMPLETED' ? 'Completado' : 
+                     order.status === 'PENDING' ? 'Pendiente' : 
+                     order.status === 'CANCELLED' ? 'Cancelado' : order.status}
                   </span>
                 </td>
                 <td className="py-4 px-6 text-[15px] text-[#6B7280]">{formatDate(order.date)}</td>

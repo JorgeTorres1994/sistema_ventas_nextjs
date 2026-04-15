@@ -26,7 +26,7 @@ export default function ProductsPage() {
   
   // Filters
   const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('All Products');
+  const [category, setCategory] = useState('Todos los Productos');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
 
@@ -37,7 +37,7 @@ export default function ProductsPage() {
         page,
         limit: 10,
         search,
-        categoryId: category === 'All Products' ? undefined : category
+        categoryId: category === 'Todos los Productos' ? undefined : category
       });
       setProducts(result.data);
       setTotal(result.total);
@@ -58,14 +58,14 @@ export default function ProductsPage() {
       await toggleProductStatus(id);
       fetchProducts();
     } catch (error) {
-      alert('Failed to update product status');
+      alert('Error al actualizar el estado del producto');
     }
   };
 
   const getStockBadge = (stock: number) => {
-    if (stock <= 0) return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-rose-50 text-rose-600 border border-rose-100 uppercase tracking-widest">Out of Stock</span>;
-    if (stock < 10) return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-50 text-amber-600 border border-amber-100 uppercase tracking-widest">Low Stock</span>;
-    return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest">In Stock</span>;
+    if (stock <= 0) return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-rose-50 text-rose-600 border border-rose-100 uppercase tracking-widest">Sin Stock</span>;
+    if (stock < 10) return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-50 text-amber-600 border border-amber-100 uppercase tracking-widest">Stock Bajo</span>;
+    return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest">En Stock</span>;
   };
 
   return (
@@ -77,12 +77,12 @@ export default function ProductsPage() {
         <header className="px-8 py-6 bg-white border-b border-gray-100 flex items-center justify-between shrink-0">
           <div>
             <nav className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
-              <span>Inventory Studio</span>
+              <span>Estudio de Inventario</span>
               <span>/</span>
-              <span className="text-gray-900">Products</span>
+              <span className="text-gray-900">Productos</span>
             </nav>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none">Products</h1>
-            <p className="text-sm text-gray-500 mt-2 font-medium">Manage and monitor your retail stock availability.</p>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none">Productos</h1>
+            <p className="text-sm text-gray-500 mt-2 font-medium">Gestione y monitoree la disponibilidad de su stock minorista.</p>
           </div>
           <div className="flex items-center gap-3">
             <button className="p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors text-gray-500 border border-gray-100">
@@ -90,7 +90,7 @@ export default function ProductsPage() {
             </button>
             <Link href="/dashboard/products/new">
               <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-black text-sm transition-all shadow-lg shadow-indigo-100 flex items-center gap-2">
-                Create Product
+                Crear Producto
               </button>
             </Link>
           </div>
@@ -101,7 +101,7 @@ export default function ProductsPage() {
           <div className="flex items-center justify-between gap-4">
              {/* Category Pills */}
              <div className="flex items-center gap-2 bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm overflow-x-auto no-scrollbar">
-                {['All Products', 'Electronics', 'Home Decor', 'Kitchenware'].map((c) => (
+                {['Todos los Productos', 'Electrónica', 'Decoración', 'Cocina'].map((c) => (
                   <button
                     key={c}
                     onClick={() => setCategory(c)}
@@ -114,10 +114,9 @@ export default function ProductsPage() {
                 ))}
                 <div className="w-[1px] h-6 bg-gray-200 mx-2" />
                 <button className="flex items-center gap-2 px-6 py-2.5 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-600 transition-all">
-                  <Filter className="w-4 h-4" /> More Filters
+                  <Filter className="w-4 h-4" /> Más Filtros
                 </button>
              </div>
-
              {/* View Mode */}
              <div className="flex bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm">
                 <button 
@@ -140,24 +139,23 @@ export default function ProductsPage() {
               <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input 
                 type="text" 
-                placeholder="Search inventory..." 
+                placeholder="Buscar en el inventario..." 
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-14 pr-4 py-4 bg-white border border-gray-100 rounded-2xl shadow-sm focus:ring-4 focus:ring-indigo-50 focus:border-indigo-600 transition-all outline-none text-sm font-medium"
               />
           </div>
-
           {/* Content */}
           <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-gray-50/50 border-b border-gray-100">
-                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Product</th>
-                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Category</th>
-                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-right">Price</th>
+                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Producto</th>
+                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Categoría</th>
+                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-right">Precio</th>
                   <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-center">Stock</th>
-                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-center">Status</th>
-                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-center">Action</th>
+                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-center">Estado</th>
+                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-center">Acción</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -185,7 +183,7 @@ export default function ProductsPage() {
                       </div>
                     </td>
                     <td className="px-8 py-5">
-                      <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">{product.category?.name || 'Uncategorized'}</span>
+                      <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">{product.category?.name || 'Sin Categoría'}</span>
                     </td>
                     <td className="px-8 py-5 text-right font-black text-gray-900 text-sm tracking-tight">
                       S/ {Number(product.price).toFixed(2)}
@@ -220,7 +218,7 @@ export default function ProductsPage() {
 
             {/* Pagination */}
             <div className="px-8 py-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Showing {(page-1)*10+1} to {Math.min(page*10, total)} of {total} products</span>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Mostrando {(page-1)*10+1} a {Math.min(page*10, total)} de {total} productos</span>
               <div className="flex items-center gap-2">
                 <button 
                   disabled={page === 1}
@@ -251,11 +249,11 @@ export default function ProductsPage() {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-black text-gray-900 leading-none">Low Stock Alerts</h3>
-                    <span className="bg-rose-100 text-rose-600 px-2 py-0.5 rounded text-[10px] font-black uppercase">Urgent</span>
+                    <h3 className="text-lg font-black text-gray-900 leading-none">Alertas de Stock Bajo</h3>
+                    <span className="bg-rose-100 text-rose-600 px-2 py-0.5 rounded text-[10px] font-black uppercase">Urgente</span>
                   </div>
-                  <p className="text-sm text-gray-500 font-medium mb-4">12 products are currently below their minimum threshold.</p>
-                  <button className="text-xs font-black text-indigo-600 underline uppercase tracking-widest">View replenishment report →</button>
+                  <p className="text-sm text-gray-500 font-medium mb-4">12 productos están actualmente por debajo de su umbral mínimo.</p>
+                  <button className="text-xs font-black text-indigo-600 underline uppercase tracking-widest">Ver reporte de reposición →</button>
                 </div>
              </div>
 
@@ -264,9 +262,9 @@ export default function ProductsPage() {
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl" />
                 
                 <div className="relative z-10 max-w-lg">
-                  <h3 className="text-2xl font-black text-white mb-2">Smart Inventory Optimization</h3>
-                  <p className="text-indigo-100 font-medium mb-6">Leverage our AI-driven system to predict stock-outs before they happen based on seasonal trends.</p>
-                  <button className="bg-white text-indigo-600 px-8 py-3 rounded-2xl font-black text-sm hover:scale-105 transition-all shadow-xl">Try AI Forecasting</button>
+                  <h3 className="text-2xl font-black text-white mb-2">Optimización Inteligente de Inventario</h3>
+                  <p className="text-indigo-100 font-medium mb-6">Aproveche nuestro sistema impulsado por IA para predecir faltantes antes de que ocurran basándose en tendencias estacionales.</p>
+                  <button className="bg-white text-indigo-600 px-8 py-3 rounded-2xl font-black text-sm hover:scale-105 transition-all shadow-xl">Probar Pronóstico IA</button>
                 </div>
 
                 <div className="relative z-10 hidden md:block">

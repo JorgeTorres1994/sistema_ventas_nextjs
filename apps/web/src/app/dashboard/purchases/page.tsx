@@ -12,10 +12,10 @@ import { getPurchases, getPurchaseById } from '@/lib/api';
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 const fmtDate = (iso: string) => {
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return new Date(iso).toLocaleDateString('es-PE', { month: 'short', day: 'numeric', year: 'numeric' });
 };
 const fmtCurrency = (n: number) => {
-  return `$${Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+  return `S/ ${Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
 };
 
 // ── Status Badge ───────────────────────────────────────────────────────────────
@@ -25,7 +25,7 @@ function StatusBadge({ status }: { status: string }) {
     PENDING: "bg-amber-50 text-amber-600 border-amber-100",
     CANCELLED: "bg-rose-50 text-rose-600 border-rose-100",
   };
-  const labels: any = { COMPLETED: "RECEIVED", PENDING: "PENDING", CANCELLED: "CANCELLED" };
+  const labels: any = { COMPLETED: "RECIBIDO", PENDING: "PENDIENTE", CANCELLED: "CANCELADO" };
   
   return (
     <span className={`px-2.5 py-1 rounded-full text-[10px] font-black border ${styles[status] || 'bg-gray-100'}`}>
@@ -60,7 +60,7 @@ function PurchaseDetailDrawer({ id, onClose }: { id: string; onClose: () => void
               <ShoppingCart className="w-5 h-5 text-indigo-600" />
             </div>
             <div>
-              <h2 className="text-lg font-black text-gray-900 leading-tight">Purchase Order</h2>
+              <h2 className="text-lg font-black text-gray-900 leading-tight">Orden de Compra</h2>
               <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">#{id.slice(0,8).toUpperCase()}</p>
             </div>
           </div>
@@ -78,11 +78,11 @@ function PurchaseDetailDrawer({ id, onClose }: { id: string; onClose: () => void
             {/* Summary Grid */}
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Status</p>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Estado</p>
                 <StatusBadge status={purchase.status} />
               </div>
               <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Order Date</p>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Fecha de Orden</p>
                 <p className="text-sm font-black text-gray-900">{fmtDate(purchase.createdAt)}</p>
               </div>
             </div>
@@ -90,7 +90,7 @@ function PurchaseDetailDrawer({ id, onClose }: { id: string; onClose: () => void
             {/* Supplier Info */}
             <div className="space-y-4">
               <h3 className="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-indigo-600" /> Supplier Information
+                <Building2 className="w-4 h-4 text-indigo-600" /> Información del Proveedor
               </h3>
               <div className="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm">
                 <div className="flex items-center gap-4 mb-4 pb-4 border-b border-gray-50">
@@ -99,13 +99,13 @@ function PurchaseDetailDrawer({ id, onClose }: { id: string; onClose: () => void
                   </div>
                   <div>
                     <p className="text-base font-black text-gray-900">{purchase.supplier?.name}</p>
-                    <p className="text-xs text-gray-400 font-mono">Tax ID: {purchase.supplier?.dniRuc}</p>
+                    <p className="text-xs text-gray-400 font-mono">DNI / RUC: {purchase.supplier?.dniRuc}</p>
                   </div>
                 </div>
                 <div className="space-y-2 text-sm font-medium text-gray-600">
-                  {purchase.supplier?.email && <p>Email: {purchase.supplier.email}</p>}
-                  {purchase.supplier?.phone && <p>Phone: {purchase.supplier.phone}</p>}
-                  {purchase.supplier?.address && <p>Address: {purchase.supplier.address}</p>}
+                  {purchase.supplier?.email && <p>Correo: {purchase.supplier.email}</p>}
+                  {purchase.supplier?.phone && <p>Teléfono: {purchase.supplier.phone}</p>}
+                  {purchase.supplier?.address && <p>Dirección: {purchase.supplier.address}</p>}
                 </div>
               </div>
             </div>
@@ -113,15 +113,15 @@ function PurchaseDetailDrawer({ id, onClose }: { id: string; onClose: () => void
             {/* Items Table */}
             <div className="space-y-4">
               <h3 className="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                <Package className="w-4 h-4 text-indigo-600" /> Item Details
+                <Package className="w-4 h-4 text-indigo-600" /> Detalles de los Artículos
               </h3>
               <div className="overflow-hidden rounded-2xl border border-gray-100">
                 <table className="w-full text-left">
                     <thead className="bg-gray-50">
                         <tr className="border-b border-gray-100">
-                            <th className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Product</th>
-                            <th className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Qty</th>
-                            <th className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Cost</th>
+                            <th className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Producto</th>
+                            <th className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Cant.</th>
+                            <th className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Costo</th>
                             <th className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Total</th>
                         </tr>
                     </thead>
@@ -139,7 +139,7 @@ function PurchaseDetailDrawer({ id, onClose }: { id: string; onClose: () => void
                     </tbody>
                     <tfoot className="bg-gray-50/50">
                         <tr>
-                            <td colSpan={3} className="px-4 py-4 text-right text-xs font-black text-gray-400 uppercase tracking-widest">Grand Total</td>
+                            <td colSpan={3} className="px-4 py-4 text-right text-xs font-black text-gray-400 uppercase tracking-widest">Total General</td>
                             <td className="px-4 py-4 text-right text-lg font-black text-indigo-600">{fmtCurrency(Number(purchase.total))}</td>
                         </tr>
                     </tfoot>
@@ -202,14 +202,14 @@ export default function PurchasesPage() {
         {/* Header */}
         <header className="px-10 py-8 bg-white/50 backdrop-blur-md sticky top-0 z-20 flex items-start justify-between">
           <div>
-            <h1 className="text-4xl font-black text-gray-900 tracking-tight leading-none mb-2">Purchase Orders</h1>
-            <p className="text-base text-gray-400 font-medium">Manage and track global procurement lifecycle.</p>
+            <h1 className="text-4xl font-black text-gray-900 tracking-tight leading-none mb-2">Órdenes de Compra</h1>
+            <p className="text-base text-gray-400 font-medium">Gestione y rastree el ciclo de vida de abastecimiento global.</p>
           </div>
           <button 
             onClick={() => router.push('/dashboard/purchases/new')}
             className="flex items-center gap-2 px-6 py-3.5 bg-indigo-600 text-white rounded-xl font-black text-sm hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition-all"
           >
-            <Plus className="w-5 h-5" /> New Purchase
+            <Plus className="w-5 h-5" /> Nueva Compra
           </button>
         </header>
 
@@ -218,10 +218,10 @@ export default function PurchasesPage() {
           {/* Metrics */}
           <div className="grid grid-cols-4 gap-6">
             {[
-              { label: 'Total Orders', value: total, icon: ShoppingCart, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-l-indigo-600' },
-              { label: 'Pending', value: purchases.filter(p => p.status === 'PENDING').length, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-l-amber-600' },
-              { label: 'Received', value: purchases.filter(p => p.status === 'COMPLETED').length, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-l-emerald-600' },
-              { label: 'Cancelled', value: purchases.filter(p => p.status === 'CANCELLED').length, icon: AlertCircle, color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-l-rose-600' },
+              { label: 'Total Órdenes', value: total, icon: ShoppingCart, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-l-indigo-600' },
+              { label: 'Pendientes', value: purchases.filter(p => p.status === 'PENDING').length, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-l-amber-600' },
+              { label: 'Recibidas', value: purchases.filter(p => p.status === 'COMPLETED').length, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-l-emerald-600' },
+              { label: 'Canceladas', value: purchases.filter(p => p.status === 'CANCELLED').length, icon: AlertCircle, color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-l-rose-600' },
             ].map((m, i) => (
               <div key={i} className={`bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 ${m.border} flex items-center justify-between`}>
                 <div>
@@ -242,7 +242,7 @@ export default function PurchasesPage() {
               <div className="flex-1 relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300" />
                 <input 
-                  placeholder="Search by ID or supplier name..."
+                  placeholder="Buscar por ID o nombre de proveedor..."
                   value={searchInput}
                   onChange={e => setSearchInput(e.target.value)}
                   className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-all"
@@ -253,22 +253,22 @@ export default function PurchasesPage() {
                 onChange={e => setStatusFilter(e.target.value)}
                 className="px-5 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-black text-gray-600 focus:outline-none cursor-pointer"
               >
-                <option value="">All Status</option>
-                <option value="COMPLETED">Received</option>
-                <option value="PENDING">Pending</option>
-                <option value="CANCELLED">Cancelled</option>
+                <option value="">Todos los Estados</option>
+                <option value="COMPLETED">Recibido</option>
+                <option value="PENDING">Pendiente</option>
+                <option value="CANCELLED">Cancelado</option>
               </select>
             </div>
 
             <table className="w-full border-collapse">
                 <thead>
                     <tr className="bg-gray-50/50 text-[11px] font-black text-gray-400 uppercase tracking-widest text-left">
-                        <th className="px-8 py-5">Order ID</th>
-                        <th className="px-6 py-5">Supplier</th>
-                        <th className="px-6 py-5">Total Amount</th>
-                        <th className="px-6 py-5">Date</th>
-                        <th className="px-6 py-5 text-center">Status</th>
-                        <th className="px-8 py-5 text-right w-16">Actions</th>
+                        <th className="px-8 py-5">ID de Orden</th>
+                        <th className="px-6 py-5">Proveedor</th>
+                        <th className="px-6 py-5">Monto Total</th>
+                        <th className="px-6 py-5">Fecha</th>
+                        <th className="px-6 py-5 text-center">Estado</th>
+                        <th className="px-8 py-5 text-right w-16">Acciones</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -284,7 +284,7 @@ export default function PurchasesPage() {
                         <tr>
                             <td colSpan={6} className="py-20 text-center">
                                 <FileText className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                                <p className="font-black text-gray-600">No purchase records found</p>
+                                <p className="font-black text-gray-600">No se encontraron registros de compra</p>
                             </td>
                         </tr>
                     ) : (
@@ -333,7 +333,7 @@ export default function PurchasesPage() {
             {/* Pagination */}
             <div className="px-8 py-5 bg-white border-t border-gray-100 flex items-center justify-between">
                 <p className="text-xs font-black text-gray-400 uppercase tracking-widest">
-                    Showing {(page-1)*LIMIT + 1} to {Math.min(page*LIMIT, total)} of {total} orders
+                    Mostrando {(page-1)*LIMIT + 1} a {Math.min(page*LIMIT, total)} de {total} órdenes
                 </p>
                 <div className="flex items-center gap-2">
                     <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page === 1}

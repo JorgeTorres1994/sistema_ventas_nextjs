@@ -48,7 +48,7 @@ export default function LoginPage() {
                 </span>
               </div>
               <h1 className="text-foreground font-extrabold text-2xl tracking-tight mb-2">ArchitectSaaS</h1>
-              <p className="text-on-surface-variant text-sm font-medium">Precision tools for the digital era.</p>
+              <p className="text-on-surface-variant text-sm font-medium">Herramientas de precisión para la era digital.</p>
             </div>
 
             {/* Error Message */}
@@ -62,9 +62,9 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <AuthInput
                 id="email"
-                label="Email"
+                label="Correo Electrónico"
                 type="email"
-                placeholder="Enter your email"
+                placeholder="Ingresa tu correo"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 successIcon={email === 'admin@admin.com'}
@@ -72,9 +72,9 @@ export default function LoginPage() {
 
               <AuthInput
                 id="password"
-                label="Password"
+                label="Contraseña"
                 type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
+                placeholder="Ingresa tu contraseña"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 rightElement={
@@ -92,12 +92,12 @@ export default function LoginPage() {
 
               <div className="flex justify-end -mt-4 px-1">
                 <Link href="#" className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors">
-                  Forgot password?
+                  ¿Olvidaste tu contraseña?
                 </Link>
               </div>
 
               <AuthButton type="submit" icon="login" isLoading={isLoading}>
-                Sign In
+                Iniciar Sesión
               </AuthButton>
             </form>
 
@@ -107,7 +107,7 @@ export default function LoginPage() {
                 <div className="w-full border-t border-outline-variant/30"></div>
               </div>
               <span className="relative bg-surface-lowest px-4 text-xs font-medium text-on-surface-variant uppercase tracking-widest">
-                Or continue with
+                O continuar con
               </span>
             </div>
 
@@ -127,28 +127,28 @@ export default function LoginPage() {
           {/* Footer Link */}
           <div className="bg-surface-low py-6 text-center px-8 border-t border-outline-variant/10">
             <p className="text-sm font-medium text-on-surface-variant">
-              Don't have an account? 
-              <Link href="/register" className="text-primary font-bold hover:underline ml-1">Sign up</Link>
+              ¿No tienes una cuenta? 
+              <Link href="/register" className="text-primary font-bold hover:underline ml-1">Regístrate</Link>
             </p>
           </div>
         </div>
 
         {/* Accessibility/Legal Footer */}
         <div className="mt-8 flex justify-center gap-6">
-          <Link href="#" className="text-xs font-medium text-on-surface-variant hover:text-primary transition-colors">Privacy Policy</Link>
-          <Link href="#" className="text-xs font-medium text-on-surface-variant hover:text-primary transition-colors">Terms of Service</Link>
-          <Link href="#" className="text-xs font-medium text-on-surface-variant hover:text-primary transition-colors">Contact Support</Link>
+          <Link href="#" className="text-xs font-medium text-on-surface-variant hover:text-primary transition-colors">Política de Privacidad</Link>
+          <Link href="#" className="text-xs font-medium text-on-surface-variant hover:text-primary transition-colors">Términos de Servicio</Link>
+          <Link href="#" className="text-xs font-medium text-on-surface-variant hover:text-primary transition-colors">Soporte Técnico</Link>
         </div>
       </div>
       
       {/* Global Copyright Footer */}
       <footer className="absolute bottom-8 w-full px-8 opacity-40">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-[0.75rem] text-on-surface-variant">
-          <p>© 2024 Digital Architect. All rights reserved.</p>
+          <p>© 2024 Digital Architect. Todos los derechos reservados.</p>
           <div className="flex gap-6 mt-4 md:mt-0">
-            <Link href="#">Privacy Policy</Link>
-            <Link href="#">Terms of Service</Link>
-            <Link href="#">Contact</Link>
+            <Link href="#">Privacidad</Link>
+            <Link href="#">Términos</Link>
+            <Link href="#">Contacto</Link>
           </div>
         </div>
       </footer>

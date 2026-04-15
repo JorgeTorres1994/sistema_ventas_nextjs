@@ -36,6 +36,16 @@ export default function SaleDetailDrawer({ saleId, onClose, onCancelSuccess }: S
     }
   };
 
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'PAID': return 'PAGADO';
+      case 'PENDING': return 'PENDIENTE';
+      case 'PARTIAL': return 'PARCIAL';
+      case 'CANCELLED': return 'CANCELADO';
+      default: return status;
+    }
+  };
+
   return (
     <>
       {/* Backdrop */}
@@ -50,8 +60,8 @@ export default function SaleDetailDrawer({ saleId, onClose, onCancelSuccess }: S
           {/* Header */}
           <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
             <div>
-              <h2 className="text-xl font-black text-gray-900 leading-none">Sale Detail</h2>
-              <p className="text-xs font-bold text-gray-400 mt-1 uppercase tracking-widest">Transaction #{sale?.id?.substring(0, 8)}</p>
+              <h2 className="text-xl font-black text-gray-900 leading-none">Detalle de Venta</h2>
+              <p className="text-xs font-bold text-gray-400 mt-1 uppercase tracking-widest">Transacción #{sale?.id?.substring(0, 8)}</p>
             </div>
             <button onClick={onClose} className="p-2 hover:bg-gray-50 rounded-xl transition-colors text-gray-400 hover:text-gray-900">
               <X className="w-6 h-6" />
@@ -68,27 +78,27 @@ export default function SaleDetailDrawer({ saleId, onClose, onCancelSuccess }: S
                 {/* General Info Grid */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Date & Time</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Fecha y Hora</p>
                     <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                       <Calendar className="w-4 h-4 text-indigo-500" />
-                      {new Date(sale.createdAt).toLocaleString()}
+                      {new Date(sale.createdAt).toLocaleString('es-PE')}
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Status</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Estado</p>
                     <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black border ${getStatusStyle(sale.status)}`}>
-                      {sale.status}
+                      {getStatusLabel(sale.status)}
                     </div>
                   </div>
                   <div className="space-y-1 mt-2">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Customer</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Cliente</p>
                     <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                       <User className="w-4 h-4 text-indigo-500" />
-                      {sale.customer?.name || 'Walk-in Customer'}
+                      {sale.customer?.name || 'Venta al Paso'}
                     </div>
                   </div>
                   <div className="space-y-1 mt-2">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Issued By</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Emitido por</p>
                     <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                       <Hash className="w-4 h-4 text-indigo-500" />
                       {sale.user?.name}
@@ -99,15 +109,15 @@ export default function SaleDetailDrawer({ saleId, onClose, onCancelSuccess }: S
                 {/* Products Table */}
                 <div className="space-y-4">
                   <h3 className="text-sm font-black text-gray-900 flex items-center gap-2 uppercase tracking-tight">
-                    <ShoppingBag className="w-4 h-4 text-orange-500" /> Items List
+                    <ShoppingBag className="w-4 h-4 text-orange-500" /> Lista de Artículos
                   </h3>
                   <div className="bg-gray-50 rounded-2xl overflow-hidden border border-gray-100">
                     <table className="w-full text-left text-xs">
                       <thead>
                         <tr className="border-b border-gray-200 text-gray-400 font-bold uppercase tracking-widest">
-                          <th className="px-4 py-3">Product</th>
-                          <th className="px-4 py-3 text-center">Qty</th>
-                          <th className="px-4 py-3 text-right">Price</th>
+                          <th className="px-4 py-3">Producto</th>
+                          <th className="px-4 py-3 text-center">Cant.</th>
+                          <th className="px-4 py-3 text-right">Precio</th>
                           <th className="px-4 py-3 text-right">Total</th>
                         </tr>
                       </thead>
@@ -132,11 +142,11 @@ export default function SaleDetailDrawer({ saleId, onClose, onCancelSuccess }: S
                     <span className="text-gray-900 font-bold">S/ {Number(sale.total - sale.taxAmount).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500 font-bold uppercase tracking-tight">Tax (8%)</span>
+                    <span className="text-gray-500 font-bold uppercase tracking-tight">IGV (18%)</span>
                     <span className="text-gray-900 font-bold">S/ {Number(sale.taxAmount).toFixed(2)}</span>
                   </div>
                   <div className="pt-3 border-t border-gray-100 flex justify-between items-center">
-                    <span className="text-lg font-black text-gray-900 uppercase tracking-tight leading-none">Total Amount</span>
+                    <span className="text-lg font-black text-gray-900 uppercase tracking-tight leading-none">Total General</span>
                     <span className="text-2xl font-black text-indigo-600 leading-none">S/ {Number(sale.total).toFixed(2)}</span>
                   </div>
                 </div>
@@ -144,7 +154,7 @@ export default function SaleDetailDrawer({ saleId, onClose, onCancelSuccess }: S
                 {/* Payment History */}
                 <div className="space-y-4">
                   <h3 className="text-sm font-black text-gray-900 flex items-center gap-2 uppercase tracking-tight">
-                    <CreditCard className="w-4 h-4 text-blue-500" /> Payments
+                    <CreditCard className="w-4 h-4 text-blue-500" /> Pagos
                   </h3>
                   <div className="space-y-2">
                     {sale.payments?.map((payment: any) => (
@@ -160,8 +170,14 @@ export default function SaleDetailDrawer({ saleId, onClose, onCancelSuccess }: S
                 </div>
               </>
             ) : (
-              <div className="py-20 text-center text-gray-400">Select a sale to view details</div>
+              <div className="py-20 text-center text-gray-400 font-bold uppercase tracking-widest">Seleccione una venta para ver detalles</div>
             )}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
           </div>
         </div>
       </div>

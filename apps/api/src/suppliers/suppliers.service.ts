@@ -8,7 +8,7 @@ export class SuppliersService {
     async create(data: { name: string; dniRuc: string; email?: string; phone?: string; address?: string }) {
         const existing = await this.prisma.supplier.findUnique({ where: { dniRuc: data.dniRuc } });
         if (existing) {
-            throw new ConflictException(`A supplier with DNI/RUC ${data.dniRuc} already exists`);
+            throw new ConflictException(`Ya existe un proveedor con DNI/RUC ${data.dniRuc}`);
         }
         return this.prisma.supplier.create({ data });
     }
@@ -63,7 +63,7 @@ export class SuppliersService {
         });
 
         if (!supplier) {
-            throw new NotFoundException(`Supplier with ID ${id} not found`);
+            throw new NotFoundException(`Proveedor con ID ${id} no encontrado`);
         }
 
         const allPurchases = await this.prisma.purchase.findMany({
@@ -86,14 +86,14 @@ export class SuppliersService {
         data: { name?: string; dniRuc?: string; email?: string; phone?: string; address?: string; isActive?: boolean },
     ) {
         const supplier = await this.prisma.supplier.findUnique({ where: { id } });
-        if (!supplier) throw new NotFoundException(`Supplier with ID ${id} not found`);
+        if (!supplier) throw new NotFoundException(`Proveedor con ID ${id} no encontrado`);
 
         if (data.dniRuc && data.dniRuc !== supplier.dniRuc) {
             const existing = await this.prisma.supplier.findFirst({
                 where: { dniRuc: data.dniRuc, NOT: { id } },
             });
             if (existing) {
-                throw new ConflictException(`Another supplier already has DNI/RUC ${data.dniRuc}`);
+                throw new ConflictException(`Otro proveedor ya tiene el DNI/RUC ${data.dniRuc}`);
             }
         }
 

@@ -12,16 +12,16 @@ const TopBar = () => {
         </div>
         <input
           type="text"
-          placeholder="Search analytics..."
+          placeholder="Buscar analíticas..."
           className="block w-full pl-10 pr-3 py-2.5 border-none bg-[#F9FAFB] rounded-lg text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>
 
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-3">
-          <span className="text-sm text-[#4B5563]">Last 7 days</span>
+          <span className="text-sm text-[#4B5563]">Últimos 7 días</span>
           <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-full px-4 py-1.5 text-sm font-medium text-[#111827]">
-            Oct 1 - Oct 31, 2023
+            {new Date().toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })} - {new Date().toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' })}
           </div>
         </div>
         
@@ -35,7 +35,7 @@ const TopBar = () => {
         <div className="flex items-center gap-3 cursor-pointer">
           <div className="text-right">
             <p className="text-sm font-semibold text-[#111827]">Alex Rivera</p>
-            <p className="text-xs text-[#6B7280]">Admin</p>
+            <p className="text-xs text-[#6B7280]">Administrador</p>
           </div>
           <div className="w-10 h-10 rounded-full bg-orange-200 overflow-hidden border border-[#E5E7EB]">
             {/* Avatar Placeholder since it's just a UI match */}

@@ -119,7 +119,7 @@ export class ProductsService {
 
     async toggleActive(id: string): Promise<Product> {
         const product = await this.prisma.product.findUnique({ where: { id } });
-        if (!product) throw new Error('Product not found');
+        if (!product) throw new Error('Producto no encontrado');
         return this.prisma.product.update({
             where: { id },
             data: { isActive: !product.isActive },

@@ -34,19 +34,19 @@ const Sidebar = () => {
   }, []);
 
   const menuItems = [
-    { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
+    { name: 'Tablero', icon: LayoutDashboard, path: '/' },
     { name: 'Terminal POS', icon: MonitorSmartphone, path: '/pos' },
-    { name: 'Cash Register', icon: Wallet, path: '/cash' },
-    { name: 'Sales', icon: Wallet, path: '/sales' },
-    { name: 'Purchases', icon: ShoppingCart, path: '/purchases' },
-    { name: 'Customers', icon: Users2, path: '/customers' },
-    { name: 'Products', icon: Package, path: '/products' },
-    { name: 'Inventory', icon: Boxes, path: '/inventory' },
-    { name: 'Suppliers', icon: Building2, path: '/suppliers' },
-    { name: 'Analytics', icon: BarChart3, path: '/analytics' },
-    { name: 'Reports', icon: FileText, path: '/reports' },
+    { name: 'Caja Registradora', icon: Wallet, path: '/cash' },
+    { name: 'Ventas', icon: Wallet, path: '/sales' },
+    { name: 'Compras', icon: ShoppingCart, path: '/purchases' },
+    { name: 'Clientes', icon: Users2, path: '/customers' },
+    { name: 'Productos', icon: Package, path: '/products' },
+    { name: 'Inventario', icon: Boxes, path: '/inventory' },
+    { name: 'Proveedores', icon: Building2, path: '/suppliers' },
+    { name: 'Estadísticas', icon: BarChart3, path: '/analytics' },
+    { name: 'Reportes', icon: FileText, path: '/reports' },
     // Only show Users to Admin
-    ...(isAdmin ? [{ name: 'Users', icon: Users, path: '/users' }] : []),
+    ...(isAdmin ? [{ name: 'Usuarios', icon: Users, path: '/users' }] : []),
   ];
 
   return (
@@ -61,10 +61,10 @@ const Sidebar = () => {
             </div>
           )}
           <div>
-            <h1 className="font-bold text-[#111827] text-md leading-tight truncate w-32" title={settings?.businessName || 'Analytics Pro'}>
-              {settings?.businessName || 'Analytics Pro'}
+            <h1 className="font-bold text-[#111827] text-md leading-tight truncate w-32" title={settings?.businessName || 'Analítica Pro'}>
+              {settings?.businessName || 'Analítica Pro'}
             </h1>
-            <p className="text-sm text-[#6B7280]">Enterprise Plan</p>
+            <p className="text-sm text-[#6B7280]">Plan Empresarial</p>
           </div>
         </div>
 
@@ -99,20 +99,16 @@ const Sidebar = () => {
                 : 'text-[#4B5563] hover:bg-gray-100 hover:text-[#111827]'
             }`}>
               <Settings className={`w-5 h-5 ${pathname === '/dashboard/settings' ? 'text-blue-600' : 'text-[#6B7280]'}`} />
-              <span className="text-[15px]">Settings</span>
+              <span className="text-[15px]">Configuración</span>
             </div>
           </Link>
         )}
         <div 
-          onClick={() => {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = '/login';
-          }}
+          onClick={logout}
           className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer text-rose-600 hover:bg-rose-50 transition-colors"
         >
           <span className="material-symbols-outlined w-5 h-5 text-rose-500">logout</span>
-          <span className="text-[15px] font-medium">Log out</span>
+          <span className="text-[15px] font-medium">Cerrar Sesión</span>
         </div>
       </div>
     </aside>

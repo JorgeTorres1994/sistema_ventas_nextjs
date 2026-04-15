@@ -32,12 +32,12 @@ export default function PosProductGrid({
     products.forEach(p => {
       if (p.category?.name) cats.add(p.category.name);
     });
-    return ['All', ...Array.from(cats)].slice(0, 6); // Up to 6 elements for design limits
+    return ['Todos', ...Array.from(cats)].slice(0, 6); // Up to 6 elements for design limits
   }, [products]);
 
   // Filter products by selected category
   const filteredProducts = useMemo(() => {
-    if (selectedCategory === 'All') return products;
+    if (selectedCategory === 'Todos') return products;
     return products.filter(p => p.category?.name === selectedCategory);
   }, [products, selectedCategory]);
 
@@ -64,11 +64,11 @@ export default function PosProductGrid({
       {/* Product Grid */}
       <div className="flex-1 overflow-y-auto hide-scrollbar pb-24">
         {isLoading ? (
-          <div className="text-center text-gray-500 py-20 animate-pulse">Loading products...</div>
+          <div className="text-center text-gray-500 py-20 animate-pulse">Cargando productos...</div>
         ) : filteredProducts.length === 0 ? (
           <div className="text-center text-gray-500 py-20 flex flex-col items-center">
             <span className="material-symbols-outlined text-4xl mb-2 opacity-50">inventory_2</span>
-            <p>No products found matching criteria.</p>
+            <p>No se encontraron productos que coincidan con los criterios.</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -78,14 +78,14 @@ export default function PosProductGrid({
               const isLowStock = product.stock > 0 && product.stock <= 10;
               
               // Handle badge logic
-              let badgeText = "IN STOCK";
+              let badgeText = "EN STOCK";
               let badgeColor = "bg-primary-container/20 text-primary";
               
               if (isOutOfStock) {
-                badgeText = "OUT OF STOCK";
+                badgeText = "SIN STOCK";
                 badgeColor = "bg-gray-800 text-white";
               } else if (isLowStock) {
-                badgeText = "LOW STOCK";
+                badgeText = "STOCK BAJO";
                 badgeColor = "bg-yellow-100 text-yellow-800";
               }
 

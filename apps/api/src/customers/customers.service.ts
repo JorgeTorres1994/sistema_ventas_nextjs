@@ -69,7 +69,7 @@ export class CustomersService {
         });
 
         if (!customer) {
-            throw new NotFoundException(`Customer with ID ${id} not found`);
+            throw new NotFoundException(`Cliente con ID ${id} no encontrado`);
         }
 
         const allSales = await this.prisma.sale.findMany({
@@ -92,7 +92,7 @@ export class CustomersService {
         data: { name?: string; dni?: string; email?: string; phone?: string; address?: string; isActive?: boolean },
     ) {
         const customer = await this.prisma.customer.findUnique({ where: { id } });
-        if (!customer) throw new NotFoundException(`Customer with ID ${id} not found`);
+        if (!customer) throw new NotFoundException(`Cliente con ID ${id} no encontrado`);
 
         if (data.dni && data.dni !== customer.dni) {
             const existing = await this.prisma.customer.findFirst({

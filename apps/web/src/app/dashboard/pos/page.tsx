@@ -28,7 +28,7 @@ export default function PosPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState('Todos');
 
   // Cart State
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -63,7 +63,7 @@ export default function PosPage() {
     
     if (existing) {
       if (existing.quantity >= product.stock) {
-        showNotification(`Maximum stock reached for ${product.name}`, true);
+        showNotification(`Límite de stock alcanzado para ${product.name}`, true);
         return;
       }
       setCart(prev => prev.map(item => 
@@ -114,7 +114,7 @@ export default function PosPage() {
       // We explicitly bypass customer requirement in UI, backend fallback will handle it
       await createSale(itemsPayload, paymentMethod, total);
       
-      showNotification('Sale completed successfully!', false);
+      showNotification('¡Venta completada con éxito!', false);
       handleClearCart();
       // Refetch products to update stock visually
       const freshProducts = await getProducts(1, 100, searchQuery);
@@ -122,7 +122,7 @@ export default function PosPage() {
       
     } catch (error: any) {
       console.error('Checkout failed:', error);
-      const errorMsg = error.response?.data?.message || 'Transaction failed. Is the Cash Register open?';
+      const errorMsg = error.response?.data?.message || 'Error en la transacción. ¿Está abierta la caja?';
       showNotification(errorMsg, true);
     } finally {
       setIsProcessing(false);

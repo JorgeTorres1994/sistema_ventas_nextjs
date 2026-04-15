@@ -19,15 +19,15 @@ interface StatsProps {
 
 const StatsCards = ({ kpis, isLoading }: StatsProps) => {
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('es-PE', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'PEN',
     }).format(value);
   };
 
   const cards = [
     {
-      title: 'Total Revenue',
+      title: 'Ingresos Totales',
       value: formatCurrency(kpis?.revenue || 0),
       growth: parseFloat((kpis?.revenueGrowth || 0).toFixed(1)),
       icon: DollarSign,
@@ -35,7 +35,7 @@ const StatsCards = ({ kpis, isLoading }: StatsProps) => {
       iconColor: 'text-blue-600',
     },
     {
-      title: 'Total Orders',
+      title: 'Órdenes Totales',
       value: (kpis?.orders || 0).toLocaleString(),
       growth: parseFloat((kpis?.ordersGrowth || 0).toFixed(1)),
       icon: ShoppingBag,
@@ -43,7 +43,7 @@ const StatsCards = ({ kpis, isLoading }: StatsProps) => {
       iconColor: 'text-purple-600',
     },
     {
-      title: 'Conversion Rate',
+      title: 'Tasa de Conversión',
       value: `${kpis?.conversionRate || 0}%`,
       growth: parseFloat((kpis?.conversionRateGrowth || 0).toFixed(1)),
       icon: Target,
@@ -51,7 +51,7 @@ const StatsCards = ({ kpis, isLoading }: StatsProps) => {
       iconColor: 'text-orange-600',
     },
     {
-      title: 'Avg. Order Value',
+      title: 'Valor Promedio',
       value: formatCurrency(kpis?.avgOrderValue || 0),
       growth: parseFloat((kpis?.avgOrderGrowth || 0).toFixed(1)),
       icon: BarChart2,

@@ -23,14 +23,14 @@ export default function PosCartPanel({
       
       {/* Header */}
       <div className="px-8 py-6 flex items-center justify-between bg-gray-50 border-white relative z-20">
-        <h2 className="text-xl font-bold text-gray-900">Active Cart</h2>
+        <h2 className="text-xl font-bold text-gray-900">Carrito Activo</h2>
         <button 
           onClick={onClearCart}
           disabled={cart.length === 0 || isProcessing}
           className="flex items-center gap-1.5 text-red-500 font-bold text-xs uppercase tracking-wide hover:text-red-700 disabled:opacity-50 transition-colors"
         >
           <span className="material-symbols-outlined text-[16px]">delete</span>
-          Clear Cart
+          Vaciar Carrito
         </button>
       </div>
 
@@ -39,7 +39,7 @@ export default function PosCartPanel({
         {cart.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-gray-400">
             <span className="material-symbols-outlined text-5xl mb-4 opacity-30">shopping_cart</span>
-            <p className="font-medium">Your cart is empty.</p>
+            <p className="font-medium">Tu carrito está vacío.</p>
           </div>
         ) : (
           cart.map((item) => {
@@ -69,7 +69,7 @@ export default function PosCartPanel({
                     {item.product.name}
                   </h4>
                   <p className="text-xs text-gray-500 font-medium mb-3">
-                    ${itemPrice.toFixed(2)} / unit
+                    ${itemPrice.toFixed(2)} / unidad
                   </p>
                   
                   <div className="flex items-center justify-between">
@@ -111,7 +111,7 @@ export default function PosCartPanel({
             <span className="font-bold text-gray-700">${subtotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-between items-center text-sm font-medium text-gray-500">
-            <span>Tax ({taxPercent}%)</span>
+            <span>Impuestos ({taxPercent}%)</span>
             <span className="font-bold text-gray-700">${taxAmount.toFixed(2)}</span>
           </div>
           <div className="flex justify-between items-end pt-3">
@@ -124,7 +124,7 @@ export default function PosCartPanel({
 
         {/* Payment Methods */}
         <div className="mb-8">
-          <p className="text-[10px] font-bold tracking-widest text-gray-500 uppercase mb-3">Payment Method</p>
+          <p className="text-[10px] font-bold tracking-widest text-gray-500 uppercase mb-3">Método de Pago</p>
           <div className="grid grid-cols-3 gap-3">
             {paymentMethods.filter(m => m.isActive).map((method) => {
               const methodKey = method.name === 'Efectivo' ? 'CASH' : method.name === 'Tarjeta' ? 'CARD' : 'DIGITAL';
@@ -137,7 +137,7 @@ export default function PosCartPanel({
                   className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-colors ${paymentMethod === methodKey ? 'border-primary bg-primary/5 text-primary' : 'border-white bg-white text-gray-600 hover:border-gray-200 shadow-sm'}`}
                 >
                   <span className="material-symbols-outlined mb-1">{icon}</span>
-                  <span className="text-[11px] font-bold">{method.name === 'Billetera Digital' ? 'Digital' : method.name === 'Tarjeta' ? 'Card' : 'Cash'}</span>
+                  <span className="text-[11px] font-bold">{method.name}</span>
                 </button>
               );
             })}
@@ -155,7 +155,7 @@ export default function PosCartPanel({
           ) : (
             <>
               <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-              Complete Sale
+              Completar Venta
             </>
           )}
         </button>
