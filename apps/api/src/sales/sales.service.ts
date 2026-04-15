@@ -223,7 +223,10 @@ export class SalesService {
         return this.prisma.$transaction(async (tx) => {
             const sale = await tx.sale.findUnique({
                 where: { id },
-                include: { items: true },
+                include: { 
+                    items: true,
+                    payments: true
+                },
             });
 
             if (!sale) {

@@ -12,9 +12,9 @@ import { ReportsModule } from './reports/reports.module.js';
 import { CustomersModule } from './customers/customers.module.js';
 import { SuppliersModule } from './suppliers/suppliers.module.js';
 import { PurchasesModule } from './purchases/purchases.module.js';
-import { CashierModule } from './cashier/cashier.module';
-import { CashRegistersModule } from './cash-registers/cash-registers.module';
-import { InventoryModule } from './inventory/inventory.module';
+import { CashierModule } from './cashier/cashier.module.js';
+import { CashRegistersModule } from './cash-registers/cash-registers.module.js';
+import { InventoryModule } from './inventory/inventory.module.js';
 
 @Module({
   imports: [

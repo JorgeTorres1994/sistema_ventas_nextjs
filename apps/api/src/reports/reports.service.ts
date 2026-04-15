@@ -113,6 +113,7 @@ export class ReportsService {
 
     async getTransactions(filters: { startDate?: string; endDate?: string }) {
         const { where } = this.getFilters(filters);
+        console.log('Fetching reports transactions history...');
 
         return this.prisma.sale.findMany({
             where,
@@ -129,7 +130,7 @@ export class ReportsService {
             id: s.id,
             date: s.createdAt,
             customer: s.customer?.name || 'Final Consumer',
-            category: s.items[0]?.product?.category?.name || 'General',
+            category: (s.items && s.items[0]?.product?.category?.name) || 'General',
             amount: Number(s.total),
             status: s.status
         })));

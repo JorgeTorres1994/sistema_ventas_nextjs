@@ -11,7 +11,8 @@ import {
     ArrowUpRight, ArrowDownRight, Printer, Filter,
     ChevronDown, Search, Loader2, Package, User, Clock,
     DollarSign, Briefcase, TrendingUp, ShoppingBag, 
-    Maximize2, MoreHorizontal, CheckCircle2, AlertCircle
+    Maximize2, MoreHorizontal, CheckCircle2, AlertCircle,
+    BarChart3
 } from 'lucide-react';
 import { 
     getReportsSummary, 
@@ -172,7 +173,7 @@ export default function ReportsPage() {
 
         <main className="flex-1 px-12 pb-12 space-y-8">
           
-          {isEmpty ? (
+          {(isEmpty || !data.summary) ? (
              <div className="flex flex-col items-center justify-center py-20 animate-in fade-in slide-in-from-bottom-4">
                 <div className="w-32 h-32 bg-gray-50 rounded-[40px] flex items-center justify-center mb-8 border border-dashed border-gray-200">
                    <BarChart3 className="w-16 h-16 text-gray-300" />
@@ -183,8 +184,8 @@ export default function ReportsPage() {
                    <button onClick={() => setFilters({startDate:'', endDate:'', type:'Consolidated Revenue'})} className="px-8 py-4 bg-blue-600 rounded-2xl text-white font-black hover:bg-blue-700 transition-all flex items-center gap-2">
                        <Calendar className="w-5 h-5" /> Adjust Date Range
                    </button>
-                   <button className="px-8 py-4 bg-white border border-gray-100 rounded-2xl text-gray-900 font-black hover:bg-gray-50 transition-all">
-                       Clear Filters
+                   <button onClick={() => fetchData()} className="px-8 py-4 bg-white border border-gray-100 rounded-2xl text-gray-900 font-black hover:bg-gray-50 transition-all flex items-center gap-2">
+                       <Loader2 className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} /> Clear Filters
                    </button>
                 </div>
              </div>
@@ -192,9 +193,9 @@ export default function ReportsPage() {
             <>
               {/* KPIs */}
               <div className="flex gap-8">
-                <KPICard title="Total Sales" value={data.summary.totalRevenue} growth={12.5} icon={ShoppingBag} isCurrency />
-                <KPICard title="Total Profit" value={data.summary.totalProfit} growth={8.2} icon={TrendingUp} isCurrency />
-                <KPICard title="Average Ticket" value={data.summary.avgTicket} growth={-1.4} icon={DollarSign} isCurrency />
+                <KPICard title="Total Sales" value={data.summary?.totalRevenue ?? 0} growth={12.5} icon={ShoppingBag} isCurrency />
+                <KPICard title="Total Profit" value={data.summary?.totalProfit ?? 0} growth={8.2} icon={TrendingUp} isCurrency />
+                <KPICard title="Average Ticket" value={data.summary?.avgTicket ?? 0} growth={-1.4} icon={DollarSign} isCurrency />
               </div>
 
               {/* Row 1: Charts */}
@@ -271,7 +272,7 @@ export default function ReportsPage() {
                               <span className="text-sm font-bold text-gray-600">{d.name}</span>
                            </div>
                            <span className="text-sm font-black text-gray-900">
-                             {((d.value / data.summary.totalRevenue) * 100).toFixed(0)}%
+                             {data.summary ? ((d.value / data.summary.totalRevenue) * 100).toFixed(0) : 0}%
                            </span>
                         </div>
                      ))}
