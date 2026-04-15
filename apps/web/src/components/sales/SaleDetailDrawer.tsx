@@ -49,11 +49,11 @@ export default function SaleDetailDrawer({ saleId, onClose, onCancelSuccess }: S
   return (
     <>
       {/* Backdrop */}
-      <div 
-        className={`fixed inset-0 bg-black/20 backdrop-blur-sm z-[60] transition-opacity duration-300 ${saleId ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} 
+      <div
+        className={`fixed inset-0 bg-black/20 backdrop-blur-sm z-[60] transition-opacity duration-300 ${saleId ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={onClose}
       />
-      
+
       {/* Drawer */}
       <div className={`fixed inset-y-0 right-0 w-full max-w-lg bg-white shadow-2xl z-[70] transform transition-transform duration-500 ease-out ${saleId ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="flex flex-col h-full">
@@ -172,12 +172,6 @@ export default function SaleDetailDrawer({ saleId, onClose, onCancelSuccess }: S
             ) : (
               <div className="py-20 text-center text-gray-400 font-bold uppercase tracking-widest">Seleccione una venta para ver detalles</div>
             )}
-          </div>
-        </div>
-      </div>
-    </>
-  );
-}
           </div>
         </div>
       </div>

@@ -292,7 +292,7 @@ export default function SettingsPage() {
                                                              'Yape, Plin, Transferencias'}
                                                         </p>
                                                     </div>
- streams                                                </div>
+                                                </div>
                                                 <button 
                                                     onClick={() => handleTogglePayment(method.id)}
                                                     className={`w-12 h-6 rounded-full relative transition-colors ${method.isActive ? 'bg-blue-600' : 'bg-gray-200'}`}

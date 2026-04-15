@@ -42,13 +42,11 @@ export default function LoginPage() {
           <div className="p-8 md:p-10">
             {/* Brand Header */}
             <div className="mb-10 text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-container rounded-xl mb-4 shadow-lg shadow-primary/20">
-                <span className="material-symbols-outlined text-white text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  architecture
-                </span>
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl mb-4 shadow-xl border border-gray-100 p-2 overflow-hidden">
+                <img src="/logo.png" alt="Nexus Genesis Logo" className="w-full h-full object-contain" />
               </div>
-              <h1 className="text-foreground font-extrabold text-2xl tracking-tight mb-2">ArchitectSaaS</h1>
-              <p className="text-on-surface-variant text-sm font-medium">Herramientas de precisión para la era digital.</p>
+              <h1 className="text-gray-900 font-black text-3xl tracking-tight mb-2">Nexus Genesis</h1>
+              <p className="text-gray-400 text-sm font-bold uppercase tracking-widest">Sincronía perfecta para empresas de élite.</p>
             </div>
 
             {/* Error Message */}

@@ -8,8 +8,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ArchitectSaaS | Login",
-  description: "Precision tools for the digital era.",
+  title: "Nexus Genesis | ERP de Élite",
+  description: "Sincronía perfecta para empresas de alto rendimiento.",
 };
 
 import { SettingsProvider } from "@/components/SettingsProvider";

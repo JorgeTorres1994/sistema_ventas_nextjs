@@ -15,10 +15,10 @@ export class SettingsService implements OnModuleInit {
         if (count === 0) {
             await this.prisma.setting.create({
                 data: {
-                    businessName: 'Lumen Ledger Storefront',
-                    address: '742 Evergreen Terrace, Springfield, OR 97477',
-                    phone: '+1 (555) 000-1234',
-                    email: 'contact@lumenledger.com',
+                    businessName: 'Nexus Genesis',
+                    address: 'Lima, Perú',
+                    phone: '+51 900 000 000',
+                    email: 'contacto@nexusgenesis.com',
                     taxRate: 18,
                     currency: 'USD',
                     dateFormat: 'MM/DD/YYYY',

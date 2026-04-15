@@ -15,10 +15,12 @@ import {
   MonitorSmartphone,
   Boxes,
   Users2,
-  Building2
+  Building2,
+  LogOut
 } from 'lucide-react';
 
 import { useSettings } from '../SettingsProvider';
+import { logout } from '@/lib/api';
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -56,15 +58,15 @@ const Sidebar = () => {
           {settings?.logoUrl ? (
             <img src={`http://localhost:3005${settings.logoUrl}`} alt="Logo" className="w-10 h-10 rounded-lg object-cover" />
           ) : (
-            <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
-              <BarChart3 className="text-white w-6 h-6" />
+            <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm">
+              <img src="/logo.png" alt="Nexus Genesis" className="w-full h-full object-contain p-1" />
             </div>
           )}
           <div>
-            <h1 className="font-bold text-[#111827] text-md leading-tight truncate w-32" title={settings?.businessName || 'Analítica Pro'}>
-              {settings?.businessName || 'Analítica Pro'}
+            <h1 className="font-bold text-[#111827] text-md leading-tight truncate w-32" title={settings?.businessName || 'Nexus Genesis'}>
+              {settings?.businessName || 'Nexus Genesis'}
             </h1>
-            <p className="text-sm text-[#6B7280]">Plan Empresarial</p>
+            <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest mt-0.5">Sistemas Élite</p>
           </div>
         </div>
 
@@ -107,7 +109,7 @@ const Sidebar = () => {
           onClick={logout}
           className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer text-rose-600 hover:bg-rose-50 transition-colors"
         >
-          <span className="material-symbols-outlined w-5 h-5 text-rose-500">logout</span>
+          <LogOut className="w-5 h-5 text-rose-500" />
           <span className="text-[15px] font-medium">Cerrar Sesión</span>
         </div>
       </div>

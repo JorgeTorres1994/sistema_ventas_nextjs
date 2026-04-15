@@ -339,7 +339,7 @@ export default function InventoryPage() {
                   onChange={e => setSearchInput(e.target.value)}
                   className="bg-transparent outline-none text-sm font-medium text-gray-700 w-48" />
               </div>
- streams            </div>
+            </div>
 
             {/* Results count */}
             <div className="px-6 py-2 bg-gray-50/50 border-b border-gray-50 flex items-center justify-between">
@@ -365,9 +365,8 @@ export default function InventoryPage() {
                       </button>
                     </th>
                     <th className="px-4 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Punto de Pedido</th>
-                    <th className="px-6 py-4 text-right text-xs font-black text-gray-400 uppercase tracking-widest">Acciones</th>
                   </tr>
- streams                </thead>
+                </thead>
                 <tbody className="divide-y divide-gray-50">
                   {loading ? (
                     Array.from({ length: 5 }).map((_, i) => (
@@ -429,14 +428,13 @@ export default function InventoryPage() {
                         <td className="px-4 py-4">
                           <span className="text-sm font-bold text-gray-400">10 unidades</span>
                         </td>
- streams                        {/* Actions */}
                         <td className="px-6 py-4 text-right">
                           <button
                             onClick={() => setAdjustProduct(product)}
                             className="opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs font-black">
                             Ajustar Stock
                           </button>
- streams                        </td>
+                        </td>
                       </tr>
                     ))
                   )}

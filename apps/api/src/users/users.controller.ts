@@ -10,8 +10,14 @@ import {
     Query, 
     UseGuards,
     ConflictException,
-    NotFoundException
+    NotFoundException,
+    Request,
+    UseInterceptors,
+    UploadedFile
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname, join } from 'path';
 import { UsersService } from './users.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { RolesGuard } from '../auth/roles.guard.js';
@@ -36,6 +42,47 @@ export class UsersController {
             role,
             isActive: isActive !== undefined ? isActive === 'true' : undefined,
         });
+    }
+
+    @Get('me')
+    async getMe(@Request() req) {
+        const user = await this.usersService.findById(req.user.userId);
+        if (!user) throw new NotFoundException('Usuario no encontrado');
+        const { password, ...result } = user;
+        return result;
+    }
+
+    @Put('me')
+    async updateMe(@Request() req, @Body() data: any) {
+        const { password, email, ...updateData } = data;
+        
+        // If password is provided, hash it
+        if (password) {
+            updateData.password = await bcrypt.hash(password, 10);
+        }
+
+        const user = await this.usersService.update(req.user.userId, updateData);
+        const { password: _, ...result } = user;
+        return result;
+    }
+
+    @Post('upload')
+    @UseInterceptors(
+        FileInterceptor('file', {
+            storage: diskStorage({
+                destination: join(process.cwd(), 'uploads'),
+                filename: (req, file, callback) => {
+                    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+                    const ext = extname(file.originalname);
+                    callback(null, `avatar-${uniqueSuffix}${ext}`);
+                },
+            }),
+        }),
+    )
+    uploadAvatar(@UploadedFile() file: Express.Multer.File) {
+        return {
+            url: `/uploads/${file.filename}`,
+        };
     }
 
     @Get(':id')

@@ -1,5 +1,31 @@
 import { useSettings } from '@/components/SettingsProvider';
 
+interface Product {
+  id: string;
+  name: string;
+  price: string | number;
+  stock: number;
+  imageUrl?: string;
+  category?: { name: string };
+  isActive?: boolean;
+}
+
+interface CartItem {
+  product: Product;
+  quantity: number;
+}
+
+interface PosCartPanelProps {
+  cart: CartItem[];
+  paymentMethod: string;
+  setPaymentMethod: (method: string) => void;
+  onClearCart: () => void;
+  onUpdateQuantity: (productId: string, delta: number) => void;
+  onRemoveItem: (productId: string) => void;
+  onCompleteSale: () => void;
+  isProcessing: boolean;
+}
+
 export default function PosCartPanel({
   cart,
   paymentMethod,
@@ -13,7 +39,7 @@ export default function PosCartPanel({
   const { settings, paymentMethods } = useSettings();
 
   // Calculations
-  const subtotal = cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
+  const subtotal = cart.reduce((acc: number, item: CartItem) => acc + (Number(item.product.price) * item.quantity), 0);
   const taxPercent = settings?.taxRate || 18;
   const taxAmount = subtotal * (taxPercent / 100);
   const total = subtotal + taxAmount;
