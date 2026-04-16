@@ -4,85 +4,129 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import AuthInput from '@/components/ui/AuthInput';
 import AuthButton from '@/components/ui/AuthButton';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 2000); // Demo loading state
+    setError(null);
+
+    // Basic validation
+    if (formData.password !== formData.confirmPassword) {
+      setError('Las contraseñas no coinciden');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      // Simulating registration process
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      toast.success('Cuenta creada exitosamente. Redirigiendo...');
+      router.push('/login');
+    } catch (err: any) {
+      console.error('Registration failed:', err);
+      setError('Error al crear la cuenta. Inténtalo de nuevo.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Basic password strength logic based on length for visual demo
+  // Password strength logic (visual only)
   const getStrength = () => {
-    if (password.length === 0) return 0;
-    if (password.length < 6) return 1;
-    if (password.length < 10) return 2;
+    if (formData.password.length === 0) return 0;
+    if (formData.password.length < 6) return 1;
+    if (formData.password.length < 10) return 2;
     return 4;
   };
 
   const strength = getStrength();
 
   return (
-    <main className="min-h-screen flex-grow flex items-center justify-center px-4 py-12 relative overflow-hidden bg-[#f9f9ff]">
-      {/* Background Elements for Atmospheric Depth */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px]"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/10 rounded-full blur-[120px]"></div>
+    <main className="min-h-screen flex-grow flex items-center justify-center px-4 py-12 relative overflow-hidden bg-background">
+      {/* Abstract Background Elements */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-secondary opacity-20 blur-[120px] rounded-full"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary opacity-20 blur-[120px] rounded-full"></div>
 
       <div className="w-full max-w-md z-10">
-        {/* Branding/Logo Placeholder */}
-        <div className="flex justify-center mb-8">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-container rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-              <span className="material-symbols-outlined text-white" style={{ fontVariationSettings: "'FILL' 1" }}>
-                architecture
-              </span>
-            </div>
-            <span className="text-2xl font-extrabold tracking-tight text-foreground">ArchitectSaaS</span>
-          </div>
-        </div>
-
-        {/* Registration Card */}
-        <div className="bg-surface-lowest rounded-xl shadow-[0px_12px_32px_rgba(20,27,43,0.04)] overflow-hidden border border-outline-variant/5">
-          {/* Visual Header */}
-          <div className="h-1 bg-gradient-to-r from-primary via-primary-container to-secondary"></div>
-          
+        <div className="bg-surface-lowest rounded-xl shadow-[0px_12px_32px_rgba(20,27,43,0.04)] overflow-hidden">
           <div className="p-8 md:p-10">
-            <header className="mb-8">
-              <h1 className="text-2xl font-bold text-foreground mb-2">Create your workspace</h1>
-              <p className="text-on-surface-variant text-sm">Join the digital architect ecosystem and scale your logistics workflow.</p>
-            </header>
+            {/* Brand Header */}
+            <div className="mb-10 text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl mb-4 shadow-xl border border-gray-100 p-2 overflow-hidden">
+                <img src="/logo.png" alt="Nexus Genesis Logo" className="w-full h-full object-contain" />
+              </div>
+              <h1 className="text-gray-900 font-black text-3xl tracking-tight mb-2">Nexus Genesis</h1>
+              <p className="text-gray-400 text-sm font-bold uppercase tracking-widest">Sincronía perfecta para empresas de élite.</p>
+            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="mb-8">
+              <h2 className="text-xl font-bold text-gray-900">Crear una cuenta</h2>
+              <p className="text-gray-400 text-sm">Únete al ecosistema y optimiza tu flujo de trabajo.</p>
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-medium animate-shake">
+                {error}
+              </div>
+            )}
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-6">
               <AuthInput
-                id="full_name"
-                label="Full Name"
-                icon="person"
-                placeholder="Alex Rivera"
+                id="name"
+                label="Nombre Completo"
+                placeholder="Ingresa tu nombre"
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                successIcon={formData.name.length > 2}
               />
 
               <AuthInput
                 id="email"
-                label="Email Address"
-                icon="mail"
+                label="Correo Electrónico"
                 type="email"
-                placeholder="alex@company.com"
+                placeholder="Ingresa tu correo"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
               />
 
               <div className="space-y-1.5">
                 <AuthInput
                   id="password"
-                  label="Password"
-                  icon="lock"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  label="Contraseña"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Crea una contraseña"
+                  value={formData.password}
+                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  rightElement={
+                    <button 
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="text-on-surface-variant hover:text-primary transition-colors focus:outline-none"
+                    >
+                      <span className="material-symbols-outlined text-xl">
+                        {showPassword ? "visibility_off" : "visibility"}
+                      </span>
+                    </button>
+                  }
                 />
-
-                {/* Password Strength Indicator */}
+                
+                {/* Strength Indicator */}
                 <div className="px-1 pt-1">
                   <div className="flex gap-1 h-1 mb-2">
                     <div className={`flex-1 rounded-full transition-colors duration-500 ${strength >= 1 ? 'bg-primary' : 'bg-surface-low'}`}></div>
@@ -92,58 +136,74 @@ export default function RegisterPage() {
                   </div>
                   <span className="text-[10px] font-medium text-on-surface-variant flex items-center gap-1">
                     <span className="material-symbols-outlined text-[12px]">info</span>
-                    Strong: Use at least 8 characters with numbers.
+                    Seguridad: Usa al menos 8 caracteres con números.
                   </span>
                 </div>
               </div>
 
               <AuthInput
-                id="confirm_password"
-                label="Confirm Password"
-                icon="verified_user"
-                type="password"
-                placeholder="••••••••"
+                id="confirmPassword"
+                label="Confirmar Contraseña"
+                type={showPassword ? "text" : "password"}
+                placeholder="Repite tu contraseña"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
               />
 
-              <div className="pt-4">
-                <AuthButton 
-                  type="submit" 
-                  isLoading={isLoading} 
-                  disabled={password.length === 0}
-                  className={password.length === 0 ? "bg-slate-200 text-slate-400 cursor-not-allowed opacity-100" : ""}
-                >
-                  Create Account
-                </AuthButton>
-
-                <p className="mt-4 text-center text-on-surface-variant text-sm">
-                  Already have an account? 
-                  <Link href="/login" className="text-primary font-semibold hover:underline decoration-2 underline-offset-4 ml-1">
-                    Log in
-                  </Link>
-                </p>
-              </div>
+              <AuthButton type="submit" isLoading={isLoading}>
+                Crear Cuenta
+              </AuthButton>
             </form>
+
+            {/* Divider */}
+            <div className="relative my-8 text-center">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-outline-variant/30"></div>
+              </div>
+              <span className="relative bg-surface-lowest px-4 text-xs font-medium text-on-surface-variant uppercase tracking-widest">
+                O continuar con
+              </span>
+            </div>
+
+            {/* Social Actions */}
+            <div className="grid grid-cols-2 gap-4">
+              <button className="flex items-center justify-center gap-2 h-11 border border-outline-variant/40 rounded-xl hover:bg-surface-low transition-colors duration-200 group">
+                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBt5pmd53KAQzwKqL8pzJb1N15hcDxI9iJtW_AKNIkjU8qbynrAkK6xXi41SgaXlufv_prrJPe_i_JwjrRS_-GOJc62i9EDaUjYXeLXo-8elyWJTsEHQkmMO1jvbwK4Y5LYNnTYqX7yXCSW7mE4a60zHy7gPaT-sCwlMB7muHRmnVuxF1AB8ndz_URLKyHo8Eyryx4ux3LVN43JurJpjDLxML0gxsf-lziMN3UkwTWqE6LzF91jxw3zmFjESRwU5w3I4gS11X47yP0" alt="Google" className="w-5 h-5 opacity-80 group-hover:opacity-100" />
+                <span className="text-sm font-semibold text-foreground">Google</span>
+              </button>
+              <button className="flex items-center justify-center gap-2 h-11 border border-outline-variant/40 rounded-xl hover:bg-surface-low transition-colors duration-200 group">
+                <span className="material-symbols-outlined text-xl text-on-surface-variant group-hover:text-foreground">terminal</span>
+                <span className="text-sm font-semibold text-foreground">GitHub</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Footer Link */}
+          <div className="bg-surface-low py-6 text-center px-8 border-t border-outline-variant/10">
+            <p className="text-sm font-medium text-on-surface-variant">
+              ¿Ya tienes una cuenta? 
+              <Link href="/login" className="text-primary font-bold hover:underline ml-1">Iniciar Sesión</Link>
+            </p>
           </div>
         </div>
 
-        {/* Social Proof Section */}
-        <div className="mt-10 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-on-surface-variant/60 mb-4">Trusted by industry leaders</p>
-          <div className="flex justify-center items-center gap-6 opacity-40 grayscale transition-all duration-500 hover:opacity-100 hover:grayscale-0">
-            <div className="h-6 w-20 bg-on-surface-variant rounded-sm flex items-center justify-center text-[10px] text-white font-bold">LOGISTICS</div>
-            <div className="h-6 w-20 bg-on-surface-variant rounded-sm flex items-center justify-center text-[10px] text-white font-bold">RETAIL CO</div>
-            <div className="h-6 w-20 bg-on-surface-variant rounded-sm flex items-center justify-center text-[10px] text-white font-bold">WAREHOUSE</div>
-          </div>
+        {/* Accessibility/Legal Footer */}
+        <div className="mt-8 flex justify-center gap-6">
+          <Link href="#" className="text-xs font-medium text-on-surface-variant hover:text-primary transition-colors">Política de Privacidad</Link>
+          <Link href="#" className="text-xs font-medium text-on-surface-variant hover:text-primary transition-colors">Términos de Servicio</Link>
+          <Link href="#" className="text-xs font-medium text-on-surface-variant hover:text-primary transition-colors">Soporte Técnico</Link>
         </div>
       </div>
       
-      {/* Footer (Simplified as in design) */}
-      <footer className="absolute bottom-12 w-full px-8 flex flex-col md:flex-row justify-between items-center text-[0.75rem] text-on-surface-variant opacity-60">
-        <p>© 2024 Digital Architect. All rights reserved.</p>
-        <div className="flex gap-8 mt-4 md:mt-0">
-          <Link href="#" className="hover:text-foreground">Privacy Policy</Link>
-          <Link href="#" className="hover:text-foreground">Terms of Service</Link>
-          <Link href="#" className="hover:text-foreground">Contact</Link>
+      {/* Global Copyright Footer */}
+      <footer className="absolute bottom-8 w-full px-8 opacity-40">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-[0.75rem] text-on-surface-variant">
+          <p>© 2024 Digital Architect. Todos los derechos reservados.</p>
+          <div className="flex gap-6 mt-4 md:mt-0">
+            <Link href="#">Privacidad</Link>
+            <Link href="#">Términos</Link>
+            <Link href="#">Contacto</Link>
+          </div>
         </div>
       </footer>
     </main>
