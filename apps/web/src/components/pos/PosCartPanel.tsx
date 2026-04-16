@@ -1,4 +1,10 @@
+import React from 'react';
 import { useSettings } from '@/components/SettingsProvider';
+import { 
+    Trash2, X, Image as ImageIcon, Minus, Plus, 
+    CreditCard, Wallet, Banknote, CheckCircle2,
+    ShoppingCart
+} from 'lucide-react';
 
 interface Product {
   id: string;
@@ -53,9 +59,9 @@ export default function PosCartPanel({
         <button 
           onClick={onClearCart}
           disabled={cart.length === 0 || isProcessing}
-          className="flex items-center gap-1.5 text-red-500 font-bold text-xs uppercase tracking-wide hover:text-red-700 disabled:opacity-50 transition-colors"
+          className="flex items-center gap-1.5 text-red-500 font-bold text-[10px] uppercase tracking-widest hover:text-red-700 disabled:opacity-50 transition-colors"
         >
-          <span className="material-symbols-outlined text-[16px]">delete</span>
+          <Trash2 className="w-3.5 h-3.5" />
           Vaciar Carrito
         </button>
       </div>
@@ -64,8 +70,8 @@ export default function PosCartPanel({
       <div className="flex-1 overflow-y-auto px-8 pb-8 space-y-4 hide-scrollbar">
         {cart.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-gray-400">
-            <span className="material-symbols-outlined text-5xl mb-4 opacity-30">shopping_cart</span>
-            <p className="font-medium">Tu carrito está vacío.</p>
+            <ShoppingCart className="w-12 h-12 mb-4 opacity-10" />
+            <p className="font-bold uppercase text-[10px] tracking-widest">Carrito vacío</p>
           </div>
         ) : (
           cart.map((item) => {
@@ -73,51 +79,51 @@ export default function PosCartPanel({
             const lineTotal = itemPrice * item.quantity;
             
             return (
-              <div key={item.product.id} className="bg-white rounded-2xl p-4 flex gap-4 shadow-sm border border-gray-100 relative group animate-fade-in-up">
+              <div key={item.product.id} className="bg-white rounded-2xl p-4 flex gap-4 shadow-sm border border-gray-100 relative group animate-in fade-in slide-in-from-bottom-2">
                 
                 <button 
                   onClick={() => onRemoveItem(item.product.id)}
-                  className="absolute top-3 right-3 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all pointer-events-auto"
+                  className="absolute top-3 right-3 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
                 >
-                  <span className="material-symbols-outlined text-[18px]">close</span>
+                  <X className="w-4 h-4" />
                 </button>
 
                 <div className="w-16 h-16 rounded-xl bg-gray-100 shrink-0 overflow-hidden flex items-center justify-center border border-gray-50">
                    {item.product.imageUrl ? (
-                     <img src={item.product.imageUrl} alt={item.product.name} className="object-cover w-full h-full mix-blend-multiply" />
+                     <img src={item.product.imageUrl} alt={item.product.name} className="object-cover w-full h-full" />
                    ) : (
-                     <span className="material-symbols-outlined text-gray-300">image</span>
+                     <ImageIcon className="w-6 h-6 text-gray-300" />
                    )}
                 </div>
                 
                 <div className="flex-1 flex flex-col justify-center min-w-0 pr-4">
-                  <h4 className="font-bold text-gray-900 text-sm truncate" title={item.product.name}>
+                  <h4 className="font-bold text-gray-900 text-sm truncate uppercase tracking-tight" title={item.product.name}>
                     {item.product.name}
                   </h4>
-                  <p className="text-xs text-gray-500 font-medium mb-3">
-                    ${itemPrice.toFixed(2)} / unidad
+                  <p className="text-[10px] text-gray-400 font-black mb-3 uppercase tracking-wider">
+                    S/ {itemPrice.toFixed(2)} / unidad
                   </p>
                   
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 bg-gray-100/80 rounded-lg px-2 py-1">
+                    <div className="flex items-center gap-4 bg-gray-50 rounded-xl px-2 py-1 border border-gray-100">
                       <button 
                         onClick={() => onUpdateQuantity(item.product.id, -1)}
-                        className="text-gray-500 hover:text-gray-900 font-bold p-1 rounded-md transition-colors"
+                        className="text-gray-400 hover:text-gray-900 font-bold p-1 transition-colors"
                       >
-                        <span className="material-symbols-outlined text-[14px]">remove</span>
+                        <Minus className="w-3 h-3" />
                       </button>
-                      <span className="font-bold text-sm w-4 text-center select-none text-gray-900">{item.quantity}</span>
+                      <span className="font-black text-xs w-4 text-center select-none text-gray-900">{item.quantity}</span>
                       <button 
                         onClick={() => onUpdateQuantity(item.product.id, 1)}
                         disabled={item.quantity >= item.product.stock}
-                        className="text-gray-500 hover:text-gray-900 font-bold p-1 rounded-md disabled:opacity-30 transition-colors"
+                        className="text-gray-400 hover:text-gray-900 font-bold p-1 disabled:opacity-30 transition-colors"
                       >
-                        <span className="material-symbols-outlined text-[14px]">add</span>
+                        <Plus className="w-3 h-3" />
                       </button>
                     </div>
                     
-                    <div className="font-extrabold text-gray-900 text-base">
-                      ${lineTotal.toFixed(2)}
+                    <div className="font-black text-gray-900 text-sm tracking-tight">
+                      S/ {lineTotal.toFixed(2)}
                     </div>
                   </div>
                 </div>
@@ -128,42 +134,48 @@ export default function PosCartPanel({
       </div>
 
       {/* Summary Footer */}
-      <div className="bg-[#f2f4fb] px-8 pt-6 pb-8 border-t border-gray-200/60 rounded-t-[32px] mt-auto relative z-20">
+      <div className="bg-[#f8f9fc] px-8 pt-8 pb-10 border-t border-gray-200/60 rounded-t-[40px] mt-auto relative z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.02)]">
         
         {/* Totals */}
-        <div className="space-y-3 mb-6">
-          <div className="flex justify-between items-center text-sm font-medium text-gray-500">
-            <span>Subtotal</span>
-            <span className="font-bold text-gray-700">${subtotal.toFixed(2)}</span>
+        <div className="space-y-4 mb-8">
+          <div className="flex justify-between items-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+            <span>Subtotal de Operación</span>
+            <span className="text-gray-900">S/ {subtotal.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between items-center text-sm font-medium text-gray-500">
+          <div className="flex justify-between items-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
             <span>Impuestos ({taxPercent}%)</span>
-            <span className="font-bold text-gray-700">${taxAmount.toFixed(2)}</span>
+            <span className="text-gray-900">S/ {taxAmount.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between items-end pt-3">
-            <span className="text-xl font-bold text-gray-900 leading-none">Total</span>
-            <span className="text-[40px] font-extrabold text-gray-900 leading-none tracking-tight">
-              ${total.toFixed(2)}
+          <div className="flex justify-between items-end pt-2">
+            <span className="text-sm font-black text-gray-900 uppercase tracking-[0.2em] leading-none mb-2">Total Neto</span>
+            <span className="text-[40px] font-black text-gray-900 leading-none tracking-tighter">
+              S/ {total.toFixed(2)}
             </span>
           </div>
         </div>
 
         {/* Payment Methods */}
-        <div className="mb-8">
-          <p className="text-[10px] font-bold tracking-widest text-gray-500 uppercase mb-3">Método de Pago</p>
+        <div className="mb-10">
+          <p className="text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase mb-4 flex items-center gap-2">
+             <Banknote className="w-3 h-3" /> Medio de Pago
+          </p>
           <div className="grid grid-cols-3 gap-3">
             {paymentMethods.filter(m => m.isActive).map((method) => {
               const methodKey = method.name === 'Efectivo' ? 'CASH' : method.name === 'Tarjeta' ? 'CARD' : 'DIGITAL';
-              const icon = method.name === 'Efectivo' ? 'payments' : method.name === 'Tarjeta' ? 'credit_card' : 'account_balance_wallet';
+              const Icon = method.name === 'Efectivo' ? Banknote : method.name === 'Tarjeta' ? CreditCard : Wallet;
               
               return (
                 <button
                   key={method.id}
                   onClick={() => setPaymentMethod(methodKey)}
-                  className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-colors ${paymentMethod === methodKey ? 'border-primary bg-primary/5 text-primary' : 'border-white bg-white text-gray-600 hover:border-gray-200 shadow-sm'}`}
+                  className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-300 ${
+                      paymentMethod === methodKey 
+                        ? 'border-blue-600 bg-blue-50/50 text-blue-600 shadow-md' 
+                        : 'border-white bg-white text-gray-400 hover:border-gray-100 hover:text-gray-600 shadow-sm'
+                  }`}
                 >
-                  <span className="material-symbols-outlined mb-1">{icon}</span>
-                  <span className="text-[11px] font-bold">{method.name}</span>
+                  <Icon className="w-5 h-5 mb-2" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">{method.name}</span>
                 </button>
               );
             })}
@@ -174,14 +186,17 @@ export default function PosCartPanel({
         <button 
           onClick={onCompleteSale}
           disabled={cart.length === 0 || isProcessing}
-          className="w-full h-16 bg-primary hover:bg-primary-container disabled:bg-gray-300 disabled:opacity-80 transition-colors rounded-2xl flex items-center justify-center gap-3 text-white font-bold text-lg shadow-[0_8px_30px_rgba(0,75,202,0.3)] disabled:shadow-none active:scale-[0.98]"
+          className="w-full h-20 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 transition-all rounded-[24px] flex items-center justify-center gap-4 text-white font-black text-lg shadow-xl shadow-blue-100 active:scale-[0.98] group"
         >
           {isProcessing ? (
-            <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            <div className="flex items-center gap-3">
+               <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+               <span className="uppercase tracking-[0.2em] text-xs">Procesando...</span>
+            </div>
           ) : (
             <>
-              <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-              Completar Venta
+              <CheckCircle2 className="w-6 h-6 group-hover:scale-110 transition-transform" />
+              <span className="uppercase tracking-[0.2em] text-sm">Completar Transacción</span>
             </>
           )}
         </button>

@@ -6,6 +6,7 @@ import PosTopBar from '@/components/pos/PosTopBar';
 import PosProductGrid from '@/components/pos/PosProductGrid';
 import PosCartPanel from '@/components/pos/PosCartPanel';
 import { getProducts, createSale } from '@/lib/api';
+import { toast } from 'sonner';
 import { useSettings } from '@/components/SettingsProvider';
 
 interface Product {
@@ -34,7 +35,6 @@ export default function PosPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [paymentMethod, setPaymentMethod] = useState('CASH');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [notification, setNotification] = useState<{message: string, isError: boolean} | null>(null);
 
   // Debounce logic for Search
   useEffect(() => {
@@ -63,7 +63,7 @@ export default function PosPage() {
     
     if (existing) {
       if (existing.quantity >= product.stock) {
-        showNotification(`Límite de stock alcanzado para ${product.name}`, true);
+        toast.error(`Límite de stock alcanzado para ${product.name}`);
         return;
       }
       setCart(prev => prev.map(item => 
@@ -72,6 +72,10 @@ export default function PosPage() {
     } else {
       setCart(prev => [...prev, { product, quantity: 1 }]);
     }
+    toast.success(`"${product.name}" añadido al carrito`, {
+      icon: '🛒',
+      duration: 1500
+    });
   }, [cart]);
 
   const handleUpdateQuantity = useCallback((productId: string, delta: number) => {
@@ -92,11 +96,6 @@ export default function PosPage() {
     setCart([]);
   }, []);
 
-  const showNotification = (message: string, isError = false) => {
-    setNotification({ message, isError });
-    setTimeout(() => setNotification(null), 3000);
-  };
-
   const { settings } = useSettings();
 
   const handleCompleteSale = async () => {
@@ -114,7 +113,9 @@ export default function PosPage() {
       // We explicitly bypass customer requirement in UI, backend fallback will handle it
       await createSale(itemsPayload, paymentMethod, total);
       
-      showNotification('¡Venta completada con éxito!', false);
+      toast.success('¡Venta completada con éxito!', {
+        description: `Total procesado: S/ ${total.toFixed(2)}`,
+      });
       handleClearCart();
       // Refetch products to update stock visually
       const freshProducts = await getProducts(1, 100, searchQuery);
@@ -123,7 +124,7 @@ export default function PosPage() {
     } catch (error: any) {
       console.error('Checkout failed:', error);
       const errorMsg = error.response?.data?.message || 'Error en la transacción. ¿Está abierta la caja?';
-      showNotification(errorMsg, true);
+      toast.error(errorMsg);
     } finally {
       setIsProcessing(false);
     }
@@ -136,13 +137,6 @@ export default function PosPage() {
       <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden relative">
         <PosTopBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         
-        {/* Notification Toast */}
-        {notification && (
-          <div className={`absolute top-20 right-1/2 translate-x-1/2 z-50 px-6 py-3 rounded-full shadow-lg font-bold text-sm tracking-wide animate-fade-in-up ${notification.isError ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
-            {notification.message}
-          </div>
-        )}
-
         <main className="flex-1 flex overflow-hidden">
           {/* Main Workspace: Product Grid */}
           <PosProductGrid 

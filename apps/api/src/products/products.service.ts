@@ -53,6 +53,10 @@ export class ProductsService {
         imageUrl?: string;
         categoryId?: string;
     }): Promise<Product> {
+        const catId = (data.categoryId && data.categoryId !== 'undefined' && data.categoryId !== '') 
+            ? data.categoryId 
+            : null;
+
         return this.prisma.product.create({
             data: {
                 name: data.name,
@@ -61,7 +65,7 @@ export class ProductsService {
                 purchasePrice: data.purchasePrice || 0,
                 stock: data.stock,
                 imageUrl: data.imageUrl,
-                categoryId: data.categoryId,
+                categoryId: catId,
             },
         });
     }
@@ -102,6 +106,10 @@ export class ProductsService {
             }
         }
 
+        const catId = (data.categoryId && data.categoryId !== 'undefined' && data.categoryId !== '') 
+            ? data.categoryId 
+            : null;
+
         return this.prisma.product.update({
             where: { id },
             data: {
@@ -111,7 +119,7 @@ export class ProductsService {
                 purchasePrice: data.purchasePrice,
                 stock: data.stock,
                 imageUrl: data.imageUrl,
-                categoryId: data.categoryId,
+                categoryId: data.categoryId === undefined ? undefined : catId,
                 isActive: data.isActive,
             },
         });

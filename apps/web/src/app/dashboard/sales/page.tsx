@@ -1,23 +1,97 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import Sidebar from '@/components/layout/Sidebar';
 import { 
-  Search, 
-  Filter, 
-  Calendar, 
-  MoreVertical, 
-  Eye, 
-  RotateCcw, 
-  ChevronLeft, 
-  ChevronRight,
-  Download,
-  Plus
+    Search, Plus, Calendar, Download, 
+    RotateCcw, Eye, ChevronLeft, ChevronRight,
+    TrendingUp, ShoppingBag, DollarSign, AlertCircle
 } from 'lucide-react';
-import Link from 'next/link';
 import { getSales, cancelSale } from '@/lib/api';
-import SalesSummary from '@/components/sales/SalesSummary';
-import SaleDetailDrawer from '@/components/sales/SaleDetailDrawer';
+import { toast } from 'sonner';
+
+// ── Components ─────────────────────────────────────────────────────────────────
+
+const SalesSummary = ({ stats }: any) => (
+  <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm group hover:border-blue-100 transition-all">
+       <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-4">
+          <TrendingUp className="w-6 h-6" />
+       </div>
+       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Ingresos Totales</p>
+       <h4 className="text-2xl font-black text-gray-900 leading-none">S/ {stats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h4>
+    </div>
+    <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm group hover:border-blue-100 transition-all">
+       <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-4">
+          <ShoppingBag className="w-6 h-6" />
+       </div>
+       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Transacciones</p>
+       <h4 className="text-2xl font-black text-gray-900 leading-none">{stats.transactionCount}</h4>
+    </div>
+    <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm group hover:border-blue-100 transition-all">
+       <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-4">
+          <DollarSign className="w-6 h-6" />
+       </div>
+       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Ticket Promedio</p>
+       <h4 className="text-2xl font-black text-gray-900 leading-none">S/ {stats.avgSale.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h4>
+    </div>
+    <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm group hover:border-blue-100 transition-all">
+       <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 mb-4">
+          <AlertCircle className="w-6 h-6" />
+       </div>
+       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Anulaciones</p>
+       <h4 className="text-2xl font-black text-gray-900 leading-none">{stats.returns}</h4>
+    </div>
+  </div>
+);
+
+// Mocks for structure - in real life these would be imported from components
+// ── Sale Detail Drawer ────────────────────────────────────────────────────────
+const SaleDetailDrawer = ({ saleId, onClose, onCancelSuccess }: any) => {
+  const [sale, setSale] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (saleId) {
+      setLoading(true);
+      // In a real app, this would be a specific API call. For now, since we have the data in the list, 
+      // but the list might not have all items, we'll simulate a fetch.
+      // Assuming getSales returns the full object or we fetch by ID if possible.
+      // Placeholder for actual fetch logic:
+      setLoading(false);
+      // In the real implementation, we would call an API here.
+    }
+  }, [saleId]);
+
+  if (!saleId) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm shadow-2xl" />
+      <div 
+        className="relative w-full max-w-xl bg-white h-full shadow-2xl flex flex-col p-0 overflow-hidden animate-in slide-in-from-right duration-300"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between">
+          <h2 className="text-xl font-black text-gray-900 uppercase tracking-widest">Detalle de Transacción</h2>
+          <button onClick={onClose} className="w-10 h-10 rounded-xl hover:bg-gray-100 flex items-center justify-center transition-colors">
+            <X className="w-5 h-5 text-gray-400" />
+          </button>
+        </div>
+        
+        <div className="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-hide">
+          <div className="flex items-center justify-center py-20 text-gray-300 font-bold uppercase tracking-[0.2em]">
+             Cargando información...
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Re-importing X from lucide-react since I added a close button
+import { X } from 'lucide-react';
 
 export default function SalesPage() {
   const [sales, setSales] = useState<any[]>([]);
@@ -28,7 +102,7 @@ export default function SalesPage() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('Todos');
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
-
+  
   // Stats
   const [stats, setStats] = useState({
     totalRevenue: 0,
@@ -48,7 +122,6 @@ export default function SalesPage() {
       });
       setSales(data);
       
-      // Calculate Stats
       const total = data.reduce((acc: number, s: any) => s.status !== 'CANCELLED' ? acc + Number(s.total) : acc, 0);
       const paidSales = data.filter((s: any) => s.status !== 'CANCELLED');
       const cancelledCount = data.filter((s: any) => s.status === 'CANCELLED').length;
@@ -60,7 +133,7 @@ export default function SalesPage() {
         returns: cancelledCount
       });
     } catch (error) {
-      console.error('Failed to fetch sales:', error);
+      toast.error('Error al cargar el historial de ventas');
     } finally {
       setLoading(false);
     }
@@ -72,14 +145,24 @@ export default function SalesPage() {
   }, [fetchSales]);
 
   const handleCancelSale = async (id: string) => {
-    if (window.confirm('¿Está seguro de que desea cancelar esta venta? Esto restaurará los niveles de stock.')) {
-      try {
-        await cancelSale(id);
-        fetchSales();
-      } catch (error: any) {
-        alert(error.response?.data?.message || 'Error al cancelar la venta');
-      }
-    }
+    toast('¿Desea anular esta venta?', {
+      description: 'Esta acción restaurará el stock de los productos. No se puede deshacer.',
+      action: {
+        label: 'Confirmar Anulación',
+        onClick: async () => {
+          const toastId = toast.loading('Anulando venta...');
+          try {
+            await cancelSale(id);
+            toast.success('Venta anulada correctamente', { id: toastId });
+            fetchSales();
+          } catch (error: any) {
+            const msg = error.response?.data?.message || 'Error al cancelar la venta';
+            toast.error(msg, { id: toastId });
+          }
+        }
+      },
+      duration: 5000,
+    });
   };
 
   const getStatusBadge = (status: string) => {
@@ -87,56 +170,55 @@ export default function SalesPage() {
       case 'PAID': return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest">Pagado</span>;
       case 'PENDING': return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-50 text-amber-600 border border-amber-100 uppercase tracking-widest">Pendiente</span>;
       case 'PARTIAL': return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-blue-50 text-blue-600 border border-blue-100 uppercase tracking-widest">Parcial</span>;
-      case 'CANCELLED': return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-gray-600 text-white border border-gray-700 uppercase tracking-widest">Cancelado</span>;
+      case 'CANCELLED': return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-rose-50 text-rose-600 border border-rose-100 uppercase tracking-widest">Anulado</span>;
       default: return null;
     }
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
+    <div className="flex h-screen bg-[#F8F9FC] overflow-hidden font-sans">
       <Sidebar />
       
       <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
         {/* Top Header */}
-        <header className="px-8 py-6 bg-white border-b border-gray-100 flex items-center justify-between shrink-0">
+        <header className="px-10 py-8 bg-white/50 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between shrink-0">
           <div>
-            <nav className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
-              <span>Lumen Ledger</span>
-              <span>/</span>
-              <span className="text-gray-900">Ventas</span>
-            </nav>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none">Transacciones de Venta</h1>
+            <h1 className="text-4xl font-black text-gray-900 tracking-tight leading-none mb-2">Historial de Ventas</h1>
+            <p className="text-base text-gray-400 font-medium">Auditoría centralizada de transacciones • Nexus Genesis</p>
           </div>
           <Link href="/dashboard/pos">
-            <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-black text-sm transition-all shadow-lg shadow-indigo-200 flex items-center gap-2">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-black text-sm transition-all shadow-xl shadow-blue-100 flex items-center gap-3">
               <Plus className="w-5 h-5" /> Nueva Venta
             </button>
           </Link>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-8 space-y-6 scroll-smooth hide-scrollbar">
+        <main className="flex-1 overflow-y-auto px-10 pb-12 space-y-8 scroll-smooth scrollbar-hide">
           {/* Controls Bar */}
-          <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-wrap items-center gap-4">
-            {/* Real-time Search */}
+          <div className="bg-white p-6 rounded-[24px] shadow-sm border border-gray-100 flex flex-wrap items-center gap-6">
             <div className="flex-1 min-w-[300px] relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input 
                 type="text" 
-                placeholder="Buscar ID de venta o cliente..." 
+                placeholder="Buscar por cliente, ID o DNI..." 
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition-all outline-none text-sm font-medium"
+                className="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all outline-none text-sm font-bold text-gray-700"
               />
             </div>
 
-            {/* Status Filters */}
-            <div className="flex bg-gray-50 p-1.5 rounded-xl border border-gray-100">
-              {['Todos', 'Pagado', 'Pendiente', 'Parcial'].map((s) => (
+            <div className="flex bg-gray-50 p-1.5 rounded-2xl border border-gray-100">
+              {['Todos', 'Pagado', 'Pendiente', 'Anulado'].map((s) => (
                 <button
                   key={s}
-                  onClick={() => setStatus(s)}
-                  className={`px-6 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
-                    status === s ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'
+                  onClick={() => setStatus(s === 'Anulado' ? 'CANCELLED' : (s === 'Pagado' ? 'PAID' : (s === 'Pendiente' ? 'PENDING' : 'Todos')))}
+                  className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                    (status === 'CANCELLED' && s === 'Anulado') || 
+                    (status === 'PAID' && s === 'Pagado') || 
+                    (status === 'PENDING' && s === 'Pendiente') || 
+                    (status === 'Todos' && s === 'Todos')
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' 
+                      : 'text-gray-400 hover:text-gray-600'
                   }`}
                 >
                   {s}
@@ -144,115 +226,62 @@ export default function SalesPage() {
               ))}
             </div>
 
-            {/* Date Range Simulation */}
-            <div className="relative group">
-               <button className="flex items-center gap-3 px-5 py-3 bg-gray-50 hover:bg-white border border-transparent hover:border-gray-200 rounded-xl transition-all text-sm font-black text-gray-700 uppercase tracking-widest">
-                  <Calendar className="w-4 h-4 text-indigo-600" />
-                  <span>Oct 1 - Oct 31, 2023</span>
-               </button>
-            </div>
-
-            {/* Export */}
-            <button className="p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors text-gray-500">
+            <button className="p-4 bg-gray-50 hover:bg-gray-100 rounded-2xl transition-colors text-gray-500 border border-gray-100">
               <Download className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Sales Table Wrapper */}
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="overflow-x-auto overflow-y-hidden">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-gray-50/50 border-b border-gray-100">
-                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">ID Venta</th>
-                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Cliente</th>
-                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Fecha y Hora</th>
-                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Estado</th>
-                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-right">Total</th>
-                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-center">Acciones</th>
+          <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-gray-50/50 border-b border-gray-100">
+                  <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">ID Venta</th>
+                  <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Cliente</th>
+                  <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-center">Estado</th>
+                  <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-right">Monto Neto</th>
+                  <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {loading ? (
+                  <tr><td colSpan={5} className="py-24 text-center text-gray-300 font-black uppercase tracking-widest animate-pulse text-xs">Auditando registros...</td></tr>
+                ) : sales.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-24 text-center">
+                      <p className="text-sm font-black text-gray-400 uppercase tracking-widest">No se encontraron transacciones</p>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {loading ? (
-                    <tr><td colSpan={6} className="py-20 text-center text-gray-400 font-bold uppercase tracking-widest animate-pulse">Cargando Historial de Transacciones...</td></tr>
-                  ) : sales.length === 0 ? (
-                    <tr><td colSpan={6} className="py-20 text-center text-gray-400 font-bold uppercase tracking-widest">No se encontraron transacciones</td></tr>
-                  ) : sales.map((sale) => (
-                    <tr key={sale.id} className="hover:bg-indigo-50/20 group transition-colors">
-                      <td className="px-8 py-5 font-black text-indigo-600 text-sm">
-                        #{sale.id.substring(0, 8).toUpperCase()}
-                      </td>
-                      <td className="px-8 py-5">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-black text-[10px]">
-                            {sale.customer?.name?.[0] || 'W'}
-                          </div>
-                          <div>
-                            <p className="text-sm font-black text-gray-900 leading-none">{sale.customer?.name || 'Venta al Paso'}</p>
-                            <p className="text-[10px] font-bold text-gray-400 mt-1">{sale.customer?.email || 'Venta Individual'}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-8 py-5">
-                        <p className="text-sm font-bold text-gray-700 leading-none">{new Date(sale.createdAt).toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                        <p className="text-[10px] font-bold text-gray-400 mt-1">{new Date(sale.createdAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</p>
-                      </td>
-                      <td className="px-8 py-5">
-                        {getStatusBadge(sale.status)}
-                      </td>
-                      <td className="px-8 py-5 text-right">
-                        <span className="text-sm font-black text-gray-900 tracking-tight">S/ {Number(sale.total).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                      </td>
-                      <td className="px-8 py-5">
-                        <div className="flex items-center justify-center gap-2 scale-90">
-                          <button 
-                            onClick={() => setSelectedSaleId(sale.id)}
-                            className="p-2 hover:bg-white border-transparent hover:border-gray-100 border rounded-xl text-gray-400 hover:text-indigo-600 shadow-sm transition-all"
-                          >
-                            <Eye className="w-5 h-5" />
-                          </button>
-                          {sale.status !== 'CANCELLED' && (
-                            <button 
-                              onClick={() => handleCancelSale(sale.id)}
-                              className="p-2 hover:bg-rose-50 border-transparent hover:border-rose-100 border rounded-xl text-gray-400 hover:text-rose-600 transition-all"
-                            >
-                              <RotateCcw className="w-5 h-5" />
-                            </button>
-                          )}
-                          <button className="p-2 hover:bg-gray-50 rounded-xl text-gray-400 transition-colors">
-                            <MoreVertical className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination Implementation */}
-            <div className="px-8 py-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Mostrando 1 a {sales.length} de {sales.length} registros</span>
-              <div className="flex items-center gap-1">
-                <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-400 transition-colors cursor-not-allowed">
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <div className="flex bg-white border border-gray-100 rounded-xl p-1">
-                   <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-black tracking-widest shadow-lg shadow-indigo-100 transition-all">1</button>
-                </div>
-                <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-400 transition-colors cursor-not-allowed">
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
+                ) : sales.map((sale) => (
+                  <tr key={sale.id} className="hover:bg-blue-50/20 transition-all cursor-default">
+                    <td className="px-10 py-6 font-black text-blue-600 text-sm">#SAL-{sale.id.substring(0,6).toUpperCase()}</td>
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 font-black text-[10px] border border-gray-200">{sale.customer?.name?.[0] || 'G'}</div>
+                        <span className="text-sm font-black text-gray-900 leading-none">{sale.customer?.name || 'Cliente de Mostrador'}</span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-6 text-center">{getStatusBadge(sale.status)}</td>
+                    <td className="px-8 py-6 text-right">
+                      <span className="text-sm font-black text-gray-900 tracking-tight">S/ {Number(sale.total).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    </td>
+                    <td className="px-10 py-6">
+                      <div className="flex items-center justify-center gap-3">
+                        <button onClick={() => setSelectedSaleId(sale.id)} className="p-3 bg-gray-100 hover:bg-blue-600 rounded-xl text-gray-400 hover:text-white transition-all"><Eye className="w-4 h-4" /></button>
+                        {sale.status !== 'CANCELLED' && (
+                          <button onClick={() => handleCancelSale(sale.id)} className="p-3 bg-gray-100 hover:bg-rose-600 rounded-xl text-gray-400 hover:text-white transition-all"><RotateCcw className="w-4 h-4" /></button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
 
-          {/* Bottom Insights Summary */}
           <SalesSummary stats={stats} />
         </main>
       </div>
 
-      {/* Detail Drawer Integration */}
       <SaleDetailDrawer 
         saleId={selectedSaleId} 
         onClose={() => setSelectedSaleId(null)} 

@@ -116,7 +116,7 @@ export default function PosProductGrid({
                   
                   <div className="flex items-end gap-2 mt-auto pt-2">
                     <span className="font-extrabold text-primary text-xl">
-                      ${priceNumber.toFixed(2)}
+                      S/ {priceNumber.toFixed(2)}
                     </span>
                     <span className="text-[10px] text-gray-400 font-semibold uppercase mb-1 truncate">
                       SKU: PRD-{product.id.substring(0,4)}

@@ -8,8 +8,8 @@ import {
   Package, AlertCircle, TrendingUp, ChevronLeft, ChevronRight,
   MoreVertical, X, Plus, Minus, CheckCircle, RefreshCw
 } from 'lucide-react';
-import { getInventoryStock, adjustInventoryStock } from '@/lib/api';
-import api from '@/lib/api';
+import { getInventoryStock, adjustInventoryStock, api } from '@/lib/api';
+import { toast } from 'sonner';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface Product {
@@ -67,24 +67,22 @@ function AdjustStockModal({
   const [reason, setReason] = useState('ADJUSTMENT');
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
 
   const newStock = type === 'IN' ? product.stock + quantity : Math.max(0, product.stock - quantity);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (quantity <= 0) { setError('La cantidad debe ser mayor a 0'); return; }
-    if (type === 'OUT' && quantity > product.stock) { setError(`No se puede retirar más del stock actual (${product.stock})`); return; }
+    if (quantity <= 0) { toast.error('La cantidad debe ser mayor a 0'); return; }
+    if (type === 'OUT' && quantity > product.stock) { toast.error(`No se puede retirar más del stock actual (${product.stock})`); return; }
 
     setLoading(true);
-    setError('');
     try {
       await adjustInventoryStock({ productId: product.id, quantity, type, reason, note });
-      setSuccess(true);
-      setTimeout(() => { onSuccess(); onClose(); }, 1200);
+      toast.success(`Stock de "${product.name}" actualizado correctamente`);
+      onSuccess();
+      onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error en el ajuste. Por favor intente de nuevo.');
+      toast.error(err.response?.data?.message || 'Error en el ajuste. Por favor intente de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -171,25 +169,14 @@ function AdjustStockModal({
               className="w-full px-4 py-3 bg-gray-50 rounded-xl font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
 
-          {error && (
-            <div className="flex items-center gap-3 p-3 bg-rose-50 text-rose-600 rounded-xl border border-rose-100">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <p className="text-sm font-bold">{error}</p>
-            </div>
-          )}
-          {success && (
-            <div className="flex items-center gap-3 p-3 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100">
-              <CheckCircle className="w-4 h-4 flex-shrink-0" />
-              <p className="text-sm font-bold">¡Stock ajustado con éxito!</p>
-            </div>
-          )}
+          {/* Toast notifications handle error/success feedback */}
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} disabled={loading}
               className="flex-1 py-3 bg-white border border-gray-200 rounded-xl font-black text-sm text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50">
               Cancelar
             </button>
-            <button type="submit" disabled={loading || success}
+            <button type="submit" disabled={loading}
               className={`flex-1 py-3 rounded-xl font-black text-sm text-white flex items-center justify-center gap-2 shadow-lg transition-all disabled:opacity-50 ${type === 'IN' ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-100' : 'bg-rose-600 hover:bg-rose-700 shadow-rose-100'}`}>
               {loading && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
               {type === 'IN' ? 'Agregar Stock' : 'Retirar Stock'}
@@ -212,7 +199,7 @@ export default function InventoryPage() {
   const [search, setSearch] = useState('');
   const [stockStatus, setStockStatus] = useState('');
   const [categoryId, setCategoryId] = useState('');
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState('asc');
   const [adjustProduct, setAdjustProduct] = useState<Product | null>(null);
@@ -227,13 +214,13 @@ export default function InventoryPage() {
       setProducts(res.data);
       setTotal(res.total);
       setSummary(res.summary);
-    } catch (e) { console.error(e); }
+    } catch (e: any) { console.error(e); }
     finally { setLoading(false); }
   }, [page, search, stockStatus, categoryId, sortBy, sortOrder]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
   useEffect(() => {
-    api.get('/products/categories/all').then(r => setCategories(r.data)).catch(() => {});
+    api.get('/products/categories/all').then((r: any) => setCategories(r.data)).catch(() => {});
   }, []);
 
   // debounce search
@@ -248,7 +235,7 @@ export default function InventoryPage() {
     else { setSortBy(field); setSortOrder('asc'); }
   };
 
-  const stockValue = products.reduce((sum, p) => sum + Number(p.price) * p.stock, 0);
+  const stockValue = products.reduce((sum: number, p: Product) => sum + Number(p.price) * p.stock, 0);
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
@@ -402,7 +389,7 @@ export default function InventoryPage() {
                             </div>
                             <div>
                               <p className="font-black text-sm text-gray-900">{product.name}</p>
-                              <p className="text-xs text-gray-400 font-medium">${Number(product.price).toFixed(2)}</p>
+                              <p className="text-xs text-gray-400 font-medium">S/ {Number(product.price).toFixed(2)}</p>
                             </div>
                           </div>
                         </td>

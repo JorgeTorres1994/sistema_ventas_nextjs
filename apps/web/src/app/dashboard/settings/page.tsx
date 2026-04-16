@@ -21,13 +21,13 @@ import {
     Upload,
     Save
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function SettingsPage() {
     const { settings, paymentMethods, refreshSettings, loading: initialLoading } = useSettings();
     const [formData, setFormData] = useState<any>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [activeTab, setActiveTab] = useState('business');
-    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
     useEffect(() => {
         if (settings) {
@@ -45,12 +45,11 @@ export default function SettingsPage() {
         try {
             await updateSettings(formData);
             await refreshSettings();
-            setMessage({ type: 'success', text: 'Settings updated successfully' });
+            toast.success('Configuración actualizada correctamente');
         } catch (error) {
-            setMessage({ type: 'error', text: 'Failed to update settings' });
+            toast.error('Error al guardar la configuración');
         } finally {
             setIsSaving(false);
-            setTimeout(() => setMessage(null), 3000);
         }
     };
 
@@ -58,9 +57,9 @@ export default function SettingsPage() {
         try {
             await togglePaymentMethod(id);
             await refreshSettings();
+            toast.success('Método de pago actualizado');
         } catch (error) {
-            setMessage({ type: 'error', text: 'Failed to update payment method' });
-            setTimeout(() => setMessage(null), 3000);
+            toast.error('Error al actualizar método de pago');
         }
     };
 
@@ -72,11 +71,9 @@ export default function SettingsPage() {
             setFormData((prev: any) => ({ ...prev, logoUrl: result.url }));
             await updateSettings({ logoUrl: result.url });
             await refreshSettings();
-            setMessage({ type: 'success', text: 'Logo updated successfully' });
+            toast.success('Logotipo corporativo actualizado');
         } catch (error) {
-            setMessage({ type: 'error', text: 'Failed to upload logo' });
-        } finally {
-            setTimeout(() => setMessage(null), 3000);
+            toast.error('Error al subir el logotipo');
         }
     };
 
