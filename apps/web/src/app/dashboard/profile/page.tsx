@@ -7,8 +7,9 @@ import { getMe, updateMyProfile, uploadAvatar } from '@/lib/api';
 import { 
   User, Mail, Lock, Camera, Save, 
   CheckCircle2, AlertCircle, Loader2,
-  Trash2, ShieldCheck
+  ShieldCheck, RefreshCw
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function ProfilePage() {
   const [user, setUser] = useState<any>(null);
@@ -22,7 +23,6 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -38,6 +38,7 @@ export default function ProfilePage() {
         });
       } catch (error) {
         console.error('Failed to fetch user:', error);
+        toast.error('Error al cargar datos del perfil');
       } finally {
         setLoading(false);
       }
@@ -58,19 +59,18 @@ export default function ProfilePage() {
     try {
       const { url } = await uploadAvatar(file);
       setFormData(prev => ({ ...prev, avatarUrl: url }));
-      setMessage({ type: 'success', text: 'Imagen cargada. Guarda los cambios para aplicar.' });
+      toast.info('Imagen cargada. Guarde los cambios para aplicar.');
     } catch (error) {
-      setMessage({ type: 'error', text: 'Error al subir la imagen' });
+      toast.error('Error al subir la imagen');
     } finally {
       setUploading(false);
-      setTimeout(() => setMessage(null), 3000);
     }
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password && formData.password !== formData.confirmPassword) {
-      setMessage({ type: 'error', text: 'Las contraseñas no coinciden' });
+      toast.error('Las contraseñas no coinciden');
       return;
     }
 
@@ -88,16 +88,15 @@ export default function ProfilePage() {
       setUser(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
       
-      setMessage({ type: 'success', text: 'Perfil actualizado con éxito' });
+      toast.success('Perfil actualizado correctamente');
       setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
       
-      // Refresh TopBar by triggering a storage event or similar if needed
+      // Update global user state (TopBar etc)
       window.dispatchEvent(new Event('storage'));
     } catch (error) {
-      setMessage({ type: 'error', text: 'Error al actualizar el perfil' });
+      toast.error('Error al actualizar el perfil');
     } finally {
       setSaving(false);
-      setTimeout(() => setMessage(null), 3000);
     }
   };
 
@@ -129,17 +128,16 @@ export default function ProfilePage() {
         <main className="flex-1 p-8 max-w-4xl mx-auto w-full">
           <header className="mb-8">
             <h1 className="text-3xl font-black text-gray-900 tracking-tight">Mi Perfil</h1>
-            <p className="text-gray-500 font-bold mt-1 uppercase text-xs tracking-widest">Gestiona tu identidad en Nexus Genesis</p>
+            <p className="text-gray-500 font-bold mt-1 uppercase text-xs tracking-widest leading-relaxed">Configuraciones de identidad y seguridad corporativa</p>
           </header>
 
           <form onSubmit={handleSave} className="space-y-8 pb-12">
-            {/* Profile Card */}
             <section className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-700 relative">
                 <div className="absolute -bottom-16 left-8 flex items-end gap-6">
                   <div className="relative group">
                     <div className="w-32 h-32 rounded-3xl bg-white p-1.5 shadow-xl">
-                      <div className="w-full h-full rounded-2xl bg-gray-100 overflow-hidden flex items-center justify-center relative">
+                      <div className="w-full h-full rounded-2xl bg-gray-100 overflow-hidden flex items-center justify-center relative border border-gray-50">
                         {displayAvatar ? (
                           <img src={displayAvatar} alt="Avatar" className="w-full h-full object-cover" />
                         ) : (
@@ -152,7 +150,7 @@ export default function ProfilePage() {
                         )}
                       </div>
                     </div>
-                    <label className="absolute bottom-2 -right-2 w-10 h-10 bg-white rounded-xl shadow-lg border border-gray-100 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all group-hover:scale-110">
+                    <label className="absolute bottom-2 -right-2 w-10 h-10 bg-white rounded-xl shadow-lg border border-gray-100 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all group-hover:scale-110 active:scale-95">
                       <Camera className="w-5 h-5 text-blue-600" />
                       <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} />
                     </label>
@@ -163,8 +161,8 @@ export default function ProfilePage() {
                       <span className="px-2 py-0.5 bg-white/20 backdrop-blur-md rounded-md text-[10px] font-black text-white uppercase tracking-wider border border-white/20">
                         {user?.role}
                       </span>
-                      <span className="text-white/80 text-xs font-bold flex items-center gap-1">
-                        <ShieldCheck className="w-3 h-3" /> Cuenta Verificada
+                      <span className="text-white/80 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                        <ShieldCheck className="w-3.5 h-3.5 text-blue-200" /> Cuenta Verificada
                       </span>
                     </div>
                   </div>
@@ -172,97 +170,90 @@ export default function ProfilePage() {
               </div>
 
               <div className="pt-24 p-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {/* Personal Info */}
-                  <div className="space-y-6">
-                    <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                       <User className="w-4 h-4" /> Información Personal
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                  <div className="space-y-8">
+                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                       <User className="w-4 h-4 text-blue-600" /> Información de Cuenta
                     </h3>
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       <div>
-                        <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Nombre Completo</label>
+                        <label className="block text-[11px] font-black text-gray-400 uppercase tracking-wider mb-2.5 ml-1">Nombre Completo</label>
                         <div className="relative">
                           <input 
                             type="text" 
                             name="name"
                             value={formData.name}
                             onChange={handleInputChange}
-                            className="w-full pl-4 pr-10 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-blue-500 transition-all outline-none font-bold text-gray-700" 
+                            className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-[20px] focus:bg-white focus:border-blue-500 transition-all outline-none font-bold text-gray-700 shadow-sm" 
+                            placeholder="Ingrese su nombre"
                           />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Correo Electrónico</label>
+                        <label className="block text-[11px] font-black text-gray-400 uppercase tracking-wider mb-2.5 ml-1">Email Institucional</label>
                         <div className="relative">
                           <input 
                             type="email" 
                             value={formData.email}
                             disabled
-                            className="w-full pl-4 pr-10 py-3 bg-gray-100 border border-transparent rounded-2xl font-bold text-gray-400 cursor-not-allowed outline-none" 
+                            className="w-full pl-5 pr-12 py-4 bg-gray-100 border border-transparent rounded-[20px] font-bold text-gray-400 cursor-not-allowed outline-none" 
                           />
-                          <Lock className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                          <Lock className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
                         </div>
-                        <p className="text-[10px] text-gray-400 mt-2 ml-1 italic">* El correo electrónico no puede ser modificado por seguridad.</p>
+                        <p className="text-[10px] text-gray-400 mt-3 ml-2 font-medium flex items-center gap-1.5">
+                           <AlertCircle className="w-3 h-3" /> El email se mantiene vinculado a la cuenta raíz.
+                        </p>
                       </div>
                     </div>
                   </div>
 
-                  {/* Security */}
-                  <div className="space-y-6">
-                    <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                       <Lock className="w-4 h-4" /> Seguridad
+                  <div className="space-y-8">
+                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                       <Lock className="w-4 h-4 text-indigo-600" /> Autenticación
                     </h3>
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       <div>
-                        <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Nueva Contraseña</label>
+                        <label className="block text-[11px] font-black text-gray-400 uppercase tracking-wider mb-2.5 ml-1">Nueva Contraseña</label>
                         <input 
                           type="password" 
                           name="password"
                           placeholder="••••••••"
                           value={formData.password}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-blue-500 transition-all outline-none font-bold text-gray-700" 
+                          className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-[20px] focus:bg-white focus:border-blue-500 transition-all outline-none font-bold text-gray-700 shadow-sm" 
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Confirmar Nueva Contraseña</label>
+                        <label className="block text-[11px] font-black text-gray-400 uppercase tracking-wider mb-2.5 ml-1">Confirmar Contraseña</label>
                         <input 
                           type="password" 
                           name="confirmPassword"
                           placeholder="••••••••"
                           value={formData.confirmPassword}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-blue-500 transition-all outline-none font-bold text-gray-700" 
+                          className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-[20px] focus:bg-white focus:border-blue-500 transition-all outline-none font-bold text-gray-700 shadow-sm" 
                         />
                       </div>
                     </div>
                   </div>
                 </div>
-
-                {message && (
-                  <div className={`mt-8 p-4 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-rose-50 text-rose-700 border border-rose-100'}`}>
-                    {message.type === 'success' ? <CheckCircle2 className="w-5 h-5 shrink-0" /> : <AlertCircle className="w-5 h-5 shrink-0" />}
-                    <p className="text-sm font-bold">{message.text}</p>
-                  </div>
-                )}
               </div>
 
-              {/* Action Footer */}
-              <div className="bg-gray-50 p-6 px-8 border-t border-gray-100 flex items-center justify-between">
+              <div className="bg-gray-50/50 p-8 px-10 border-t border-gray-100 flex items-center justify-between">
                 <button 
                   type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, avatarUrl: user?.avatarUrl || '' }))}
-                  className="px-6 py-2.5 text-rose-600 font-black text-xs uppercase tracking-widest hover:bg-rose-100/50 rounded-xl transition-all"
+                  onClick={() => window.location.reload()}
+                  className="px-6 py-3 text-gray-400 font-black text-[10px] uppercase tracking-[0.2em] hover:text-rose-600 transition-all flex items-center gap-2"
                 >
-                  Restaurar Cambios
+                  <RefreshCw className="w-4 h-4" /> Descartar
                 </button>
                 <button 
                   type="submit"
                   disabled={saving}
-                  className="px-10 py-3 bg-blue-600 text-white font-black text-sm rounded-2xl hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
+                  className="px-12 py-4 bg-blue-600 text-white font-black text-xs uppercase tracking-[0.2em] rounded-[22px] hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-3"
                 >
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  Guardar Perfil
+                  {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                  Actualizar Perfil
                 </button>
               </div>
             </section>
