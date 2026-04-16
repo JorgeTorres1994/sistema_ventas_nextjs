@@ -448,4 +448,5 @@ export const logout = () => {
   window.location.href = '/login';
 };
 
+export { api };
 export default api;
