@@ -28,13 +28,13 @@ export default function EditProductPage() {
         <header className="px-8 py-6 bg-white border-b border-gray-100 flex items-center justify-between shrink-0">
           <div>
             <nav className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
-              <span>Inventory Studio</span>
+              <span>Gestión de Inventario</span>
               <span>/</span>
-              <span>Products</span>
+              <span>Productos</span>
               <span>/</span>
-              <span className="text-gray-900">Edit Product</span>
+              <span className="text-gray-900">Editar Producto</span>
             </nav>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none">Edit Product</h1>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none">Editar Producto</h1>
           </div>
         </header>
 

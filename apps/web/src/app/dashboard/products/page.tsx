@@ -77,7 +77,7 @@ export default function ProductsPage() {
         <header className="px-8 py-6 bg-white border-b border-gray-100 flex items-center justify-between shrink-0">
           <div>
             <nav className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
-              <span>Estudio de Inventario</span>
+              <span>Gestión de Inventario</span>
               <span>/</span>
               <span className="text-gray-900">Productos</span>
             </nav>
