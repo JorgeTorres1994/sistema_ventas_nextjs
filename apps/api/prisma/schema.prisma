@@ -142,6 +142,7 @@ model CashRegister {
   user            User            @relation(fields: [userId], references: [id])
   sales           Sale[]
   cashMovements   CashMovement[]
+  expenses        Expense[]
 }
 
 model Sale {
@@ -281,4 +282,32 @@ model DocumentSeries {
   isActive     Boolean?  @default(true)
   createdAt    DateTime? @default(now())
   updatedAt    DateTime  @updatedAt
+}
+
+model ExpenseCategory {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  description String?
+  isActive    Boolean?  @default(true)
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  expenses    Expense[]
+}
+
+model Expense {
+  id                String          @id @default(uuid())
+  description       String
+  amount            Decimal         @db.Decimal(10, 2)
+  date              DateTime        @default(now())
+  categoryId        String
+  cashRegisterId    String?
+  paymentMethod     String?         @default("CASH")
+  referenceNumber   String?
+  notes             String?
+  createdAt         DateTime?       @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  category          ExpenseCategory @relation(fields: [categoryId], references: [id])
+  cashRegister      CashRegister?   @relation(fields: [cashRegisterId], references: [id])
 }

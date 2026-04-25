@@ -18,6 +18,7 @@ import { InventoryModule } from './inventory/inventory.module.js';
 import { SettingsModule } from './settings/settings.module.js';
 import { RolesModule } from './roles/roles.module';
 import { DocumentSeriesModule } from './document-series/document-series.module';
+import { ExpensesModule } from './expenses/expenses.module.js';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { DocumentSeriesModule } from './document-series/document-series.module';
     SettingsModule,
     RolesModule,
     DocumentSeriesModule,
+    ExpensesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
