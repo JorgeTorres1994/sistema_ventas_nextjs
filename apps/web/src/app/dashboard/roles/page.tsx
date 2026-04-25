@@ -25,7 +25,8 @@ const moduleTranslations: Record<string, string> = {
     reports: 'Reportes y Analítica',
     users: 'Gestión de Usuarios',
     roles: 'Roles y Seguridad',
-    settings: 'Configuración General'
+    settings: 'Configuración General',
+    expenses: 'Gastos y Egresos'
 };
 
 export default function RolesPage() {

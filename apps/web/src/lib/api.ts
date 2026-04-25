@@ -493,5 +493,46 @@ export const updateDocumentSeries = async (id: string, data: any) => {
   return response.data;
 };
 
+// ── Expenses & Outflows ────────────────────────────────────────────────
+export const getExpenses = async (params?: { startDate?: string; endDate?: string; categoryId?: string }) => {
+  const response = await api.get('/expenses', { params });
+  return response.data;
+};
+
+export const getExpenseCategories = async () => {
+  const response = await api.get('/expenses/categories');
+  return response.data;
+};
+
+export const createExpense = async (data: any) => {
+  const response = await api.post('/expenses', data);
+  return response.data;
+};
+
+export const updateExpense = async (id: string, data: any) => {
+  const response = await api.patch(`/expenses/${id}`, data);
+  return response.data;
+};
+
+export const deleteExpense = async (id: string) => {
+  const response = await api.delete(`/expenses/${id}`);
+  return response.data;
+};
+
+export const createExpenseCategory = async (data: any) => {
+  const response = await api.post('/expenses/categories', data);
+  return response.data;
+};
+
+export const updateExpenseCategory = async (id: string, data: any) => {
+  const response = await api.patch(`/expenses/categories/${id}`, data);
+  return response.data;
+};
+
+export const deleteExpenseCategory = async (id: string) => {
+  const response = await api.delete(`/expenses/categories/${id}`);
+  return response.data;
+};
+
 export { api };
 export default api;

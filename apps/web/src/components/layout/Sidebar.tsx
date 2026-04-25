@@ -17,7 +17,8 @@ import {
   Users2,
   Building2,
   LogOut,
-  ShieldCheck
+  ShieldCheck,
+  Receipt
 } from 'lucide-react';
 
 import { useSettings } from '../SettingsProvider';
@@ -62,6 +63,7 @@ const Sidebar = () => {
       items: [
         { name: 'Caja Registradora', icon: Wallet, path: '/cash', permission: 'cash' },
         { name: 'Ventas', icon: Wallet, path: '/sales', permission: 'sales' },
+        { name: 'Gastos y Egresos', icon: Receipt, path: '/expenses', permission: 'expenses' },
         { name: 'Clientes', icon: Users2, path: '/customers', permission: 'customers' },
       ]
     },
