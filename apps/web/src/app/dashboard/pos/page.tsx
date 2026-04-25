@@ -98,6 +98,8 @@ export default function PosPage() {
 
   const { settings } = useSettings();
 
+  const [documentType, setDocumentType] = useState('BOLETA');
+
   const handleCompleteSale = async () => {
     setIsProcessing(true);
     try {
@@ -110,14 +112,12 @@ export default function PosPage() {
       const taxRate = (settings?.taxRate || 18) / 100; 
       const total = subtotal + (subtotal * taxRate);
 
-      // We explicitly bypass customer requirement in UI, backend fallback will handle it
-      await createSale(itemsPayload, paymentMethod, total);
+      await createSale(itemsPayload, paymentMethod, total, documentType);
       
       toast.success('¡Venta completada con éxito!', {
         description: `Total procesado: S/ ${total.toFixed(2)}`,
       });
       handleClearCart();
-      // Refetch products to update stock visually
       const freshProducts = await getProducts(1, 100, searchQuery);
       setProducts(freshProducts.data);
       
@@ -152,6 +152,8 @@ export default function PosPage() {
             cart={cart}
             paymentMethod={paymentMethod}
             setPaymentMethod={setPaymentMethod}
+            documentType={documentType}
+            setDocumentType={setDocumentType}
             onClearCart={handleClearCart}
             onUpdateQuantity={handleUpdateQuantity}
             onRemoveItem={handleRemoveItem}

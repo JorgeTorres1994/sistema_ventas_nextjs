@@ -3,13 +3,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Sidebar from '@/components/layout/Sidebar';
+import TopBar from '@/components/layout/TopBar';
 import { 
     Search, Plus, Calendar, Download, 
     RotateCcw, Eye, ChevronLeft, ChevronRight,
-    TrendingUp, ShoppingBag, DollarSign, AlertCircle
+    TrendingUp, ShoppingBag, DollarSign, AlertCircle, X,
+    User, Hash, Clock, CreditCard
 } from 'lucide-react';
-import { getSales, cancelSale } from '@/lib/api';
+import { getSales, getSaleById, cancelSale } from '@/lib/api';
 import { toast } from 'sonner';
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+const fmtCurrency = (n: number) => `S/ ${Number(n).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const fmtDate = (iso: string) => new Date(iso).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' });
+const fmtTime = (iso: string) => new Date(iso).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
 
 // ── Components ─────────────────────────────────────────────────────────────────
 
@@ -20,7 +27,7 @@ const SalesSummary = ({ stats }: any) => (
           <TrendingUp className="w-6 h-6" />
        </div>
        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Ingresos Totales</p>
-       <h4 className="text-2xl font-black text-gray-900 leading-none">S/ {stats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h4>
+       <h4 className="text-2xl font-black text-gray-900 leading-none">S/ {stats.totalRevenue.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</h4>
     </div>
     <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm group hover:border-blue-100 transition-all">
        <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-4">
@@ -34,7 +41,7 @@ const SalesSummary = ({ stats }: any) => (
           <DollarSign className="w-6 h-6" />
        </div>
        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Ticket Promedio</p>
-       <h4 className="text-2xl font-black text-gray-900 leading-none">S/ {stats.avgSale.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h4>
+       <h4 className="text-2xl font-black text-gray-900 leading-none">S/ {stats.avgSale.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</h4>
     </div>
     <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm group hover:border-blue-100 transition-all">
        <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 mb-4">
@@ -48,55 +55,196 @@ const SalesSummary = ({ stats }: any) => (
 
 // Mocks for structure - in real life these would be imported from components
 // ── Sale Detail Drawer ────────────────────────────────────────────────────────
-const SaleDetailDrawer = ({ saleId, onClose, onCancelSuccess }: any) => {
+const SaleDetailDrawer = ({ saleId, onClose, onCancelSale }: any) => {
   const [sale, setSale] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (saleId) {
       setLoading(true);
-      // In a real app, this would be a specific API call. For now, since we have the data in the list, 
-      // but the list might not have all items, we'll simulate a fetch.
-      // Assuming getSales returns the full object or we fetch by ID if possible.
-      // Placeholder for actual fetch logic:
-      setLoading(false);
-      // In the real implementation, we would call an API here.
+      getSaleById(saleId)
+        .then(setSale)
+        .catch(() => toast.error('Error al cargar detalle de venta'))
+        .finally(() => setLoading(false));
+    } else {
+      setSale(null);
     }
   }, [saleId]);
 
   if (!saleId) return null;
 
+  const getStatusStyle = (status: string) => {
+    switch (status) {
+      case 'PAID': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
+      case 'PENDING': return 'bg-amber-50 text-amber-600 border-amber-100';
+      case 'CANCELLED': return 'bg-rose-50 text-rose-600 border-rose-100';
+      default: return 'bg-gray-50 text-gray-400 border-gray-100';
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex justify-end" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm shadow-2xl" />
+    <div className="fixed inset-0 z-[100] flex justify-end" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300" />
       <div 
-        className="relative w-full max-w-xl bg-white h-full shadow-2xl flex flex-col p-0 overflow-hidden animate-in slide-in-from-right duration-300"
+        className="relative w-full max-w-2xl bg-white h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-500 ease-out"
         onClick={e => e.stopPropagation()}
       >
-        <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-xl font-black text-gray-900 uppercase tracking-widest">Detalle de Transacción</h2>
-          <button onClick={onClose} className="w-10 h-10 rounded-xl hover:bg-gray-100 flex items-center justify-center transition-colors">
-            <X className="w-5 h-5 text-gray-400" />
+        {/* Header */}
+        <div className="px-10 py-8 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+               <h2 className="text-2xl font-black text-gray-900 tracking-tight">Comprobante de Venta</h2>
+               {sale && (
+                 <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${getStatusStyle(sale.status)}`}>
+                   {sale.status === 'PAID' ? 'Pagado' : sale.status === 'CANCELLED' ? 'Anulado' : 'Pendiente'}
+                 </span>
+               )}
+            </div>
+            <p className="text-sm text-gray-400 font-medium flex items-center gap-2">
+              <Hash className="w-3.5 h-3.5" /> {sale.documentSeries && sale.documentNumber ? `${sale.documentSeries}-${sale.documentNumber.toString().padStart(8, '0')}` : saleId.toUpperCase()}
+            </p>
+          </div>
+          <button onClick={onClose} className="w-12 h-12 rounded-2xl hover:bg-gray-50 flex items-center justify-center transition-all group">
+            <X className="w-6 h-6 text-gray-300 group-hover:text-gray-900 transition-colors" />
           </button>
         </div>
         
-        <div className="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-hide">
-          <div className="flex items-center justify-center py-20 text-gray-300 font-bold uppercase tracking-[0.2em]">
-             Cargando información...
+        {loading ? (
+          <div className="flex-1 flex flex-col items-center justify-center space-y-4">
+             <div className="w-10 h-10 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin" />
+             <p className="text-xs font-black text-gray-300 uppercase tracking-[0.2em]">Sincronizando auditoría...</p>
           </div>
-        </div>
+        ) : sale ? (
+          <div className="flex-1 overflow-y-auto scrollbar-hide">
+             {/* Main Info */}
+             <div className="px-10 py-8 grid grid-cols-2 gap-8 border-b border-gray-50 bg-gray-50/30">
+                <div className="space-y-4">
+                   <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center border border-gray-100 text-blue-600">
+                         <User className="w-5 h-5" />
+                      </div>
+                      <div>
+                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Cliente</p>
+                         <p className="text-sm font-black text-gray-900">{sale.customer?.name || 'Cliente de Mostrador'}</p>
+                      </div>
+                   </div>
+                   <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center border border-gray-100 text-amber-600">
+                         <Calendar className="w-5 h-5" />
+                      </div>
+                      <div>
+                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Fecha de Emisión</p>
+                         <p className="text-sm font-black text-gray-900">{fmtDate(sale.createdAt)}</p>
+                      </div>
+                   </div>
+                </div>
+                <div className="space-y-4">
+                   <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center border border-gray-100 text-indigo-600">
+                         <CreditCard className="w-5 h-5" />
+                      </div>
+                      <div>
+                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Método de Pago</p>
+                         <p className="text-sm font-black text-gray-900">{sale.paymentMethod || 'Efectivo'}</p>
+                      </div>
+                   </div>
+                   <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center border border-gray-100 text-emerald-600">
+                         <Clock className="w-5 h-5" />
+                      </div>
+                      <div>
+                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Hora de Registro</p>
+                         <p className="text-sm font-black text-gray-900">{fmtTime(sale.createdAt)}</p>
+                      </div>
+                   </div>
+                </div>
+             </div>
+
+             {/* Items Table */}
+             <div className="px-10 py-10">
+                <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Resumen de Artículos</h3>
+                <div className="space-y-4">
+                   {sale.items?.map((item: any, idx: number) => (
+                      <div key={idx} className="flex items-center justify-between p-5 bg-white rounded-2xl border border-gray-100 shadow-sm hover:border-blue-100 transition-all">
+                         <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 font-black text-xs">
+                               {item.product?.name?.[0] || 'P'}
+                            </div>
+                            <div>
+                               <p className="text-sm font-black text-gray-900">{item.product?.name || 'Producto Desconocido'}</p>
+                               <p className="text-xs text-gray-400 font-bold">{item.quantity} unidades × {fmtCurrency(Number(item.price))}</p>
+                            </div>
+                         </div>
+                         <div className="text-right">
+                            <p className="text-sm font-black text-gray-900">{fmtCurrency(Number(item.price) * item.quantity)}</p>
+                         </div>
+                      </div>
+                   ))}
+                </div>
+             </div>
+
+             {/* Totals */}
+             <div className="mx-10 my-6 p-8 bg-gray-900 rounded-[32px] text-white shadow-2xl shadow-gray-200">
+                <div className="space-y-4 border-b border-white/10 pb-6 mb-6">
+                   <div className="flex justify-between items-center opacity-60">
+                      <span className="text-xs font-bold uppercase tracking-widest">Subtotal Gravado</span>
+                      <span className="text-sm font-black">{fmtCurrency(Number(sale.total) / 1.18)}</span>
+                   </div>
+                   <div className="flex justify-between items-center opacity-60">
+                      <span className="text-xs font-bold uppercase tracking-widest">I.G.V (18%)</span>
+                      <span className="text-sm font-black">{fmtCurrency(Number(sale.total) - (Number(sale.total) / 1.18))}</span>
+                   </div>
+                </div>
+                <div className="flex justify-between items-center">
+                   <div>
+                      <p className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-1">Total a Liquidar</p>
+                      <h4 className="text-3xl font-black tracking-tighter">{fmtCurrency(Number(sale.total))}</h4>
+                   </div>
+                   <div className="text-right">
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Monto Recibido</p>
+                      <p className="text-xl font-black text-emerald-400">{fmtCurrency(Number(sale.amountPaid || sale.total))}</p>
+                   </div>
+                </div>
+             </div>
+             
+             <div className="px-10 py-10">
+                {sale.status !== 'CANCELLED' ? (
+                   <button 
+                     onClick={() => {
+                        onCancelSale(sale.id);
+                     }}
+                     className="w-full py-4 bg-rose-50 text-rose-600 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-rose-100 transition-all flex items-center justify-center gap-3"
+                   >
+                      <RotateCcw className="w-4 h-4" /> Solicitar Anulación de Comprobante
+                   </button>
+                ) : (
+                   <div className="p-6 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-4">
+                      <AlertCircle className="w-6 h-6 text-rose-600" />
+                      <div>
+                         <p className="text-sm font-black text-rose-900">Esta venta ha sido anulada</p>
+                         <p className="text-xs text-rose-600 font-medium">Los productos han sido devueltos al inventario central.</p>
+                      </div>
+                   </div>
+                )}
+             </div>
+          </div>
+        ) : (
+          <div className="flex-1 flex items-center justify-center text-gray-400 font-black uppercase tracking-widest">
+             No se pudo recuperar la información
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-// Re-importing X from lucide-react since I added a close button
-import { X } from 'lucide-react';
-
 export default function SalesPage() {
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const openId = searchParams?.get('open');
+
   const [sales, setSales] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedSaleId, setSelectedSaleId] = useState<string | null>(null);
+  const [selectedSaleId, setSelectedSaleId] = useState<string | null>(openId || null);
   
   // Filters
   const [search, setSearch] = useState('');
@@ -180,8 +328,10 @@ export default function SalesPage() {
       <Sidebar />
       
       <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
-        {/* Top Header */}
-        <header className="px-10 py-8 bg-white/50 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between shrink-0">
+        <TopBar />
+        
+        {/* Module Header */}
+        <div className="px-10 py-8 bg-transparent flex items-center justify-between shrink-0">
           <div>
             <h1 className="text-4xl font-black text-gray-900 tracking-tight leading-none mb-2">Historial de Ventas</h1>
             <p className="text-base text-gray-400 font-medium">Auditoría centralizada de transacciones • Nexus Genesis</p>
@@ -191,7 +341,7 @@ export default function SalesPage() {
               <Plus className="w-5 h-5" /> Nueva Venta
             </button>
           </Link>
-        </header>
+        </div>
 
         <main className="flex-1 overflow-y-auto px-10 pb-12 space-y-8 scroll-smooth scrollbar-hide">
           {/* Controls Bar */}
@@ -253,7 +403,11 @@ export default function SalesPage() {
                   </tr>
                 ) : sales.map((sale) => (
                   <tr key={sale.id} className="hover:bg-blue-50/20 transition-all cursor-default">
-                    <td className="px-10 py-6 font-black text-blue-600 text-sm">#SAL-{sale.id.substring(0,6).toUpperCase()}</td>
+                    <td className="px-10 py-6 font-black text-blue-600 text-sm">
+                      {sale.documentSeries && sale.documentNumber 
+                        ? `${sale.documentSeries}-${sale.documentNumber.toString().padStart(8, '0')}` 
+                        : `#SAL-${sale.id.substring(0,6).toUpperCase()}`}
+                    </td>
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-4">
                         <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 font-black text-[10px] border border-gray-200">{sale.customer?.name?.[0] || 'G'}</div>
@@ -262,7 +416,7 @@ export default function SalesPage() {
                     </td>
                     <td className="px-8 py-6 text-center">{getStatusBadge(sale.status)}</td>
                     <td className="px-8 py-6 text-right">
-                      <span className="text-sm font-black text-gray-900 tracking-tight">S/ {Number(sale.total).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                      <span className="text-sm font-black text-gray-900 tracking-tight">S/ {Number(sale.total).toLocaleString('es-PE', { minimumFractionDigits: 2 })}</span>
                     </td>
                     <td className="px-10 py-6">
                       <div className="flex items-center justify-center gap-3">
@@ -285,10 +439,10 @@ export default function SalesPage() {
       <SaleDetailDrawer 
         saleId={selectedSaleId} 
         onClose={() => setSelectedSaleId(null)} 
-        onCancelSuccess={() => {
+        onCancelSale={(id: string) => {
+          handleCancelSale(id);
           setSelectedSaleId(null);
-          fetchSales();
-        }}
+        }} 
       />
     </div>
   );

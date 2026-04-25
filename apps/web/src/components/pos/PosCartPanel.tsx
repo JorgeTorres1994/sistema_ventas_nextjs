@@ -25,6 +25,8 @@ interface PosCartPanelProps {
   cart: CartItem[];
   paymentMethod: string;
   setPaymentMethod: (method: string) => void;
+  documentType: string;
+  setDocumentType: (type: string) => void;
   onClearCart: () => void;
   onUpdateQuantity: (productId: string, delta: number) => void;
   onRemoveItem: (productId: string) => void;
@@ -36,6 +38,8 @@ export default function PosCartPanel({
   cart,
   paymentMethod,
   setPaymentMethod,
+  documentType,
+  setDocumentType,
   onClearCart,
   onUpdateQuantity,
   onRemoveItem,
@@ -151,6 +155,28 @@ export default function PosCartPanel({
             <span className="text-[40px] font-black text-gray-900 leading-none tracking-tighter">
               S/ {total.toFixed(2)}
             </span>
+          </div>
+        </div>
+
+        {/* Document Type Selection */}
+        <div className="mb-6">
+          <p className="text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase mb-4 flex items-center gap-2">
+             <FileText className="w-3 h-3" /> Tipo de Comprobante
+          </p>
+          <div className="flex gap-2">
+            {['BOLETA', 'FACTURA'].map((type) => (
+              <button
+                key={type}
+                onClick={() => setDocumentType(type)}
+                className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border-2 transition-all ${
+                  documentType === type 
+                    ? 'bg-gray-900 border-gray-900 text-white shadow-lg' 
+                    : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200'
+                }`}
+              >
+                {type}
+              </button>
+            ))}
           </div>
         </div>
 
