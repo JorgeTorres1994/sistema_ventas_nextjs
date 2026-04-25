@@ -52,13 +52,15 @@ export const getProducts = async (page = 1, limit = 50, search = '') => {
 export const createSale = async (
   items: { productId: string; quantity: number }[],
   paymentMethod: string,
-  amountPaid: number
+  amountPaid: number,
+  documentType: string = 'BOLETA'
 ) => {
   try {
     const response = await api.post('/sales', {
       items,
       paymentMethod,
-      amountPaid
+      amountPaid,
+      documentType
     });
     return response.data;
   } catch (error) {
@@ -394,11 +396,7 @@ export const uploadSettingsLogo = async (file: File) => {
 };
 
 // ── Users Management ────────────────────────────────────────────────────────
-export const getUsers = async (params: {
-  search?: string;
-  role?: string;
-  isActive?: boolean;
-} = {}) => {
+export const getUsers = async (params?: { search?: string; role?: string; roleId?: string; isActive?: boolean }) => {
   const response = await api.get('/users', { params });
   return response.data;
 };
@@ -446,6 +444,53 @@ export const logout = () => {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
   window.location.href = '/login';
+};
+
+// ── Roles & Permissions ──────────────────────────────────────────────────
+export const getRoles = async () => {
+  const response = await api.get('/roles');
+  return response.data;
+};
+
+export const getRoleById = async (id: string) => {
+  const response = await api.get(`/roles/${id}`);
+  return response.data;
+};
+
+export const createRole = async (data: { name: string; description?: string; permissionIds: string[] }) => {
+  const response = await api.post('/roles', data);
+  return response.data;
+};
+
+export const updateRole = async (id: string, data: { name?: string; description?: string; permissionIds?: string[] }) => {
+  const response = await api.patch(`/roles/${id}`, data);
+  return response.data;
+};
+
+export const deleteRole = async (id: string) => {
+  const response = await api.delete(`/roles/${id}`);
+  return response.data;
+};
+
+export const getPermissions = async () => {
+  const response = await api.get('/roles/permissions');
+  return response.data;
+};
+
+// ── Document Series (Billing) ──────────────────────────────────────────
+export const getDocumentSeries = async () => {
+  const response = await api.get('/document-series');
+  return response.data;
+};
+
+export const createDocumentSeries = async (data: any) => {
+  const response = await api.post('/document-series', data);
+  return response.data;
+};
+
+export const updateDocumentSeries = async (id: string, data: any) => {
+  const response = await api.patch(`/document-series/${id}`, data);
+  return response.data;
 };
 
 export { api };
