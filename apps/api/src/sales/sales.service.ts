@@ -15,13 +15,14 @@ export class SalesService {
         customerId?: string,
         amountPaid?: number,
         paymentMethod?: string,
-        status?: 'PAID' | 'PENDING' | 'PARTIAL'
+        status?: 'PAID' | 'PENDING' | 'PARTIAL',
+        documentType: string = 'BOLETA'
     ) {
         try {
             return await this.prisma.$transaction(async (tx) => {
                 let finalCustomerId = customerId;
                 
-                // Fallback for customerId if omitted, as the POS UI design doesn't have a selector
+                // Fallback for customerId
                 if (!finalCustomerId) {
                     let defaultCustomer = await tx.customer.findFirst({
                         where: { name: 'Consumidor Final' }
@@ -39,73 +40,72 @@ export class SalesService {
 
                 const user = await tx.user.findUnique({ where: { id: userId } });
                 if (!user) {
-                    throw new BadRequestException('Usuario no encontrado. Por favor, cierra sesión y vuelve a entrar.');
+                    throw new BadRequestException('Usuario no encontrado.');
                 }
 
-                // Verify user has an open cash register
                 const openRegister = await tx.cashRegister.findFirst({
                     where: { userId, status: 'OPEN' }
                 });
 
                 if (!openRegister) {
-                    throw new BadRequestException('ACTIVA_CAJA: Debes aperturar o abrir tu caja, antes de realizar cualquier venta.');
+                    throw new BadRequestException('ACTIVA_CAJA: Debes aperturar o abrir tu caja.');
                 }
+
+                // --- LOGICA DE FACTURACIÓN (SERIES) ---
+                const seriesConfig = await tx.documentSeries.findFirst({
+                    where: { documentType, isActive: true }
+                });
+
+                if (!seriesConfig) {
+                    throw new BadRequestException(`No hay una serie configurada para ${documentType}`);
+                }
+
+                const nextCorrelative = seriesConfig.currentNumber + 1;
+                await tx.documentSeries.update({
+                    where: { id: seriesConfig.id },
+                    data: { currentNumber: nextCorrelative }
+                });
+                // -------------------------------------
 
                 let total = 0;
                 const saleItems: { productId: string; quantity: number; price: number }[] = [];
 
                 for (const item of items) {
-                    // 1. Get product and check stock
-                    const product = await tx.product.findUnique({
-                        where: { id: item.productId },
-                    });
-
-                    if (!product) {
-                        throw new BadRequestException(`Producto con ID ${item.productId} no encontrado`);
-                    }
-
-                    if (!product.isActive) {
-                        throw new BadRequestException(`El producto ${product.name} no está activo`);
-                    }
-
+                    const product = await tx.product.findUnique({ where: { id: item.productId } });
+                    if (!product) throw new BadRequestException(`Producto ${item.productId} no encontrado`);
                     if (product.stock < item.quantity) {
-                        throw new BadRequestException(`Stock insuficiente para ${product.name}. Disponible: ${product.stock}`);
+                        throw new BadRequestException(`Stock insuficiente para ${product.name}`);
                     }
 
-                    // 2. Calculate subtotal and track items
                     const productPriceNumber = Number(product.price);
                     total += productPriceNumber * item.quantity;
                     saleItems.push({
                         productId: product.id,
                         quantity: item.quantity,
-                        price: productPriceNumber, // Store current price
+                        price: productPriceNumber,
                     });
 
-                    // 3. Reduce stock
                     await tx.product.update({
                         where: { id: product.id },
-                        data: {
-                            stock: {
-                                decrement: item.quantity,
-                            },
-                        },
+                        data: { stock: { decrement: item.quantity } },
                     });
                 }
 
                 const finalStatus = status || (amountPaid !== undefined && amountPaid < total ? 'PARTIAL' : 'PAID');
                 const finalAmountPaid = amountPaid !== undefined ? amountPaid : (finalStatus === 'PAID' ? total : 0);
 
-                // Calculate Taxes (exact 8% based on the visual design mockups)
-                const taxRate = 8;
+                const taxRate = 18; // IGV Estándar
                 const subtotal = total / (1 + (taxRate / 100));
                 const taxAmount = total - subtotal;
 
-                // 4. Create the sale and its items
                 const sale = await tx.sale.create({
                     data: {
                         userId,
                         customerId: finalCustomerId,
                         cashRegisterId: openRegister.id,
+                        series: seriesConfig.prefix,
+                        correlative: nextCorrelative,
+                        documentType,
                         total,
                         subtotal,
                         taxAmount,
@@ -128,14 +128,13 @@ export class SalesService {
                     },
                 });
 
-                // 5. If payment is in CASH, log automatic movement
                 if ((paymentMethod === 'CASH' || paymentMethod === 'EFECTIVO') && finalAmountPaid > 0) {
                     await tx.cashMovement.create({
                         data: {
                             cashRegisterId: openRegister.id,
                             type: 'IN',
                             amount: finalAmountPaid,
-                            description: `Venta POS #${sale.id.slice(0, 8).toUpperCase()}`,
+                            description: `Venta ${documentType} ${seriesConfig.prefix}-${nextCorrelative}`,
                         }
                     });
                 }
@@ -148,38 +147,23 @@ export class SalesService {
         }
     }
 
-    async findAll(filters: { 
-        startDate?: string; 
-        endDate?: string; 
-        status?: string; 
-        customerId?: string;
-        search?: string;
-    }) {
+    async findAll(filters: any) {
         const where: any = {};
-
-        if (filters.status && filters.status !== 'All') {
-            where.status = filters.status;
-        }
-
-        if (filters.customerId) {
-            where.customerId = filters.customerId;
-        }
-
+        if (filters.status && filters.status !== 'All') where.status = filters.status;
+        if (filters.customerId) where.customerId = filters.customerId;
         if (filters.startDate || filters.endDate) {
             where.createdAt = {};
-            if (filters.startDate) {
-                where.createdAt.gte = new Date(filters.startDate);
-            }
+            if (filters.startDate) where.createdAt.gte = new Date(filters.startDate);
             if (filters.endDate) {
                 const end = new Date(filters.endDate);
                 end.setHours(23, 59, 59, 999);
                 where.createdAt.lte = end;
             }
         }
-
         if (filters.search) {
             where.OR = [
                 { id: { contains: filters.search, mode: 'insensitive' } },
+                { series: { contains: filters.search, mode: 'insensitive' } },
                 { customer: { name: { contains: filters.search, mode: 'insensitive' } } },
             ];
         }
@@ -191,69 +175,38 @@ export class SalesService {
                 customer: { select: { name: true, email: true } },
                 payments: true,
             },
-            orderBy: {
-                createdAt: 'desc',
-            },
+            orderBy: { createdAt: 'desc' },
         });
     }
 
     async findOne(id: string) {
-        const sale = await this.prisma.sale.findUnique({
+        return this.prisma.sale.findUnique({
             where: { id },
             include: {
                 user: { select: { name: true } },
                 customer: true,
-                items: {
-                    include: {
-                        product: true,
-                    },
-                },
+                items: { include: { product: true } },
                 payments: true,
             },
         });
-
-        if (!sale) {
-            throw new BadRequestException('Venta no encontrada');
-        }
-
-        return sale;
     }
 
     async cancelSale(id: string) {
         return this.prisma.$transaction(async (tx) => {
             const sale = await tx.sale.findUnique({
                 where: { id },
-                include: { 
-                    items: true,
-                    payments: true
-                },
+                include: { items: true, payments: true },
             });
+            if (!sale) throw new BadRequestException('Venta no encontrada');
+            if (sale.status === 'CANCELLED') throw new BadRequestException('Venta ya anulada');
 
-            if (!sale) {
-                throw new BadRequestException('Venta no encontrada');
-            }
+            await tx.sale.update({ where: { id }, data: { status: 'CANCELLED' } });
 
-            if (sale.status === 'CANCELLED') {
-                throw new BadRequestException('Esta venta ya ha sido anulada');
-            }
-
-            // 1. Update sale status
-            await tx.sale.update({
-                where: { id },
-                data: { status: 'CANCELLED' },
-            });
-
-            // 2. Restore stock and record movement
             for (const item of sale.items) {
                 await tx.product.update({
                     where: { id: item.productId },
-                    data: {
-                        stock: {
-                            increment: item.quantity,
-                        },
-                    },
+                    data: { stock: { increment: item.quantity } },
                 });
-
                 await tx.stockMovement.create({
                     data: {
                         productId: item.productId,
@@ -265,27 +218,23 @@ export class SalesService {
                 });
             }
 
-            // 3. If it was a CASH sale, register reversal movement
             const cashPayment = sale.payments?.find(p => p.method === 'CASH' || p.method === 'EFECTIVO');
             if (cashPayment && Number(cashPayment.amount) > 0) {
                 const openRegister = await tx.cashRegister.findFirst({
                     where: { userId: sale.userId, status: 'OPEN' }
                 });
-                
                 if (openRegister) {
                     await tx.cashMovement.create({
                         data: {
                             cashRegisterId: openRegister.id,
                             type: 'OUT',
                             amount: cashPayment.amount,
-                            description: `Anulación Venta #${sale.id.slice(0, 8).toUpperCase()}`,
+                            description: `Anulación ${sale.documentType} ${sale.series}-${sale.correlative}`,
                         }
                     });
                 }
             }
-
             return { message: 'Venta anulada exitosamente' };
         });
     }
 }
-
