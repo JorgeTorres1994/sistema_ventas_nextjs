@@ -16,6 +16,8 @@ import { CashierModule } from './cashier/cashier.module.js';
 import { CashRegistersModule } from './cash-registers/cash-registers.module.js';
 import { InventoryModule } from './inventory/inventory.module.js';
 import { SettingsModule } from './settings/settings.module.js';
+import { RolesModule } from './roles/roles.module';
+import { DocumentSeriesModule } from './document-series/document-series.module';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { SettingsModule } from './settings/settings.module.js';
     CashRegistersModule,
     InventoryModule,
     SettingsModule,
+    RolesModule,
+    DocumentSeriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

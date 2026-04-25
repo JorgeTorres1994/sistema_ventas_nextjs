@@ -20,9 +20,38 @@ enum PurchaseStatus {
   CANCELLED
 }
 
-enum Role {
-  USER
-  ADMIN
+model Role {
+  id          String           @id @default(uuid())
+  name        String           @unique
+  description String?
+  isActive    Boolean?         @default(true)
+  createdAt   DateTime?        @default(now())
+  updatedAt   DateTime         @updatedAt
+  
+  users       User[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          String           @id @default(uuid())
+  name        String           @unique // e.g., "products:create"
+  module      String           // e.g., "products"
+  action      String           // e.g., "create"
+  description String?
+  createdAt   DateTime?        @default(now())
+  updatedAt   DateTime         @updatedAt
+  
+  roles       RolePermission[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
 }
 
 model User {
@@ -30,14 +59,15 @@ model User {
   email          String         @unique
   password       String
   name           String
-  role           Role           @default(USER)
   avatarUrl      String?
   isActive       Boolean?       @default(true)
   lastLogin      DateTime?
   failedAttempts Int?           @default(0)
   createdAt      DateTime?      @default(now())
   updatedAt      DateTime       @updatedAt
+  roleId         String?
 
+  role           Role?          @relation(fields: [roleId], references: [id])
   sales          Sale[]
   cashRegisters  CashRegister[]
   auditLogs      AuditLog[]
@@ -239,4 +269,16 @@ model PaymentMethod {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model DocumentSeries {
+  id           String    @id @default(uuid())
+  documentType String    // e.g., "FACTURA", "BOLETA"
+  prefix       String    // e.g., "F001"
+  startNumber  Int       @default(1)
+  currentNumber Int      @default(0)
+  description  String?
+  isActive     Boolean?  @default(true)
+  createdAt    DateTime? @default(now())
+  updatedAt    DateTime  @updatedAt
 }
