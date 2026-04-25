@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
+import TopBar from '@/components/layout/TopBar';
 import {
   Search, SlidersHorizontal, ArrowUpDown, Download, AlertTriangle,
   Package, AlertCircle, TrendingUp, ChevronLeft, ChevronRight,
@@ -240,12 +241,13 @@ export default function InventoryPage() {
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-y-auto">
+      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
+        <TopBar />
 
-        {/* Header */}
-        <header className="px-8 py-6 bg-white border-b border-gray-100 flex items-start justify-between sticky top-0 z-20">
+        {/* Module Header */}
+        <div className="px-8 py-6 bg-white border-b border-gray-100 flex items-start justify-between shrink-0">
           <div>
-            <nav className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+            <nav className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">
               <span>Inventario</span><span>/</span>
               <span className="text-indigo-600">Vista General</span>
             </nav>
@@ -261,7 +263,7 @@ export default function InventoryPage() {
               Historial de Movimientos
             </button>
           </div>
-        </header>
+        </div>
 
         <main className="flex-1 p-8 space-y-8">
 
@@ -288,7 +290,7 @@ export default function InventoryPage() {
             </div>
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50">
               <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Unidades Totales</p>
-              <p className="text-3xl font-black text-indigo-600">{summary.totalStockUnits.toLocaleString()}</p>
+              <p className="text-3xl font-black text-indigo-600">{summary.totalStockUnits.toLocaleString('es-PE')}</p>
               <p className="text-xs text-gray-400 font-bold mt-2">En todos los productos activos</p>
             </div>
           </div>
@@ -352,6 +354,7 @@ export default function InventoryPage() {
                       </button>
                     </th>
                     <th className="px-4 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Punto de Pedido</th>
+                    <th className="px-6 py-4 text-right text-xs font-black text-gray-400 uppercase tracking-widest">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
+import TopBar from '@/components/layout/TopBar';
 import {
   Search, Plus, ChevronLeft, ChevronRight, X, Calendar, 
   ShoppingCart, Filter, Package, Eye, FileText, CheckCircle2,
@@ -197,10 +198,11 @@ export default function PurchasesPage() {
   return (
     <div className="flex h-screen bg-[#F8F9FC] overflow-hidden font-sans">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-y-auto">
+      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
+        <TopBar />
         
-        {/* Header */}
-        <header className="px-10 py-8 bg-white/50 backdrop-blur-md sticky top-0 z-20 flex items-start justify-between">
+        {/* Module Header */}
+        <div className="px-10 py-8 bg-white/50 backdrop-blur-md shrink-0 flex items-start justify-between">
           <div>
             <h1 className="text-4xl font-black text-gray-900 tracking-tight leading-none mb-2">Órdenes de Compra</h1>
             <p className="text-base text-gray-400 font-medium">Gestione y rastree el ciclo de vida de abastecimiento global.</p>
@@ -211,9 +213,9 @@ export default function PurchasesPage() {
           >
             <Plus className="w-5 h-5" /> Nueva Compra
           </button>
-        </header>
+        </div>
 
-        <main className="flex-1 px-10 pb-12 space-y-8">
+        <main className="flex-1 overflow-y-auto px-10 pb-12 space-y-8">
           
           {/* Metrics */}
           <div className="grid grid-cols-4 gap-6">
@@ -226,7 +228,7 @@ export default function PurchasesPage() {
               <div key={i} className={`bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 ${m.border} flex items-center justify-between`}>
                 <div>
                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{m.label}</p>
-                  <p className="text-3xl font-black text-gray-900">{m.value.toLocaleString()}</p>
+                  <p className="text-3xl font-black text-gray-900">{m.value.toLocaleString('es-PE')}</p>
                 </div>
                 <div className={`${m.bg} ${m.color} w-12 h-12 rounded-2xl flex items-center justify-center`}>
                   <m.icon className="w-6 h-6" />

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from '@/components/layout/Sidebar';
+import TopBar from '@/components/layout/TopBar';
 import { 
     Unlock, Lock, TrendingUp, Target, 
     CheckCircle2, Plus, Download, RefreshCw, 
@@ -165,10 +166,11 @@ export default function CashRegisterPage() {
   return (
     <div className="flex h-screen bg-[#F8F9FC] overflow-hidden font-sans">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-y-auto">
-        
-        {/* Header */}
-        <header className="px-10 py-8 bg-transparent flex items-start justify-between">
+      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
+        <TopBar />
+
+        {/* Module Header */}
+        <div className="px-10 py-8 bg-transparent flex items-start justify-between shrink-0">
           <div>
             <h1 className="text-4xl font-black text-gray-900 tracking-tight leading-none mb-2">Control de Caja</h1>
             <p className="text-base text-gray-400 font-medium">Control centralizado de flujos de efectivo • Nexus Genesis</p>
@@ -191,9 +193,9 @@ export default function CashRegisterPage() {
                 </button>
              )}
           </div>
-        </header>
+        </div>
 
-        <main className="flex-1 px-10 pb-10 space-y-10">
+        <main className="flex-1 overflow-y-auto px-10 py-10 space-y-10">
           
           {/* Metrics Grid */}
           <div className="flex gap-8">

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from '@/components/layout/Sidebar';
+import TopBar from '@/components/layout/TopBar';
 import { 
   Search, 
   Filter, 
@@ -73,10 +74,12 @@ export default function ProductsPage() {
       <Sidebar />
       
       <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
-        {/* Top Header */}
-        <header className="px-8 py-6 bg-white border-b border-gray-100 flex items-center justify-between shrink-0">
+        <TopBar />
+
+        {/* Module Header */}
+        <div className="px-8 py-6 bg-white border-b border-gray-100 flex items-center justify-between shrink-0">
           <div>
-            <nav className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+            <nav className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">
               <span>Gestión de Inventario</span>
               <span>/</span>
               <span className="text-gray-900">Productos</span>
@@ -94,7 +97,7 @@ export default function ProductsPage() {
               </button>
             </Link>
           </div>
-        </header>
+        </div>
 
         <main className="flex-1 overflow-y-auto p-8 space-y-6 scroll-smooth hide-scrollbar">
           {/* Controls Bar */}

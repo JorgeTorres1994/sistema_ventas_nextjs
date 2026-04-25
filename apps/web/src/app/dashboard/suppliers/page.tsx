@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
+import TopBar from '@/components/layout/TopBar';
 import {
   Search, Plus, ChevronLeft, ChevronRight, X, Mail, Phone, MapPin, 
   ShoppingBag, TrendingUp, Calendar, Building2, CheckCircle, AlertCircle, 
@@ -300,10 +301,11 @@ export default function SuppliersPage() {
   return (
     <div className="flex h-screen bg-[#F9FAFB] overflow-hidden font-sans">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-y-auto">
+      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
+        <TopBar />
 
-        {/* Header */}
-        <header className="px-10 py-8 bg-transparent flex items-start justify-between">
+        {/* Module Header */}
+        <div className="px-10 py-8 bg-transparent flex items-start justify-between shrink-0">
           <div>
             <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Proveedores</h1>
             <p className="text-base text-gray-500 font-medium">Gestione su red global de proveedores y cadenas de abastecimiento.</p>
@@ -316,9 +318,9 @@ export default function SuppliersPage() {
               <Plus className="w-5 h-5" /> Agregar Proveedor
             </button>
           </div>
-        </header>
+        </div>
 
-        <main className="flex-1 px-10 pb-10 space-y-6">
+        <main className="flex-1 overflow-y-auto px-10 pb-10 space-y-6">
 
           {/* Filter Bar */}
           <div className="flex items-center gap-4">

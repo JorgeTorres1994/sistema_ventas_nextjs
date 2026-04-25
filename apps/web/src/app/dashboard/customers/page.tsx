@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
+import TopBar from '@/components/layout/TopBar';
 import {
   Search, UserPlus, ChevronLeft, ChevronRight, MoreVertical,
   X, Mail, Phone, MapPin, ShoppingBag, TrendingUp, Calendar,
@@ -278,10 +279,11 @@ export default function CustomersPage() {
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-y-auto">
+      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
+        <TopBar />
 
-        {/* Header */}
-        <header className="px-8 py-6 bg-white border-b border-gray-100 flex items-start justify-between sticky top-0 z-20">
+        {/* Module Header */}
+        <div className="px-8 py-6 bg-white border-b border-gray-100 flex items-start justify-between shrink-0">
           <div>
             <p className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-1">Gestión</p>
             <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none">Clientes</h1>
@@ -295,9 +297,9 @@ export default function CustomersPage() {
               <UserPlus className="w-4 h-4" /> Agregar Cliente
             </button>
           </div>
-        </header>
+        </div>
 
-        <main className="flex-1 p-8 space-y-6">
+        <main className="flex-1 overflow-y-auto p-8 space-y-6">
 
           {/* Filter Bar */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex items-center gap-4 flex-wrap">
