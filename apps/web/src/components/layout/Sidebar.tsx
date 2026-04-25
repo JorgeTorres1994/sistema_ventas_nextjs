@@ -16,7 +16,8 @@ import {
   Boxes,
   Users2,
   Building2,
-  LogOut
+  LogOut,
+  ShieldCheck
 } from 'lucide-react';
 
 import { useSettings } from '../SettingsProvider';
@@ -26,48 +27,68 @@ const Sidebar = () => {
   const pathname = usePathname();
   const { settings } = useSettings();
   const [isAdmin, setIsAdmin] = React.useState(false);
+  const [permissions, setPermissions] = React.useState<string[]>([]);
   
   React.useEffect(() => {
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      const user = JSON.parse(userStr);
-      setIsAdmin(user.role === 'ADMIN');
-    }
+    const loadUser = () => {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        setIsAdmin(user.role === 'Administrador' || user.role === 'ADMIN');
+        setPermissions(user.permissions || []);
+      }
+    };
+
+    loadUser();
+    window.addEventListener('storage', loadUser);
+    return () => window.removeEventListener('storage', loadUser);
   }, []);
+
+  const hasPermission = (module: string) => {
+    if (isAdmin) return true;
+    return permissions.includes(`${module}:read`);
+  };
 
   const menuGroups = [
     {
       title: 'Principal',
       items: [
-        { name: 'Tablero', icon: LayoutDashboard, path: '/' },
-        { name: 'Terminal POS', icon: MonitorSmartphone, path: '/pos' },
+        { name: 'Tablero', icon: LayoutDashboard, path: '/', permission: 'dashboard' },
+        { name: 'Terminal POS', icon: MonitorSmartphone, path: '/pos', permission: 'pos' },
       ]
     },
     {
       title: 'Ventas y Caja',
       items: [
-        { name: 'Caja Registradora', icon: Wallet, path: '/cash' },
-        { name: 'Ventas', icon: Wallet, path: '/sales' },
-        { name: 'Clientes', icon: Users2, path: '/customers' },
+        { name: 'Caja Registradora', icon: Wallet, path: '/cash', permission: 'cash' },
+        { name: 'Ventas', icon: Wallet, path: '/sales', permission: 'sales' },
+        { name: 'Clientes', icon: Users2, path: '/customers', permission: 'customers' },
       ]
     },
     {
       title: 'Logística',
       items: [
-        { name: 'Productos', icon: Package, path: '/products' },
-        { name: 'Inventario', icon: Boxes, path: '/inventory' },
-        { name: 'Proveedores', icon: Building2, path: '/suppliers' },
-        { name: 'Compras', icon: ShoppingCart, path: '/purchases' },
+        { name: 'Productos', icon: Package, path: '/products', permission: 'products' },
+        { name: 'Inventario', icon: Boxes, path: '/inventory', permission: 'inventory' },
+        { name: 'Proveedores', icon: Building2, path: '/suppliers', permission: 'suppliers' },
+        { name: 'Compras', icon: ShoppingCart, path: '/purchases', permission: 'purchases' },
       ]
     },
     {
       title: 'Administración',
       items: [
-        { name: 'Reportes', icon: FileText, path: '/reports' },
-        ...(isAdmin ? [{ name: 'Usuarios', icon: Users, path: '/users' }] : []),
+        { name: 'Reportes', icon: FileText, path: '/reports', permission: 'reports' },
+        { name: 'Usuarios', icon: Users, path: '/users', permission: 'users' },
+        { name: 'Roles', icon: ShieldCheck, path: '/roles', permission: 'roles' }
       ]
     }
   ];
+
+  // Filter groups and items
+  const filteredGroups = menuGroups.map(group => ({
+    ...group,
+    items: group.items.filter(item => hasPermission(item.permission))
+  })).filter(group => group.items.length > 0);
 
   return (
     <aside className="w-64 border-r border-[#E5E7EB] h-screen bg-[#F9FAFB] flex flex-col justify-between fixed left-0 top-0 overflow-y-auto scrollbar-hide">
@@ -89,7 +110,7 @@ const Sidebar = () => {
         </div>
 
         <nav className="px-4 pb-4 space-y-6">
-          {menuGroups.map((group) => (
+          {filteredGroups.map((group) => (
             <div key={group.title} className="space-y-1">
               <h3 className="px-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] mb-2">{group.title}</h3>
               <div className="space-y-1">
@@ -119,7 +140,7 @@ const Sidebar = () => {
       </div>
 
       <div className="p-4 border-t border-[#E5E7EB] space-y-1">
-        {isAdmin && (
+        {hasPermission('settings') && (
           <Link href="/dashboard/settings">
             <div className={`flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-colors ${
               pathname === '/dashboard/settings'
