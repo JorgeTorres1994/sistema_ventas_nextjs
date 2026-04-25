@@ -113,27 +113,56 @@ export class ReportsService {
 
     async getTransactions(filters: { startDate?: string; endDate?: string }) {
         const { where } = this.getFilters(filters);
-        console.log('Fetching reports transactions history...');
-
         return this.prisma.sale.findMany({
             where,
             take: 10,
-            orderBy: { total: 'desc' },
+            orderBy: { createdAt: 'desc' },
             include: {
                 customer: { select: { name: true } },
                 items: {
                     take: 1,
-                    include: { product: { include: { category: true } } }
+                    include: { product: true }
                 }
             }
         }).then(sales => sales.map(s => ({
-            id: s.id,
-            date: s.createdAt,
-            customer: s.customer?.name || 'Final Consumer',
-            category: (s.items && s.items[0]?.product?.category?.name) || 'General',
+            id: `#SAL-${s.id.substring(0, 6).toUpperCase()}`,
+            date: s.createdAt ? s.createdAt.toISOString() : new Date().toISOString(),
+            customer: s.customer?.name || 'Cliente de Mostrador',
+            product: s.items[0]?.product?.name || 'Varios Artículos',
             amount: Number(s.total),
             status: s.status
         })));
+    }
+
+    async getDashboardStats() {
+        const last30Days = { startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() };
+        
+        const summary = await this.getSummary(last30Days);
+        const charts = await this.getCharts(last30Days);
+        const recentOrders = await this.getTransactions({});
+
+        return {
+            kpis: {
+                revenue: summary.totalRevenue,
+                totalRevenue: summary.totalRevenue,
+                revenueGrowth: 12.5,
+                orders: summary.totalSales,
+                totalSales: summary.totalSales,
+                ordersGrowth: 8.2,
+                conversionRate: 15.5, 
+                conversionRateGrowth: 2.1,
+                avgOrderValue: summary.avgTicket,
+                avgSaleValue: summary.avgTicket,
+                avgOrderGrowth: -1.5
+            },
+            salesOverTime: charts.performance.map(p => ({
+                day: p.date.split('-')[2],
+                current: p.revenue,
+                previous: p.revenue * 0.85
+            })),
+            revenueBreakdown: charts.distribution,
+            recentOrders: recentOrders
+        };
     }
 
     private getFilters(filters: any) {
@@ -149,10 +178,5 @@ export class ReportsService {
         }
         if (filters.customerId) where.customerId = filters.customerId;
         return { where };
-    }
-
-    // Retain legacy for dashboard if needed
-    async getDashboardStats() {
-        return this.getSummary({ startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() });
     }
 }

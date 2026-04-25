@@ -157,6 +157,17 @@ async function main() {
     await prisma.product.deleteMany();
     await prisma.user.deleteMany();
 
+    console.log('Creando roles base...');
+    let adminRole = await prisma.role.findFirst({ where: { name: 'Administrador' } });
+    if (!adminRole) {
+        adminRole = await prisma.role.create({
+            data: {
+                name: 'Administrador',
+                description: 'Acceso total al sistema'
+            }
+        });
+    }
+
     console.log('Creando usuario administrador...');
     const hashedPassword = await bcrypt.hash('admin123', 10);
     await prisma.user.create({
@@ -164,7 +175,7 @@ async function main() {
             email: 'admin@admin.com',
             password: hashedPassword,
             name: 'Jorge Torres',
-            role: 'ADMIN',
+            roleId: adminRole.id,
         },
     });
 

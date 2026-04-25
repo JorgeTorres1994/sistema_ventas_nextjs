@@ -188,14 +188,24 @@ async function main() {
   }
 
   // 4. Ensure a User exists to assign the Sale
+  let adminRole = await prisma.role.findFirst({ where: { name: 'Administrador' } });
+  if (!adminRole) {
+    adminRole = await prisma.role.create({
+      data: {
+        name: 'Administrador',
+        description: 'Acceso total'
+      }
+    });
+  }
+
   let defaultUser = await prisma.user.findFirst();
   if (!defaultUser) {
     defaultUser = await prisma.user.create({
       data: {
         email: 'admin@nexus.com',
-        password: 'password123', // In a real app use hashing, but for seed it works
+        password: 'password123',
         name: 'Super Admin',
-        role: 'ADMIN',
+        roleId: adminRole.id,
       }
     });
     console.log('Created default admin user for seeding.');

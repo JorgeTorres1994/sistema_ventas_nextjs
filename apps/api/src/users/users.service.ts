@@ -1,32 +1,49 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service.js';
-import { User, Prisma, Role } from '@prisma/client';
+import { User, Prisma } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
     constructor(private prisma: PrismaService) { }
 
     async findByEmail(email: string): Promise<User | null> {
-        return this.prisma.user.findUnique({ where: { email } });
+        return this.prisma.user.findUnique({ 
+            where: { email },
+            include: { 
+                role: {
+                    include: {
+                        permissions: {
+                            include: {
+                                permission: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
-    async findAll(filters: { search?: string; role?: Role; isActive?: boolean } = {}): Promise<User[]> {
-        const { search, role, isActive } = filters;
+    async findAll(filters: { search?: string; roleId?: string; isActive?: boolean } = {}): Promise<User[]> {
+        const { search, roleId, isActive } = filters;
         return this.prisma.user.findMany({
             where: {
                 OR: search ? [
                     { name: { contains: search, mode: 'insensitive' } },
                     { email: { contains: search, mode: 'insensitive' } },
                 ] : undefined,
-                role,
+                roleId,
                 isActive,
             },
+            include: { role: true },
             orderBy: { createdAt: 'desc' },
         });
     }
 
     async findById(id: string): Promise<User | null> {
-        return this.prisma.user.findUnique({ where: { id } });
+        return this.prisma.user.findUnique({ 
+            where: { id },
+            include: { role: true }
+        });
     }
 
     async create(data: Prisma.UserCreateInput): Promise<User> {
@@ -37,6 +54,7 @@ export class UsersService {
         return this.prisma.user.update({
             where: { id },
             data,
+            include: { role: true }
         });
     }
 

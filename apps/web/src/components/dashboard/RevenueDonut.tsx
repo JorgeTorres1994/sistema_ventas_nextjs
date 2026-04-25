@@ -31,7 +31,7 @@ const RevenueDonut = ({ data, isLoading }: RevenueDonutProps) => {
         <div className="bg-gray-900 border-none text-white p-3 rounded-lg shadow-xl text-sm">
           <p className="font-semibold">{payload[0].name}</p>
           <p className="text-gray-300">
-            S/ {payload[0].value.toLocaleString()} 
+            S/ {payload[0].value.toLocaleString('es-PE')} 
             ({((payload[0].value / total) * 100).toFixed(1)}%)
           </p>
         </div>

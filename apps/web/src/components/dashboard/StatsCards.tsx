@@ -36,7 +36,7 @@ const StatsCards = ({ kpis, isLoading }: StatsProps) => {
     },
     {
       title: 'Órdenes Totales',
-      value: (kpis?.orders || 0).toLocaleString(),
+      value: (kpis?.orders || 0).toLocaleString('es-PE'),
       growth: parseFloat((kpis?.ordersGrowth || 0).toFixed(1)),
       icon: ShoppingBag,
       iconBg: 'bg-purple-100',

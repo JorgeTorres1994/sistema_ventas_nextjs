@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Sidebar from '@/components/layout/Sidebar';
+import TopBar from '@/components/layout/TopBar';
 import { 
     BarChart3, TrendingUp, ShoppingBag, DollarSign, 
     Calendar, Download, FileText, Search, 
@@ -122,10 +123,11 @@ export default function ReportsPage() {
   return (
     <div className="flex h-screen bg-[#F8F9FC] overflow-hidden font-sans">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-y-auto" ref={reportRef}>
-        
-        {/* Header */}
-        <header className="px-12 pt-12 pb-8 bg-transparent flex items-start justify-between">
+      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden" ref={reportRef}>
+        <TopBar />
+
+        {/* Module Header */}
+        <div className="px-12 pt-12 pb-8 bg-transparent flex items-start justify-between shrink-0">
           <div>
             <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Análisis de Operaciones</h1>
             <p className="text-base text-gray-400 font-medium tracking-tight">Nexus Genesis ERP • Panel de Control Estadístico Global</p>
@@ -138,7 +140,9 @@ export default function ReportsPage() {
                 <TableIcon className="w-5 h-5" /> Descargar Excel
              </button>
           </div>
-        </header>
+        </div>
+
+        <main className="flex-1 overflow-y-auto">
 
         {/* Filters Top Bar */}
         <div className="px-12 pb-10 flex items-center gap-6 sticky top-0 bg-[#F8F9FC]/80 backdrop-blur-md z-30 pt-2">

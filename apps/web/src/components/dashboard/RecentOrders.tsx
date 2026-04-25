@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, Eye, Printer, RotateCcw } from 'lucide-react';
 
 interface RecentOrdersProps {
   orders: {
@@ -99,10 +99,31 @@ const RecentOrders = ({ orders, isLoading }: RecentOrdersProps) => {
                   </span>
                 </td>
                 <td className="py-4 px-6 text-[15px] text-[#6B7280]">{formatDate(order.date)}</td>
-                <td className="py-4 px-6 text-right">
-                  <button className="text-[#9CA3AF] hover:text-[#4B5563] p-1 rounded-lg hover:bg-gray-100 transition">
-                    <MoreHorizontal className="w-5 h-5" />
-                  </button>
+                <td className="py-4 px-6 text-right relative">
+                  <div className="group inline-block relative">
+                    <button className="text-[#9CA3AF] hover:text-[#4B5563] p-1 rounded-lg hover:bg-gray-100 transition">
+                      <MoreHorizontal className="w-5 h-5" />
+                    </button>
+                    <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block z-50 bg-white border border-gray-100 shadow-xl rounded-xl py-2 w-48 text-left animate-in fade-in slide-in-from-bottom-2 duration-200">
+                      <button 
+                        onClick={() => {
+                          const realId = order.id.replace('#SAL-', '').toLowerCase();
+                          // Find the full ID if possible, or just navigate to sales page with detail
+                          window.location.href = `/dashboard/sales?open=${realId}`;
+                        }}
+                        className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 font-medium"
+                      >
+                        <Eye className="w-4 h-4 text-blue-500" /> Ver Detalle
+                      </button>
+                      <button className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 font-medium">
+                        <Printer className="w-4 h-4 text-emerald-500" /> Imprimir Ticket
+                      </button>
+                      <div className="border-t border-gray-50 my-1"></div>
+                      <button className="w-full px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 flex items-center gap-2 font-medium">
+                        <RotateCcw className="w-4 h-4" /> Solicitar Anulación
+                      </button>
+                    </div>
+                  </div>
                 </td>
               </tr>
             ))}

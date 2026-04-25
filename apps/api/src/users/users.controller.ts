@@ -20,26 +20,25 @@ import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { UsersService } from './users.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
-import { RolesGuard } from '../auth/roles.guard.js';
-import { Roles } from '../auth/roles.decorator.js';
-import { Role } from '@prisma/client';
+import { PermissionsGuard } from '../auth/permissions.guard.js';
+import { RequirePermissions } from '../auth/permissions.decorator.js';
 import * as bcrypt from 'bcrypt';
 
 @Controller('users')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class UsersController {
     constructor(private readonly usersService: UsersService) { }
 
     @Get()
-    @Roles(Role.ADMIN)
+    @RequirePermissions('users:read')
     async findAll(
         @Query('search') search?: string,
-        @Query('role') role?: Role,
+        @Query('roleId') roleId?: string,
         @Query('isActive') isActive?: string,
     ) {
         return this.usersService.findAll({
             search,
-            role,
+            roleId,
             isActive: isActive !== undefined ? isActive === 'true' : undefined,
         });
     }
@@ -54,9 +53,8 @@ export class UsersController {
 
     @Put('me')
     async updateMe(@Request() req, @Body() data: any) {
-        const { password, email, ...updateData } = data;
+        const { password, email, roleId, ...updateData } = data;
         
-        // If password is provided, hash it
         if (password) {
             updateData.password = await bcrypt.hash(password, 10);
         }
@@ -86,7 +84,7 @@ export class UsersController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN)
+    @RequirePermissions('users:read')
     async findOne(@Param('id') id: string) {
         const user = await this.usersService.findById(id);
         if (!user) throw new NotFoundException('Usuario no encontrado');
@@ -95,7 +93,7 @@ export class UsersController {
     }
 
     @Post()
-    @Roles(Role.ADMIN)
+    @RequirePermissions('users:create')
     async create(@Body() data: any) {
         const existing = await this.usersService.findByEmail(data.email);
         if (existing) throw new ConflictException('Email already registered');
@@ -110,11 +108,10 @@ export class UsersController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN)
+    @RequirePermissions('users:update')
     async update(@Param('id') id: string, @Body() data: any) {
         const { password, email, ...updateData } = data;
         
-        // If password is provided, hash it
         if (password) {
             updateData.password = await bcrypt.hash(password, 10);
         }
@@ -125,13 +122,13 @@ export class UsersController {
     }
 
     @Patch(':id/status')
-    @Roles(Role.ADMIN)
+    @RequirePermissions('users:update')
     async toggleStatus(@Param('id') id: string) {
         return this.usersService.toggleStatus(id);
     }
 
     @Delete(':id')
-    @Roles(Role.ADMIN)
+    @RequirePermissions('users:delete')
     async remove(@Param('id') id: string) {
         return this.usersService.remove(id);
     }

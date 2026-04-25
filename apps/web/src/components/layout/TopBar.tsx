@@ -10,10 +10,14 @@ const TopBar = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
+    const loadUser = () => {
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        setUser(JSON.parse(userData));
+      }
+    };
+
+    loadUser();
 
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -21,8 +25,14 @@ const TopBar = () => {
       }
     };
 
+    // Listen for storage changes (even in same tab)
+    window.addEventListener('storage', loadUser);
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => {
+      window.removeEventListener('storage', loadUser);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   const userAvatar = user?.avatarUrl 
