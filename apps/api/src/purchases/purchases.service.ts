@@ -56,21 +56,39 @@ export class PurchasesService {
             // If COMPLETED, we process stock and movements
             if (status === 'COMPLETED') {
                 for (const item of items) {
+                    const product = await tx.product.findUnique({ where: { id: item.productId } });
+                    if (!product) throw new BadRequestException(`Producto ${item.productId} no encontrado`);
+
+                    const currentStock = product.stock;
+                    const currentUnitCost = Number(product.purchasePrice) || 0;
+                    const currentValue = currentStock * currentUnitCost;
+                    
+                    const newStock = currentStock + item.quantity;
+                    // Average Cost calculation
+                    const newUnitCost = (currentValue + (item.quantity * item.costPrice)) / newStock;
+                    const newValue = newStock * newUnitCost;
+
                     // 2. Update Product stock and last purchase price
                     await tx.product.update({
                         where: { id: item.productId },
                         data: {
-                            stock: { increment: item.quantity },
-                            purchasePrice: item.costPrice,
+                            stock: newStock,
+                            purchasePrice: newUnitCost,
                         },
                     });
 
                     // 3. Register Stock Movement
-                    await tx.stockMovement.create({
+                    await (tx.stockMovement as any).create({
                         data: {
                             productId: item.productId,
                             type: 'IN',
                             quantity: item.quantity,
+                            unitCost: item.costPrice,
+                            totalCost: item.quantity * item.costPrice,
+                            prevStock: currentStock,
+                            nextStock: newStock,
+                            prevValue: currentValue,
+                            nextValue: newValue,
                             reason: 'PURCHASE',
                             referenceId: purchase.id,
                         },
@@ -80,13 +98,12 @@ export class PurchasesService {
             
             // --- LOGICA DE CRÉDITO (CUENTAS POR PAGAR) ---
             if (status === 'PENDING') {
-                await tx.creditPurchase.create({
+                await (tx as any).creditPurchase.create({
                     data: {
                         purchaseId: purchase.id,
                         totalAmount: total,
                         remainingAmount: total,
                         status: 'PENDING',
-                        // Set default due date to 30 days from now
                         dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
                     }
                 });

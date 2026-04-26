@@ -167,29 +167,33 @@ export class InventoryService {
 
     /**
      * POST /inventory/adjust
-     * Atomically adjusts stock and creates StockMovement record.
+     * Atomically adjusts stock and creates StockMovement record with valuation.
      */
     async adjustStock(data: {
         productId: string;
         quantity: number;
         type: 'IN' | 'OUT';
         reason?: string;
+        unitCost?: number;
         note?: string;
     }) {
-        const { productId, quantity, type, reason = 'ADJUSTMENT', note } = data;
+        const { productId, quantity, type, reason = 'ADJUSTMENT', unitCost, note } = data;
 
         if (quantity <= 0) {
             throw new BadRequestException('Quantity must be greater than zero');
         }
 
-        // Fetch current product in a transaction
         return this.prisma.$transaction(async (tx) => {
             const product = await tx.product.findUnique({ where: { id: productId } });
             if (!product) throw new BadRequestException('Producto no encontrado');
 
+            const currentStock = product.stock;
+            const currentUnitCost = Number(product.purchasePrice) || 0;
+            const currentValue = currentStock * currentUnitCost;
+
             const newStock = type === 'IN'
-                ? product.stock + quantity
-                : product.stock - quantity;
+                ? currentStock + quantity
+                : currentStock - quantity;
 
             if (newStock < 0) {
                 throw new BadRequestException(
@@ -197,17 +201,35 @@ export class InventoryService {
                 );
             }
 
-            // Update stock and create movement atomically
+            // If IN, we might want to update the unit cost (Average Cost)
+            let newUnitCost = currentUnitCost;
+            if (type === 'IN' && unitCost !== undefined) {
+                // Simplistic Average Cost Calculation: (CurrentValue + NewValue) / TotalStock
+                const newValue = quantity * unitCost;
+                newUnitCost = (currentValue + newValue) / newStock;
+            }
+
+            const newValueTotal = newStock * newUnitCost;
+
             const [updatedProduct, movement] = await Promise.all([
                 tx.product.update({
                     where: { id: productId },
-                    data: { stock: newStock },
+                    data: { 
+                        stock: newStock,
+                        purchasePrice: newUnitCost
+                    },
                 }),
-                tx.stockMovement.create({
+                (tx.stockMovement as any).create({
                     data: {
                         productId,
                         type,
                         quantity,
+                        unitCost: unitCost ?? currentUnitCost,
+                        totalCost: quantity * (unitCost ?? currentUnitCost),
+                        prevStock: currentStock,
+                        nextStock: newStock,
+                        prevValue: currentValue,
+                        nextValue: newValueTotal,
                         reason,
                         referenceId: note,
                     },
@@ -220,5 +242,41 @@ export class InventoryService {
                 newStock,
             };
         });
+    }
+
+    /**
+     * GET /inventory/kardex/:productId
+     * Returns the valued history of movements for a product.
+     */
+    async getKardex(productId: string, params: { startDate?: string; endDate?: string }) {
+        const { startDate, endDate } = params;
+        const where: any = { productId };
+        
+        if (startDate || endDate) {
+            where.createdAt = {};
+            if (startDate) where.createdAt.gte = new Date(startDate);
+            if (endDate) {
+                const end = new Date(endDate);
+                end.setHours(23, 59, 59, 999);
+                where.createdAt.lte = end;
+            }
+        }
+
+        const product = await this.prisma.product.findUnique({
+            where: { id: productId },
+            include: { category: true }
+        });
+
+        if (!product) throw new BadRequestException('Producto no encontrado');
+
+        const movements = await this.prisma.stockMovement.findMany({
+            where,
+            orderBy: { createdAt: 'asc' },
+        });
+
+        return {
+            product,
+            movements
+        };
     }
 }

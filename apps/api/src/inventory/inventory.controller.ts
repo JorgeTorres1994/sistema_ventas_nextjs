@@ -4,6 +4,7 @@ import {
     Post,
     Body,
     Query,
+    Param,
     UseGuards,
 } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
@@ -63,12 +64,23 @@ export class InventoryController {
             quantity: number;
             type: 'IN' | 'OUT';
             reason?: string;
+            unitCost?: number;
             note?: string;
         },
     ) {
         return this.inventoryService.adjustStock({
             ...body,
             quantity: Number(body.quantity),
+            unitCost: body.unitCost ? Number(body.unitCost) : undefined
         });
+    }
+
+    @Get('kardex/:productId')
+    async getKardex(
+        @Param('productId') productId: string,
+        @Query('startDate') startDate?: string,
+        @Query('endDate') endDate?: string,
+    ) {
+        return this.inventoryService.getKardex(productId, { startDate, endDate });
     }
 }

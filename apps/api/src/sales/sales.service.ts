@@ -78,6 +78,13 @@ export class SalesService {
                     }
 
                     const productPriceNumber = Number(product.price);
+                    const purchasePrice = Number(product.purchasePrice) || 0;
+                    
+                    const currentStock = product.stock;
+                    const currentValue = currentStock * purchasePrice;
+                    const nextStock = currentStock - item.quantity;
+                    const nextValue = nextStock * purchasePrice;
+
                     total += productPriceNumber * item.quantity;
                     saleItems.push({
                         productId: product.id,
@@ -88,6 +95,22 @@ export class SalesService {
                     await tx.product.update({
                         where: { id: product.id },
                         data: { stock: { decrement: item.quantity } },
+                    });
+
+                    await (tx.stockMovement as any).create({
+                        data: {
+                            productId: product.id,
+                            type: 'OUT',
+                            quantity: item.quantity,
+                            unitCost: purchasePrice,
+                            totalCost: item.quantity * purchasePrice,
+                            prevStock: currentStock,
+                            nextStock: nextStock,
+                            prevValue: currentValue,
+                            nextValue: nextValue,
+                            reason: 'SALE',
+                            referenceId: null
+                        }
                     });
                 }
 
@@ -143,7 +166,7 @@ export class SalesService {
                 if (paymentMethod === 'CREDITO' || finalStatus === 'PENDING' || finalStatus === 'PARTIAL') {
                     const remainingAmount = total - finalAmountPaid;
                     if (remainingAmount > 0) {
-                        await tx.creditSale.create({
+                        await (tx as any).creditSale.create({
                             data: {
                                 saleId: sale.id,
                                 totalAmount: total,

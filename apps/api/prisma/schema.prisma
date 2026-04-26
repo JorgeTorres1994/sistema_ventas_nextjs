@@ -223,8 +223,14 @@ model PurchaseItem {
 model StockMovement {
   id          String    @id @default(uuid())
   productId   String
-  type        String
+  type        String    // IN, OUT
   quantity    Int
+  unitCost    Decimal?  @db.Decimal(10, 2)
+  totalCost   Decimal?  @db.Decimal(10, 2)
+  prevStock   Int?
+  nextStock   Int?
+  prevValue   Decimal?  @db.Decimal(10, 2)
+  nextValue   Decimal?  @db.Decimal(10, 2)
   reason      String?
   referenceId String?
   createdAt   DateTime? @default(now())
