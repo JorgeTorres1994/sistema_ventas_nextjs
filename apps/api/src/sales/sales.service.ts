@@ -139,6 +139,23 @@ export class SalesService {
                     });
                 }
 
+                // --- LOGICA DE CRÉDITO (CUENTAS POR COBRAR) ---
+                if (paymentMethod === 'CREDITO' || finalStatus === 'PENDING' || finalStatus === 'PARTIAL') {
+                    const remainingAmount = total - finalAmountPaid;
+                    if (remainingAmount > 0) {
+                        await tx.creditSale.create({
+                            data: {
+                                saleId: sale.id,
+                                totalAmount: total,
+                                remainingAmount: remainingAmount,
+                                status: 'PENDING',
+                                // Set default due date to 30 days from now
+                                dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                            }
+                        });
+                    }
+                }
+
                 return sale;
             });
         } catch (error) {

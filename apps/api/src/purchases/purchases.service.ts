@@ -77,6 +77,20 @@ export class PurchasesService {
                     });
                 }
             }
+            
+            // --- LOGICA DE CRÉDITO (CUENTAS POR PAGAR) ---
+            if (status === 'PENDING') {
+                await tx.creditPurchase.create({
+                    data: {
+                        purchaseId: purchase.id,
+                        totalAmount: total,
+                        remainingAmount: total,
+                        status: 'PENDING',
+                        // Set default due date to 30 days from now
+                        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                    }
+                });
+            }
 
             return purchase;
         });
