@@ -38,11 +38,9 @@ export const getDashboardData = async () => {
   }
 };
 
-export const getProducts = async (page = 1, limit = 50, search = '') => {
+export const getProducts = async (params: { page?: number; limit?: number; search?: string; categoryId?: string } = {}) => {
   try {
-    const response = await api.get('/products', {
-      params: { page, limit, search }
-    });
+    const response = await api.get('/products', { params });
     return response.data;
   } catch (error) {
     throw error;
@@ -554,6 +552,12 @@ export const recordCreditPayment = async (data: {
   cashRegisterId?: string;
 }) => {
   const response = await api.post('/credits/payments', data);
+  return response.data;
+};
+
+// ── Inventory & Kardex ────────────────────────────────────────────────
+export const getKardex = async (productId: string, params?: { startDate?: string; endDate?: string }) => {
+  const response = await api.get(`/inventory/kardex/${productId}`, { params });
   return response.data;
 };
 

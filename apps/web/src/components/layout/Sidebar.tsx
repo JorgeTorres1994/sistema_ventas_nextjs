@@ -74,6 +74,7 @@ const Sidebar = () => {
       items: [
         { name: 'Productos', icon: Package, path: '/products', permission: 'products' },
         { name: 'Inventario', icon: Boxes, path: '/inventory', permission: 'inventory' },
+        { name: 'Kardex Valorizado', icon: BarChart3, path: '/inventory/kardex', permission: 'inventory' },
         { name: 'Proveedores', icon: Building2, path: '/suppliers', permission: 'suppliers' },
         { name: 'Compras', icon: ShoppingCart, path: '/purchases', permission: 'purchases' },
       ]
@@ -119,9 +120,10 @@ const Sidebar = () => {
               <h3 className="px-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] mb-2">{group.title}</h3>
               <div className="space-y-1">
                 {group.items.map((item) => {
+                  const fullPath = item.path === '/' ? '/dashboard' : `/dashboard${item.path}`;
                   const isActive = item.path === '/' 
                     ? pathname === '/dashboard' 
-                    : pathname?.includes(item.path);
+                    : (item.path === '/inventory' ? pathname === fullPath : pathname?.includes(item.path));
                   return (
                     <Link href={item.path === '/' ? '/dashboard' : `/dashboard${item.path}`} key={item.name}>
                       <div
