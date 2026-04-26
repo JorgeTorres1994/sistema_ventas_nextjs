@@ -18,7 +18,8 @@ import {
   Building2,
   LogOut,
   ShieldCheck,
-  Receipt
+  Receipt,
+  CreditCard
 } from 'lucide-react';
 
 import { useSettings } from '../SettingsProvider';
@@ -64,6 +65,7 @@ const Sidebar = () => {
         { name: 'Caja Registradora', icon: Wallet, path: '/cash', permission: 'cash' },
         { name: 'Ventas', icon: Wallet, path: '/sales', permission: 'sales' },
         { name: 'Gastos y Egresos', icon: Receipt, path: '/expenses', permission: 'expenses' },
+        { name: 'Créditos y Cobranzas', icon: CreditCard, path: '/credits', permission: 'credits' },
         { name: 'Clientes', icon: Users2, path: '/customers', permission: 'customers' },
       ]
     },

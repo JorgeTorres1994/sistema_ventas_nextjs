@@ -534,5 +534,28 @@ export const deleteExpenseCategory = async (id: string) => {
   return response.data;
 };
 
+// ── Credits & Debts (Accounts Receivable/Payable) ──────────────────
+export const getReceivables = async (params?: { status?: string; customerId?: string; search?: string }) => {
+  const response = await api.get('/credits/receivables', { params });
+  return response.data;
+};
+
+export const getPayables = async (params?: { status?: string; supplierId?: string; search?: string }) => {
+  const response = await api.get('/credits/payables', { params });
+  return response.data;
+};
+
+export const recordCreditPayment = async (data: {
+  amount: number;
+  paymentMethod: string;
+  notes?: string;
+  creditSaleId?: string;
+  creditPurchaseId?: string;
+  cashRegisterId?: string;
+}) => {
+  const response = await api.post('/credits/payments', data);
+  return response.data;
+};
+
 export { api };
 export default api;
