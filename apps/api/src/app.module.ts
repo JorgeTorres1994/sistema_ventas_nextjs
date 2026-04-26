@@ -20,6 +20,8 @@ import { RolesModule } from './roles/roles.module';
 import { DocumentSeriesModule } from './document-series/document-series.module';
 import { ExpensesModule } from './expenses/expenses.module.js';
 import { CreditsModule } from './credits/credits.module.js';
+import { PromotionsModule } from './promotions/promotions.module.js';
+import { AuditModule } from './audit/audit.module.js';
 
 @Module({
   imports: [
@@ -44,6 +46,8 @@ import { CreditsModule } from './credits/credits.module.js';
     DocumentSeriesModule,
     ExpensesModule,
     CreditsModule,
+    PromotionsModule,
+    AuditModule,
   ],
   controllers: [AppController],
   providers: [AppService],

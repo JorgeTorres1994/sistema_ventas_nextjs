@@ -2,9 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Product } from '@prisma/client';
 
+import { AuditService } from '../audit/audit.service.js';
+
 @Injectable()
 export class ProductsService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private auditService: AuditService
+    ) { }
 
     async findAll(
         page: number = 1, 
@@ -52,12 +57,12 @@ export class ProductsService {
         stock: number;
         imageUrl?: string;
         categoryId?: string;
-    }): Promise<Product> {
+    }, userId?: string): Promise<Product> {
         const catId = (data.categoryId && data.categoryId !== 'undefined' && data.categoryId !== '') 
             ? data.categoryId 
             : null;
 
-        return this.prisma.product.create({
+        const product = await this.prisma.product.create({
             data: {
                 name: data.name,
                 description: data.description,
@@ -68,6 +73,18 @@ export class ProductsService {
                 categoryId: catId,
             },
         });
+
+        if (userId) {
+            await this.auditService.logAction(
+                userId,
+                'PRODUCTS',
+                'CREATE',
+                `Producto creado: ${product.name}`,
+                { price: product.price, stock: product.stock }
+            );
+        }
+
+        return product;
     }
 
     async findOne(id: string): Promise<any> {
@@ -89,6 +106,7 @@ export class ProductsService {
             categoryId?: string;
             isActive?: boolean;
         },
+        userId?: string
     ): Promise<Product> {
         // Handle Stock Movement if stock changes
         if (data.stock !== undefined) {
@@ -110,7 +128,7 @@ export class ProductsService {
             ? data.categoryId 
             : null;
 
-        return this.prisma.product.update({
+        const updatedProduct = await this.prisma.product.update({
             where: { id },
             data: {
                 name: data.name,
@@ -123,6 +141,18 @@ export class ProductsService {
                 isActive: data.isActive,
             },
         });
+
+        if (userId) {
+            await this.auditService.logAction(
+                userId,
+                'PRODUCTS',
+                'UPDATE',
+                `Producto actualizado: ${updatedProduct.name}`,
+                { changes: data }
+            );
+        }
+
+        return updatedProduct;
     }
 
     async toggleActive(id: string): Promise<Product> {
@@ -134,10 +164,23 @@ export class ProductsService {
         });
     }
 
-    async delete(id: string): Promise<Product> {
-        return this.prisma.product.delete({
+    async delete(id: string, userId?: string): Promise<Product> {
+        const product = await this.prisma.product.findUnique({ where: { id } });
+        const deleted = await this.prisma.product.delete({
             where: { id },
         });
+
+        if (userId && product) {
+            await this.auditService.logAction(
+                userId,
+                'PRODUCTS',
+                'DELETE',
+                `Producto eliminado: ${product.name}`,
+                { product }
+            );
+        }
+
+        return deleted;
     }
 
     async findAllCategories() {

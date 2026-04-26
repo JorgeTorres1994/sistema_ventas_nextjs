@@ -2,11 +2,17 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service.js';
 import { CashRegistersService } from '../cash-registers/cash-registers.service.js';
 
+import { PromotionsService } from '../promotions/promotions.service.js';
+
+import { AuditService } from '../audit/audit.service.js';
+
 @Injectable()
 export class SalesService {
     constructor(
         private prisma: PrismaService,
-        private cashService: CashRegistersService
+        private cashService: CashRegistersService,
+        private promotionsService: PromotionsService,
+        private auditService: AuditService
     ) { }
 
     async createSale(
@@ -16,7 +22,9 @@ export class SalesService {
         amountPaid?: number,
         paymentMethod?: string,
         status?: 'PAID' | 'PENDING' | 'PARTIAL',
-        documentType: string = 'BOLETA'
+        documentType: string = 'BOLETA',
+        couponCode?: string,
+        pointsToRedeem: number = 0
     ) {
         try {
             return await this.prisma.$transaction(async (tx) => {
@@ -65,7 +73,6 @@ export class SalesService {
                     where: { id: seriesConfig.id },
                     data: { currentNumber: nextCorrelative }
                 });
-                // -------------------------------------
 
                 let total = 0;
                 const saleItems: { productId: string; quantity: number; price: number }[] = [];
@@ -114,14 +121,45 @@ export class SalesService {
                     });
                 }
 
-                const finalStatus = status || (amountPaid !== undefined && amountPaid < total ? 'PARTIAL' : 'PAID');
-                const finalAmountPaid = amountPaid !== undefined ? amountPaid : (finalStatus === 'PAID' ? total : 0);
+                // --- LOGICA DE CUPONES Y DESCUENTOS ---
+                let discountAmount = 0;
+                let couponId = null;
 
-                const taxRate = 18; // IGV Estándar
-                const subtotal = total / (1 + (taxRate / 100));
-                const taxAmount = total - subtotal;
+                if (couponCode) {
+                    const coupon = await this.promotionsService.validateCoupon(couponCode, total);
+                    if (coupon.type === 'PERCENTAGE') {
+                        discountAmount = total * (Number(coupon.value) / 100);
+                        if (coupon.maxDiscount && discountAmount > Number(coupon.maxDiscount)) {
+                            discountAmount = Number(coupon.maxDiscount);
+                        }
+                    } else {
+                        discountAmount = Number(coupon.value);
+                    }
+                    couponId = coupon.id;
+                    await (tx as any).coupon.update({
+                        where: { id: coupon.id },
+                        data: { usageCount: { increment: 1 } }
+                    });
+                }
 
-                const sale = await tx.sale.create({
+                // --- LOGICA DE PUNTOS (REDENCIÓN) ---
+                if (pointsToRedeem > 0 && finalCustomerId) {
+                    const pointsDiscount = this.promotionsService.calculatePointDiscount(pointsToRedeem);
+                    discountAmount += pointsDiscount;
+                    await this.promotionsService.applyPointsRedemption(finalCustomerId, pointsToRedeem, tx);
+                }
+
+                const finalTotal = Math.max(0, total - discountAmount);
+                const pointsEarned = this.promotionsService.calculatePoints(finalTotal);
+
+                const finalStatus = status || (amountPaid !== undefined && amountPaid < finalTotal ? 'PARTIAL' : 'PAID');
+                const finalAmountPaid = amountPaid !== undefined ? amountPaid : (finalStatus === 'PAID' ? finalTotal : 0);
+
+                const taxRate = 18; 
+                const subtotal = finalTotal / (1 + (taxRate / 100));
+                const taxAmount = finalTotal - subtotal;
+
+                const sale = await (tx as any).sale.create({
                     data: {
                         userId,
                         customerId: finalCustomerId,
@@ -129,12 +167,16 @@ export class SalesService {
                         series: seriesConfig.prefix,
                         correlative: nextCorrelative,
                         documentType,
-                        total,
+                        total: finalTotal,
                         subtotal,
                         taxAmount,
                         taxRate,
                         amountPaid: finalAmountPaid,
                         status: finalStatus as any,
+                        couponId,
+                        discountAmount,
+                        pointsEarned,
+                        pointsRedeemed: pointsToRedeem,
                         payments: {
                             create: {
                                 amount: finalAmountPaid,
@@ -151,6 +193,13 @@ export class SalesService {
                     },
                 });
 
+                if (finalCustomerId) {
+                    await (tx as any).customer.update({
+                        where: { id: finalCustomerId },
+                        data: { loyaltyPoints: { increment: pointsEarned } }
+                    });
+                }
+
                 if ((paymentMethod === 'CASH' || paymentMethod === 'EFECTIVO') && finalAmountPaid > 0) {
                     await tx.cashMovement.create({
                         data: {
@@ -164,20 +213,28 @@ export class SalesService {
 
                 // --- LOGICA DE CRÉDITO (CUENTAS POR COBRAR) ---
                 if (paymentMethod === 'CREDITO' || finalStatus === 'PENDING' || finalStatus === 'PARTIAL') {
-                    const remainingAmount = total - finalAmountPaid;
+                    const remainingAmount = finalTotal - finalAmountPaid;
                     if (remainingAmount > 0) {
                         await (tx as any).creditSale.create({
                             data: {
                                 saleId: sale.id,
-                                totalAmount: total,
+                                totalAmount: finalTotal,
                                 remainingAmount: remainingAmount,
                                 status: 'PENDING',
-                                // Set default due date to 30 days from now
                                 dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
                             }
                         });
                     }
                 }
+
+                // Log the action
+                await this.auditService.logAction(
+                    userId,
+                    'SALES',
+                    'CREATE',
+                    `Venta creada: ${sale.documentType} ${sale.series}-${sale.correlative}`,
+                    { total: sale.total, itemsCount: items.length }
+                );
 
                 return sale;
             });

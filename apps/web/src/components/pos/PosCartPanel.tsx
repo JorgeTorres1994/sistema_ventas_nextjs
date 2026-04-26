@@ -3,7 +3,7 @@ import { useSettings } from '@/components/SettingsProvider';
 import { 
     Trash2, X, Image as ImageIcon, Minus, Plus, 
     CreditCard, Wallet, Banknote, CheckCircle2,
-    ShoppingCart
+    ShoppingCart, FileText, Ticket, Star
 } from 'lucide-react';
 
 interface Product {
@@ -27,6 +27,11 @@ interface PosCartPanelProps {
   setPaymentMethod: (method: string) => void;
   documentType: string;
   setDocumentType: (type: string) => void;
+  couponCode: string;
+  setCouponCode: (code: string) => void;
+  pointsToRedeem: number;
+  setPointsToRedeem: (points: number) => void;
+  customerPoints: number;
   onClearCart: () => void;
   onUpdateQuantity: (productId: string, delta: number) => void;
   onRemoveItem: (productId: string) => void;
@@ -40,6 +45,11 @@ export default function PosCartPanel({
   setPaymentMethod,
   documentType,
   setDocumentType,
+  couponCode,
+  setCouponCode,
+  pointsToRedeem,
+  setPointsToRedeem,
+  customerPoints,
   onClearCart,
   onUpdateQuantity,
   onRemoveItem,
@@ -206,6 +216,34 @@ export default function PosCartPanel({
               );
             })}
           </div>
+        </div>
+
+        {/* Coupons & Loyalty */}
+        <div className="mb-6 grid grid-cols-2 gap-4">
+           <div>
+              <p className="text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase mb-3 flex items-center gap-2">
+                 <Ticket className="w-3 h-3" /> Cupón
+              </p>
+              <input 
+                type="text" 
+                placeholder="Código"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                className="w-full px-4 py-3 bg-white border border-gray-100 rounded-xl text-xs font-bold placeholder:text-gray-300 focus:border-blue-500 outline-none transition-all shadow-sm"
+              />
+           </div>
+           <div>
+              <p className="text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase mb-3 flex items-center gap-2">
+                 <Star className="w-3 h-3 text-amber-500" /> Puntos ({customerPoints})
+              </p>
+              <input 
+                type="number" 
+                placeholder="Canjear"
+                value={pointsToRedeem || ''}
+                onChange={(e) => setPointsToRedeem(parseInt(e.target.value) || 0)}
+                className="w-full px-4 py-3 bg-white border border-gray-100 rounded-xl text-xs font-bold placeholder:text-gray-300 focus:border-blue-500 outline-none transition-all shadow-sm"
+              />
+           </div>
         </div>
 
         {/* Checkout Button */}

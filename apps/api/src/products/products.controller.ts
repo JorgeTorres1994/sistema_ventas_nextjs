@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Delete, Param, Patch, UseInterceptors, UploadedFile, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, Patch, UseInterceptors, UploadedFile, Query, UseGuards, Request } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
@@ -36,6 +36,7 @@ export class ProductsController {
 
     @Post()
     async create(
+        @Request() req,
         @Body()
         data: {
             name: string;
@@ -52,11 +53,12 @@ export class ProductsController {
             price: Number(data.price),
             purchasePrice: data.purchasePrice ? Number(data.purchasePrice) : 0,
             stock: Number(data.stock),
-        });
+        }, req.user.id);
     }
 
     @Patch(':id')
     async update(
+        @Request() req,
         @Param('id') id: string,
         @Body()
         data: {
@@ -75,7 +77,7 @@ export class ProductsController {
             price: data.price ? Number(data.price) : undefined,
             purchasePrice: data.purchasePrice ? Number(data.purchasePrice) : undefined,
             stock: data.stock ? Number(data.stock) : undefined,
-        });
+        }, req.user.id);
     }
 
     @Patch(':id/toggle')

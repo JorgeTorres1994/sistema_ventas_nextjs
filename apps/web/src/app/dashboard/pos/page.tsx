@@ -35,6 +35,12 @@ export default function PosPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [paymentMethod, setPaymentMethod] = useState('CASH');
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Promotions & Customer State
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
+  const [couponCode, setCouponCode] = useState('');
+  const [pointsToRedeem, setPointsToRedeem] = useState(0);
+  const [customerPoints, setCustomerPoints] = useState(0);
 
   // Debounce logic for Search
   useEffect(() => {
@@ -112,7 +118,15 @@ export default function PosPage() {
       const taxRate = (settings?.taxRate || 18) / 100; 
       const total = subtotal + (subtotal * taxRate);
 
-      await createSale(itemsPayload, paymentMethod, total, documentType);
+      await createSale(
+        itemsPayload, 
+        paymentMethod, 
+        total, 
+        documentType,
+        selectedCustomerId,
+        couponCode,
+        pointsToRedeem
+      );
       
       toast.success('¡Venta completada con éxito!', {
         description: `Total procesado: S/ ${total.toFixed(2)}`,
@@ -154,6 +168,11 @@ export default function PosPage() {
             setPaymentMethod={setPaymentMethod}
             documentType={documentType}
             setDocumentType={setDocumentType}
+            couponCode={couponCode}
+            setCouponCode={setCouponCode}
+            pointsToRedeem={pointsToRedeem}
+            setPointsToRedeem={setPointsToRedeem}
+            customerPoints={customerPoints}
             onClearCart={handleClearCart}
             onUpdateQuantity={handleUpdateQuantity}
             onRemoveItem={handleRemoveItem}

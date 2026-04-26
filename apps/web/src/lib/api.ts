@@ -51,14 +51,20 @@ export const createSale = async (
   items: { productId: string; quantity: number }[],
   paymentMethod: string,
   amountPaid: number,
-  documentType: string = 'BOLETA'
+  documentType: string = 'BOLETA',
+  customerId?: string,
+  couponCode?: string,
+  pointsToRedeem: number = 0
 ) => {
   try {
     const response = await api.post('/sales', {
       items,
       paymentMethod,
       amountPaid,
-      documentType
+      documentType,
+      customerId,
+      couponCode,
+      pointsToRedeem
     });
     return response.data;
   } catch (error) {
@@ -558,6 +564,17 @@ export const recordCreditPayment = async (data: {
 // ── Inventory & Kardex ────────────────────────────────────────────────
 export const getKardex = async (productId: string, params?: { startDate?: string; endDate?: string }) => {
   const response = await api.get(`/inventory/kardex/${productId}`, { params });
+  return response.data;
+};
+
+// ── Promotions & Loyalty ──────────────────────────────────────────
+export const validateCoupon = async (code: string, amount: number) => {
+  const response = await api.get('/promotions/coupons/validate', { params: { code, amount } });
+  return response.data;
+};
+
+export const getCustomerPoints = async (customerId: string) => {
+  const response = await api.get(`/promotions/loyalty/${customerId}`);
   return response.data;
 };
 

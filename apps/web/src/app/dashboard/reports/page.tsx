@@ -182,7 +182,7 @@ export default function ReportsPage() {
            </div>
         </div>
 
-        <main className="flex-1 px-12 pb-16 space-y-10">
+        <div className="flex-1 px-12 pb-16 space-y-10">
           
           {(isEmpty || !data.summary) ? (
              <div className="flex flex-col items-center justify-center py-28 animate-in fade-in slide-in-from-bottom-4 bg-white rounded-[48px] border border-dashed border-gray-200 mx-4">
@@ -366,9 +366,9 @@ export default function ReportsPage() {
                </div>
             </>
           )}
-
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
-  );
+  </div>
+);
 }

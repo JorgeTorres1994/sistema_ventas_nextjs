@@ -18,8 +18,10 @@ import {
   Building2,
   LogOut,
   ShieldCheck,
-  Receipt,
-  CreditCard
+  Receipt, 
+  CreditCard,
+  Tag,
+  History
 } from 'lucide-react';
 
 import { useSettings } from '../SettingsProvider';
@@ -80,11 +82,18 @@ const Sidebar = () => {
       ]
     },
     {
+      title: 'Marketing',
+      items: [
+        { name: 'Promociones y Fidelización', icon: Tag, path: '/promotions', permission: 'promotions' },
+      ]
+    },
+    {
       title: 'Administración',
       items: [
-        { name: 'Reportes', icon: FileText, path: '/reports', permission: 'reports' },
-        { name: 'Usuarios', icon: Users, path: '/users', permission: 'users' },
-        { name: 'Roles', icon: ShieldCheck, path: '/roles', permission: 'roles' }
+        { name: 'Reportes', icon: FileText, path: '/reports', permission: 'reports:read' },
+        { name: 'Auditoría y Logs', icon: History, path: '/audit', permission: 'audit:read' },
+        { name: 'Usuarios', icon: Users2, path: '/users', permission: 'users:read' },
+        { name: 'Roles y Permisos', icon: ShieldCheck, path: '/roles', permission: 'roles:read' },
       ]
     }
   ];

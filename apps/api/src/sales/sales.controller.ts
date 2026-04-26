@@ -13,7 +13,10 @@ export class SalesController {
         customerId?: string,
         amountPaid?: number,
         paymentMethod?: string,
-        status?: 'PAID' | 'PENDING' | 'PARTIAL'
+        status?: 'PAID' | 'PENDING' | 'PARTIAL',
+        documentType?: string,
+        couponCode?: string,
+        pointsToRedeem?: number
     }) {
         return this.salesService.createSale(
             req.user.userId,
@@ -21,7 +24,10 @@ export class SalesController {
             body.customerId,
             body.amountPaid,
             body.paymentMethod,
-            body.status
+            body.status,
+            body.documentType,
+            body.couponCode,
+            body.pointsToRedeem || 0
         );
     }
 
