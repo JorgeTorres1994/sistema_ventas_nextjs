@@ -19,6 +19,7 @@ import { SettingsModule } from './settings/settings.module.js';
 import { RolesModule } from './roles/roles.module';
 import { DocumentSeriesModule } from './document-series/document-series.module';
 import { ExpensesModule } from './expenses/expenses.module.js';
+import { CreditsModule } from './credits/credits.module.js';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ExpensesModule } from './expenses/expenses.module.js';
     RolesModule,
     DocumentSeriesModule,
     ExpensesModule,
+    CreditsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

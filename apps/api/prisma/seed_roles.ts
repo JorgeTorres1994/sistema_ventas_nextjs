@@ -10,7 +10,7 @@ async function main() {
     const modules = [
         'dashboard', 'pos', 'cash', 'sales', 'customers', 
         'products', 'inventory', 'suppliers', 'purchases', 
-        'reports', 'users', 'roles', 'settings', 'expenses'
+        'reports', 'users', 'roles', 'settings', 'expenses', 'credits'
     ];
     const actions = ['read', 'create', 'update', 'delete'];
 

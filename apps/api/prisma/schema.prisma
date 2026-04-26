@@ -143,6 +143,7 @@ model CashRegister {
   sales           Sale[]
   cashMovements   CashMovement[]
   expenses        Expense[]
+  creditPayments  CreditPayment[]
 }
 
 model Sale {
@@ -166,6 +167,7 @@ model Sale {
   cashRegister   CashRegister?  @relation(fields: [cashRegisterId], references: [id], onDelete: SetNull)
   items          SaleItem[]
   payments       Payment[]
+  creditSale     CreditSale?
 }
 
 model SaleItem {
@@ -204,6 +206,7 @@ model Purchase {
 
   supplier   Supplier        @relation(fields: [supplierId], references: [id])
   items      PurchaseItem[]
+  creditPurchase CreditPurchase?
 }
 
 model PurchaseItem {
@@ -310,4 +313,47 @@ model Expense {
 
   category          ExpenseCategory @relation(fields: [categoryId], references: [id])
   cashRegister      CashRegister?   @relation(fields: [cashRegisterId], references: [id])
+}
+
+model CreditSale {
+  id             String         @id @default(uuid())
+  saleId         String         @unique
+  totalAmount    Decimal        @db.Decimal(10, 2)
+  remainingAmount Decimal        @db.Decimal(10, 2)
+  dueDate        DateTime?
+  status         String         @default("PENDING") // PENDING, PAID, OVERDUE
+  createdAt      DateTime?      @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  sale           Sale           @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  payments       CreditPayment[]
+}
+
+model CreditPurchase {
+  id             String         @id @default(uuid())
+  purchaseId     String         @unique
+  totalAmount    Decimal        @db.Decimal(10, 2)
+  remainingAmount Decimal        @db.Decimal(10, 2)
+  dueDate        DateTime?
+  status         String         @default("PENDING") // PENDING, PAID, OVERDUE
+  createdAt      DateTime?      @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  purchase       Purchase       @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  payments       CreditPayment[]
+}
+
+model CreditPayment {
+  id               String          @id @default(uuid())
+  amount           Decimal         @db.Decimal(10, 2)
+  date             DateTime        @default(now())
+  paymentMethod    String          @default("CASH")
+  notes            String?
+  creditSaleId     String?
+  creditPurchaseId String?
+  cashRegisterId   String?
+
+  creditSale       CreditSale?     @relation(fields: [creditSaleId], references: [id])
+  creditPurchase   CreditPurchase? @relation(fields: [creditPurchaseId], references: [id])
+  cashRegister     CashRegister?   @relation(fields: [cashRegisterId], references: [id])
 }
