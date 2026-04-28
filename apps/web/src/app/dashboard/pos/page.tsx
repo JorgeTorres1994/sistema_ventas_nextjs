@@ -118,7 +118,7 @@ export default function PosPage() {
       const taxRate = (settings?.taxRate || 18) / 100; 
       const total = subtotal + (subtotal * taxRate);
 
-      await createSale(
+      const result = await createSale(
         itemsPayload, 
         paymentMethod, 
         total, 
@@ -130,6 +130,12 @@ export default function PosPage() {
       
       toast.success('¡Venta completada con éxito!', {
         description: `Total procesado: S/ ${total.toFixed(2)}`,
+        action: {
+          label: 'Ver Comprobante',
+          onClick: () => {
+            window.location.href = `/dashboard/sales?open=${result.id}`;
+          }
+        }
       });
       handleClearCart();
       const freshProducts = await getProducts(1, 100, searchQuery);

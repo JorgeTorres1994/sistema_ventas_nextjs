@@ -5,6 +5,7 @@ import { CashRegistersService } from '../cash-registers/cash-registers.service.j
 import { PromotionsService } from '../promotions/promotions.service.js';
 
 import { AuditService } from '../audit/audit.service.js';
+import { InvoicingService } from '../invoicing/invoicing.service.js';
 
 @Injectable()
 export class SalesService {
@@ -12,7 +13,8 @@ export class SalesService {
         private prisma: PrismaService,
         private cashService: CashRegistersService,
         private promotionsService: PromotionsService,
-        private auditService: AuditService
+        private auditService: AuditService,
+        private invoicingService: InvoicingService
     ) { }
 
     async createSale(
@@ -27,7 +29,7 @@ export class SalesService {
         pointsToRedeem: number = 0
     ) {
         try {
-            return await this.prisma.$transaction(async (tx) => {
+            const result = await this.prisma.$transaction(async (tx) => {
                 let finalCustomerId = customerId;
                 
                 // Fallback for customerId
@@ -238,6 +240,13 @@ export class SalesService {
 
                 return sale;
             });
+
+            // Intentar facturar electrónicamente de forma asíncrona (no bloquea el retorno al cliente)
+            this.invoicingService.sendInvoice(result.id).catch(err => {
+                console.error(`Error asíncrono en facturación de venta ${result.id}:`, err.message);
+            });
+
+            return result;
         } catch (error) {
             console.error('Error in createSale:', error);
             throw error;
@@ -247,6 +256,8 @@ export class SalesService {
     async findAll(filters: any) {
         const where: any = {};
         if (filters.status && filters.status !== 'All') where.status = filters.status;
+        if (filters.invoiceStatus && filters.invoiceStatus !== 'All') where.invoiceStatus = filters.invoiceStatus;
+        if (filters.documentType && filters.documentType !== 'All') where.documentType = filters.documentType;
         if (filters.customerId) where.customerId = filters.customerId;
         if (filters.startDate || filters.endDate) {
             where.createdAt = {};

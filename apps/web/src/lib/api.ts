@@ -578,5 +578,11 @@ export const getCustomerPoints = async (customerId: string) => {
   return response.data;
 };
 
+// --- Invoicing ---
+export const reSendInvoice = async (saleId: string) => {
+  const response = await api.post(`/invoicing/send/${saleId}`);
+  return response.data;
+};
+
 export { api };
 export default api;

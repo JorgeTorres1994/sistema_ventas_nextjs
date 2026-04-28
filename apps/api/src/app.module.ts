@@ -22,6 +22,7 @@ import { ExpensesModule } from './expenses/expenses.module.js';
 import { CreditsModule } from './credits/credits.module.js';
 import { PromotionsModule } from './promotions/promotions.module.js';
 import { AuditModule } from './audit/audit.module.js';
+import { InvoicingModule } from './invoicing/invoicing.module.js';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { AuditModule } from './audit/audit.module.js';
     CreditsModule,
     PromotionsModule,
     AuditModule,
+    InvoicingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
