@@ -23,6 +23,7 @@ import { CreditsModule } from './credits/credits.module.js';
 import { PromotionsModule } from './promotions/promotions.module.js';
 import { AuditModule } from './audit/audit.module.js';
 import { InvoicingModule } from './invoicing/invoicing.module.js';
+import { QuotationsModule } from './quotations/quotations.module.js';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { InvoicingModule } from './invoicing/invoicing.module.js';
     PromotionsModule,
     AuditModule,
     InvoicingModule,
+    QuotationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

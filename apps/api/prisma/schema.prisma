@@ -71,6 +71,7 @@ model User {
   sales          Sale[]
   cashRegisters  CashRegister[]
   auditLogs      AuditLog[]
+  quotations     Quotation[]
 }
 
 model Customer {
@@ -86,6 +87,7 @@ model Customer {
   updatedAt     DateTime  @updatedAt
 
   sales     Sale[]
+  quotations Quotation[]
 }
 
 model Supplier {
@@ -126,6 +128,7 @@ model Product {
   purchaseItems PurchaseItem[]
   stockMovements StockMovement[]
   promotions    ProductPromotion[]
+  quotationItems QuotationItem[]
 }
 
 model Promotion {
@@ -424,4 +427,34 @@ model CreditPayment {
   creditSale       CreditSale?     @relation(fields: [creditSaleId], references: [id])
   creditPurchase   CreditPurchase? @relation(fields: [creditPurchaseId], references: [id])
   cashRegister     CashRegister?   @relation(fields: [cashRegisterId], references: [id])
+}
+
+model Quotation {
+  id             String          @id @default(uuid())
+  number         String          @unique
+  subtotal       Decimal         @db.Decimal(10, 2)
+  taxAmount      Decimal         @db.Decimal(10, 2)
+  total          Decimal         @db.Decimal(10, 2)
+  status         String          @default("PENDING") // PENDING, ACCEPTED, REJECTED, EXPIRED, CONVERTED
+  expirationDate DateTime
+  notes          String?
+  createdAt      DateTime?       @default(now())
+  updatedAt      DateTime        @updatedAt
+  userId         String
+  customerId     String?
+
+  user           User            @relation(fields: [userId], references: [id])
+  customer       Customer?       @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  items          QuotationItem[]
+}
+
+model QuotationItem {
+  id          String    @id @default(uuid())
+  quotationId String
+  productId   String
+  quantity    Int
+  price       Decimal   @db.Decimal(10, 2)
+
+  quotation   Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  product     Product   @relation(fields: [productId], references: [id])
 }
