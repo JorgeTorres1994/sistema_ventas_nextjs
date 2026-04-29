@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
 import {
   ArrowLeft, User, Hash, Mail, Phone, MapPin,
-  Save, CheckCircle, AlertCircle, Loader2
+  Save, CheckCircle, AlertCircle, Loader2, Search
 } from 'lucide-react';
 import { createCustomer, updateCustomer, getCustomerById } from '@/lib/api';
 
@@ -28,7 +28,8 @@ interface FormErrors {
 function validate(data: FormData): FormErrors {
   const errors: FormErrors = {};
   if (!data.name.trim()) errors.name = 'El nombre es obligatorio';
-  if (!data.dni.trim()) errors.dni = 'El DNI es obligatorio';
+  if (!data.dni.trim()) errors.dni = 'El documento es obligatorio';
+  else if (data.dni.length !== 8 && data.dni.length !== 11) errors.dni = 'El documento debe tener 8 (DNI) u 11 (RUC) dígitos';
   if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
     errors.email = 'Formato de correo inválido';
   }
@@ -44,6 +45,7 @@ export default function CustomerFormPage() {
   const [form, setForm] = useState<FormData>({ name: '', dni: '', email: '', phone: '', address: '' });
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(isEditing);
 
   // Load existing customer if editing
@@ -69,8 +71,54 @@ export default function CustomerFormPage() {
   }, [customerId, isEditing, router]);
 
   const set = (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm(prev => ({ ...prev, [field]: e.target.value }));
+    // Si es DNI/RUC, forzar solo números y máximo 11
+    let value = e.target.value;
+    if (field === 'dni') {
+      value = value.replace(/\D/g, '').slice(0, 11);
+    }
+    setForm(prev => ({ ...prev, [field]: value }));
     setErrors(prev => ({ ...prev, [field]: undefined }));
+  };
+
+  const handleConsultarDocumento = async () => {
+    const isDNI = form.dni.length === 8;
+    const isRUC = form.dni.length === 11;
+
+    if (!isDNI && !isRUC) {
+      toast.error('Ingrese un DNI (8) o RUC (11) válido');
+      return;
+    }
+    
+    setIsSearching(true);
+    try {
+      const type = isDNI ? 'dni' : 'ruc';
+      const endpoint = `/api/decolecta?type=${type}&numero=${form.dni}`;
+        
+      const response = await fetch(endpoint);
+
+      if (!response.ok) {
+        throw new Error(isDNI ? 'DNI no encontrado' : 'RUC no encontrado o inválido');
+      }
+
+      const data = await response.json();
+      
+      if (isDNI) {
+        setForm(prev => ({ ...prev, name: data.full_name || '' }));
+      } else {
+        setForm(prev => ({ 
+          ...prev, 
+          name: data.razon_social || '',
+          address: data.direccion || ''
+        }));
+      }
+      
+      toast.success('Datos obtenidos correctamente');
+      setErrors(prev => ({ ...prev, name: undefined, dni: undefined }));
+    } catch (err: any) {
+      toast.error(err.message || 'Error al consultar documento');
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -172,15 +220,26 @@ export default function CustomerFormPage() {
                     <label className="block text-sm font-black text-gray-900 mb-2">
                       DNI / Documento Identidad <span className="text-rose-500">*</span>
                     </label>
-                    <div className="relative">
-                      <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                      <input
-                        type="text"
-                        placeholder="ej. 76543210"
-                        value={form.dni}
-                        onChange={set('dni')}
-                        className={`w-full pl-11 pr-4 py-3 bg-gray-50 rounded-xl font-medium text-gray-900 focus:outline-none focus:ring-2 transition-all font-mono ${errors.dni ? 'ring-2 ring-rose-300 bg-rose-50' : 'focus:ring-indigo-300'}`}
-                      />
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                        <input
+                          type="text"
+                          placeholder="ej. 76543210"
+                          value={form.dni}
+                          onChange={set('dni')}
+                          className={`w-full pl-11 pr-4 py-3 bg-gray-50 rounded-xl font-medium text-gray-900 focus:outline-none focus:ring-2 transition-all font-mono ${errors.dni ? 'ring-2 ring-rose-300 bg-rose-50' : 'focus:ring-indigo-300'}`}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleConsultarDocumento}
+                        disabled={isSearching || (form.dni.length !== 8 && form.dni.length !== 11)}
+                        className="px-6 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-black text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-md shadow-gray-200"
+                      >
+                        {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                        <span className="hidden sm:inline">Consultar</span>
+                      </button>
                     </div>
                     {errors.dni && <p className="mt-1.5 text-xs font-bold text-rose-500 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.dni}</p>}
                   </div>

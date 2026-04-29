@@ -396,7 +396,7 @@ export default function CustomersPage() {
                       <td className="px-4 py-4"><StatusBadge isActive={!!customer.isActive} /></td>
                       {/* Actions */}
                       <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
-                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center justify-end gap-2 transition-opacity">
                           <button
                             onClick={(e) => { e.stopPropagation(); setSelectedId(customer.id); }}
                             className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs font-black transition-colors">

@@ -8,7 +8,7 @@ export class CustomersService {
     async create(data: { name: string; dni: string; email?: string; phone?: string; address?: string }) {
         const existing = await this.prisma.customer.findUnique({ where: { dni: data.dni } });
         if (existing) {
-            throw new ConflictException(`A customer with DNI ${data.dni} already exists`);
+            throw new ConflictException(`Ya existe un cliente registrado con el DNI ${data.dni}`);
         }
         return this.prisma.customer.create({ data });
     }
@@ -99,7 +99,7 @@ export class CustomersService {
                 where: { dni: data.dni, NOT: { id } },
             });
             if (existing) {
-                throw new ConflictException(`Another customer already has DNI ${data.dni}`);
+                throw new ConflictException(`Ya existe otro cliente registrado con el DNI ${data.dni}`);
             }
         }
 
