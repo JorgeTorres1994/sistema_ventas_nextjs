@@ -202,6 +202,8 @@ export default function PosPage() {
             setPaymentMethod={setPaymentMethod}
             documentType={documentType}
             setDocumentType={setDocumentType}
+            selectedCustomerId={selectedCustomerId}
+            setSelectedCustomerId={setSelectedCustomerId}
             couponCode={couponCode}
             setCouponCode={setCouponCode}
             pointsToRedeem={pointsToRedeem}

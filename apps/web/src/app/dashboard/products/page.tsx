@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { getApiProducts, toggleProductStatus } from '@/lib/api';
+import { toast } from 'sonner';
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -59,7 +60,7 @@ export default function ProductsPage() {
       await toggleProductStatus(id);
       fetchProducts();
     } catch (error) {
-      alert('Error al actualizar el estado del producto');
+      toast.error('Error al actualizar el estado del producto');
     }
   };
 

@@ -101,7 +101,7 @@ const SaleDetailDrawer = ({ saleId, onClose, onCancelSale }: any) => {
                )}
             </div>
             <p className="text-sm text-gray-400 font-medium flex items-center gap-2">
-              <Hash className="w-3.5 h-3.5" /> {sale.documentSeries && sale.documentNumber ? `${sale.documentSeries}-${sale.documentNumber.toString().padStart(8, '0')}` : saleId.toUpperCase()}
+              <Hash className="w-3.5 h-3.5" /> {sale?.documentSeries && sale?.documentNumber ? `${sale.documentSeries}-${sale.documentNumber.toString().padStart(8, '0')}` : saleId.toUpperCase()}
             </p>
           </div>
           <button onClick={onClose} className="w-12 h-12 rounded-2xl hover:bg-gray-50 flex items-center justify-center transition-all group">

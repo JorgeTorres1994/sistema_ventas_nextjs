@@ -3,8 +3,10 @@ import { useSettings } from '@/components/SettingsProvider';
 import { 
     Trash2, X, Image as ImageIcon, Minus, Plus, 
     CreditCard, Wallet, Banknote, CheckCircle2,
-    ShoppingCart, FileText, Ticket, Star
+    ShoppingCart, FileText, Ticket, Star, User
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { getCustomers } from '@/lib/api';
 
 interface Product {
   id: string;
@@ -27,6 +29,8 @@ interface PosCartPanelProps {
   setPaymentMethod: (method: string) => void;
   documentType: string;
   setDocumentType: (type: string) => void;
+  selectedCustomerId: string;
+  setSelectedCustomerId: (id: string) => void;
   couponCode: string;
   setCouponCode: (code: string) => void;
   pointsToRedeem: number;
@@ -46,6 +50,8 @@ export default function PosCartPanel({
   setPaymentMethod,
   documentType,
   setDocumentType,
+  selectedCustomerId,
+  setSelectedCustomerId,
   couponCode,
   setCouponCode,
   pointsToRedeem,
@@ -59,6 +65,13 @@ export default function PosCartPanel({
   isProcessing
 }: PosCartPanelProps) {
   const { settings, paymentMethods } = useSettings();
+  const [customers, setCustomers] = useState<any[]>([]);
+
+  useEffect(() => {
+    getCustomers({ page: 1, limit: 100, isActive: true })
+      .then(res => setCustomers(res.data))
+      .catch(console.error);
+  }, []);
 
   // Calculations
   const subtotal = cart.reduce((acc: number, item: CartItem) => acc + (Number(item.product.price) * item.quantity), 0);
@@ -167,6 +180,28 @@ export default function PosCartPanel({
             <span className="text-[40px] font-black text-gray-900 leading-none tracking-tighter">
               S/ {total.toFixed(2)}
             </span>
+          </div>
+        </div>
+
+        {/* Customer Selection */}
+        <div className="mb-6">
+          <p className="text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase mb-4 flex items-center gap-2">
+             <User className="w-3 h-3" /> Cliente
+          </p>
+          <div className="relative">
+            <select
+              value={selectedCustomerId}
+              onChange={(e) => setSelectedCustomerId(e.target.value)}
+              className="w-full pl-4 pr-10 py-3 bg-white border border-gray-100 rounded-xl text-sm font-bold text-gray-900 appearance-none outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all shadow-sm"
+            >
+              <option value="">Consumidor Final (Sin DNI/RUC)</option>
+              {customers.map(c => (
+                <option key={c.id} value={c.id}>{c.name} - {c.dni}</option>
+              ))}
+            </select>
+            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
           </div>
         </div>
 

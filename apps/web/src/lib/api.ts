@@ -77,6 +77,8 @@ export const getSales = async (filters: {
   endDate?: string;
   status?: string;
   search?: string;
+  invoiceStatus?: string;
+  documentType?: string;
 } = {}) => {
   try {
     const response = await api.get('/sales', { params: filters });
