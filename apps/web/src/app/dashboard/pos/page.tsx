@@ -5,7 +5,7 @@ import Sidebar from '@/components/layout/Sidebar';
 import PosTopBar from '@/components/pos/PosTopBar';
 import PosProductGrid from '@/components/pos/PosProductGrid';
 import PosCartPanel from '@/components/pos/PosCartPanel';
-import { getProducts, createSale } from '@/lib/api';
+import { getProducts, createSale, createQuotation } from '@/lib/api';
 import { toast } from 'sonner';
 import { useSettings } from '@/components/SettingsProvider';
 
@@ -47,7 +47,7 @@ export default function PosPage() {
     const fetchProducts = async () => {
       setIsLoading(true);
       try {
-        const response = await getProducts(1, 100, searchQuery);
+        const response = await getProducts({ page: 1, limit: 100, search: searchQuery });
         setProducts(response.data);
       } catch (error) {
         console.error('Failed to load products:', error);
@@ -138,13 +138,41 @@ export default function PosPage() {
         }
       });
       handleClearCart();
-      const freshProducts = await getProducts(1, 100, searchQuery);
+      const freshProducts = await getProducts({ page: 1, limit: 100, search: searchQuery });
       setProducts(freshProducts.data);
       
     } catch (error: any) {
       console.error('Checkout failed:', error);
       const errorMsg = error.response?.data?.message || 'Error en la transacción. ¿Está abierta la caja?';
       toast.error(errorMsg);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleGenerateQuotation = async () => {
+    setIsProcessing(true);
+    try {
+      const itemsPayload = cart.map(item => ({
+        productId: item.product.id,
+        quantity: item.quantity
+      }));
+      
+      await createQuotation({
+        items: itemsPayload,
+        customerId: selectedCustomerId || null,
+        notes: 'Generado desde POS',
+        expirationDays: 15
+      });
+      
+      toast.success('¡Cotización generada con éxito!', {
+        description: 'Puedes verla en el módulo de Cotizaciones',
+        icon: '📄'
+      });
+      handleClearCart();
+    } catch (error: any) {
+      console.error('Quotation failed:', error);
+      toast.error('Error al generar cotización');
     } finally {
       setIsProcessing(false);
     }
@@ -183,6 +211,7 @@ export default function PosPage() {
             onUpdateQuantity={handleUpdateQuantity}
             onRemoveItem={handleRemoveItem}
             onCompleteSale={handleCompleteSale}
+            onGenerateQuotation={handleGenerateQuotation}
             isProcessing={isProcessing}
           />
         </main>

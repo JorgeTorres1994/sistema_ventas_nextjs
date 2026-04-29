@@ -67,6 +67,7 @@ const Sidebar = () => {
         { name: 'Caja Registradora', icon: Wallet, path: '/cash', permission: 'cash' },
         { name: 'Ventas', icon: Wallet, path: '/sales', permission: 'sales' },
         { name: 'Facturación Electrónica', icon: FileText, path: '/invoicing', permission: 'sales' },
+        { name: 'Cotizaciones', icon: FileText, path: '/quotations', permission: 'sales' },
         { name: 'Gastos y Egresos', icon: Receipt, path: '/expenses', permission: 'expenses' },
         { name: 'Créditos y Cobranzas', icon: CreditCard, path: '/credits', permission: 'credits' },
         { name: 'Clientes', icon: Users2, path: '/customers', permission: 'customers' },

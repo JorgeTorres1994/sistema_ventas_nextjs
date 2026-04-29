@@ -36,6 +36,7 @@ interface PosCartPanelProps {
   onUpdateQuantity: (productId: string, delta: number) => void;
   onRemoveItem: (productId: string) => void;
   onCompleteSale: () => void;
+  onGenerateQuotation: () => void;
   isProcessing: boolean;
 }
 
@@ -54,6 +55,7 @@ export default function PosCartPanel({
   onUpdateQuantity,
   onRemoveItem,
   onCompleteSale,
+  onGenerateQuotation,
   isProcessing
 }: PosCartPanelProps) {
   const { settings, paymentMethods } = useSettings();
@@ -263,6 +265,15 @@ export default function PosCartPanel({
               <span className="uppercase tracking-[0.2em] text-sm">Completar Transacción</span>
             </>
           )}
+        </button>
+
+        <button 
+          onClick={onGenerateQuotation}
+          disabled={cart.length === 0 || isProcessing}
+          className="w-full mt-4 h-12 bg-white hover:bg-gray-50 disabled:bg-gray-50 disabled:text-gray-300 transition-all rounded-xl flex items-center justify-center gap-3 text-gray-700 font-black text-xs border border-gray-200 uppercase tracking-widest active:scale-[0.98]"
+        >
+           <FileText className="w-4 h-4 text-blue-600" />
+           Generar Cotización (Proforma)
         </button>
       </div>
 

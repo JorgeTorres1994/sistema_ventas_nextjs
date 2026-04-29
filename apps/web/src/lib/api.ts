@@ -584,5 +584,31 @@ export const reSendInvoice = async (saleId: string) => {
   return response.data;
 };
 
+// ── Quotations ──────────────────────────────────────────────────────────
+export const getQuotations = async (params: any) => {
+  const response = await api.get('/quotations', { params });
+  return response.data;
+};
+
+export const getQuotationById = async (id: string) => {
+  const response = await api.get(`/quotations/${id}`);
+  return response.data;
+};
+
+export const createQuotation = async (data: any) => {
+  const response = await api.post('/quotations', data);
+  return response.data;
+};
+
+export const updateQuotationStatus = async (id: string, status: string) => {
+  const response = await api.patch(`/quotations/${id}/status`, { status });
+  return response.data;
+};
+
+export const convertQuotationToSale = async (id: string, paymentMethod: string = 'CASH') => {
+  const response = await api.post(`/quotations/${id}/convert`, { paymentMethod });
+  return response.data;
+};
+
 export { api };
 export default api;
