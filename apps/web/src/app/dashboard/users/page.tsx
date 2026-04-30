@@ -283,8 +283,8 @@ export default function UsersPage() {
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <td className="px-8 py-5 text-right">
-                                                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                                <td className="px-6 py-5 text-right w-24" onClick={e => e.stopPropagation()}>
+                                                    <div className="flex items-center justify-end gap-2 transition-all">
                                                         <button 
                                                             onClick={() => openEditModal(user)}
                                                             className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"

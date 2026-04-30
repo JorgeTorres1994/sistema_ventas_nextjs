@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { 
   Upload, Info, ToggleRight, ToggleLeft, 
-  ChevronDown, Save, Loader2 
+  ChevronDown, Save, Loader2, Link as LinkIcon 
 } from 'lucide-react';
 import api, { createProduct, updateProduct, uploadProductImage } from '@/lib/api';
 
@@ -175,6 +175,23 @@ export default function ProductForm({ initialData, isEdit }: ProductFormProps) {
                 >
                    <Upload className="w-4 h-4" /> Subir Nueva
                 </button>
+
+                <div className="flex items-center gap-4 my-4">
+                  <div className="h-px bg-gray-100 flex-1"></div>
+                  <span className="text-xs font-bold text-gray-400">O USA URL</span>
+                  <div className="h-px bg-gray-100 flex-1"></div>
+                </div>
+
+                <div className="relative">
+                  <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                  <input
+                    type="url"
+                    placeholder="https://ejemplo.com/imagen.jpg"
+                    value={formData.imageUrl}
+                    onChange={(e) => setFormData({...formData, imageUrl: e.target.value})}
+                    className="w-full pl-11 pr-4 py-3 bg-white border border-gray-100 shadow-sm rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition-all outline-none text-sm font-medium text-gray-900"
+                  />
+                </div>
              </div>
 
              <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">

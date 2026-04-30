@@ -219,7 +219,7 @@ export default function RolesPage() {
                                         <div className="p-3 bg-blue-50 rounded-2xl">
                                             <Shield className="w-6 h-6 text-blue-600" />
                                         </div>
-                                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="flex gap-2 transition-opacity">
                                             <button 
                                                 onClick={() => openEditModal(role)}
                                                 className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"

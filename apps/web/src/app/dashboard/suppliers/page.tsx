@@ -366,7 +366,7 @@ export default function SuppliersPage() {
                   <th className="px-6 py-5">Persona de Contacto</th>
                   <th className="px-6 py-5">Correo</th>
                   <th className="px-6 py-5">Estado</th>
-                  <th className="px-6 py-5"></th>
+                  <th className="px-6 py-5">Acción</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -424,8 +424,8 @@ export default function SuppliersPage() {
                         <StatusBadge isActive={!!supplier.isActive} />
                       </td>
                       {/* Actions */}
-                      <td className="px-6 py-5 text-right w-16" onClick={e => e.stopPropagation()}>
-                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-end gap-2 transition-opacity">
                           <button
                             onClick={(e) => { e.stopPropagation(); setSelectedId(supplier.id); }}
                             className="px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-xl text-xs font-black transition-colors"

@@ -421,7 +421,7 @@ export default function InventoryPage() {
                         <td className="px-6 py-4 text-right">
                           <button
                             onClick={() => setAdjustProduct(product)}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs font-black">
+                            className="transition-opacity px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs font-black">
                             Ajustar Stock
                           </button>
                         </td>

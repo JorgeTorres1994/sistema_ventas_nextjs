@@ -321,7 +321,7 @@ export default function PurchasesPage() {
                                 <td className="px-8 py-5 text-right" onClick={e => e.stopPropagation()}>
                                     <button 
                                         onClick={() => setSelectedId(purchase.id)}
-                                        className="p-2 bg-gray-50 hover:bg-gray-200 rounded-xl text-gray-400 hover:text-gray-900 transition-all opacity-0 group-hover:opacity-100"
+                                        className="p-2 bg-gray-50 hover:bg-gray-200 rounded-xl text-gray-400 hover:text-gray-900 transition-all"
                                     >
                                         <Eye className="w-4 h-4" />
                                     </button>

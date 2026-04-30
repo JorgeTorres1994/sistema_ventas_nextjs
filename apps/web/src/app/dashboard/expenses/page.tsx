@@ -349,8 +349,8 @@ export default function ExpensesPage() {
                                S/ {Number(expense.amount).toFixed(2)}
                              </span>
                           </td>
-                          <td className="px-8 py-6">
-                             <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <td className="px-6 py-5" onClick={e => e.stopPropagation()}>
+                             <div className="flex items-center justify-center gap-2 transition-opacity">
                                 <button 
                                   onClick={() => openEditModal(expense)}
                                   className="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"

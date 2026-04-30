@@ -303,7 +303,7 @@ export default function ReportsPage() {
                        <button className="text-[11px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-800 transition-colors">Auditar Stock</button>
                     </div>
                     <div className="space-y-12">
-                       {data.products.map((p: any, i: number) => (
+                       {data.products.slice(0, 5).map((p: any, i: number) => (
                           <div key={i} className="group">
                              <div className="flex items-center justify-between mb-4">
                                 <span className="text-sm font-black text-gray-800 uppercase tracking-tight">{p.name}</span>
@@ -334,7 +334,7 @@ export default function ReportsPage() {
                              </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-50">
-                             {data.transactions.map((t: any) => (
+                             {data.transactions.slice(0, 5).map((t: any) => (
                                 <tr key={t.id} className="group hover:bg-blue-50/30 transition-all cursor-default">
                                    <td className="px-6 py-7 text-sm font-black text-gray-900">#{t.id.slice(0,6).toUpperCase()}</td>
                                    <td className="px-6 py-7">
