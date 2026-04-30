@@ -1,0 +1,17 @@
+1. Ajustes Principales
+Root Directory: apps/api
+Build Command: npm install && npx prisma generate && npm run build
+Start Command: npm run start:prod
+
+2. Plan (Instance Type)
+Selecciona el plan "Free" (el primero de arriba a la izquierda que dice $0/month).
+
+3. Variables de Entorno (Environment Variables)
+Baja hasta la sección de "Environment Variables" y haz clic en "Add Environment Variable" para añadir estas tres:
+
+Key: DATABASE_URL Value: postgresql://postgres:Sukitteiinayo1@db.tpwicvbekroujrossswp.supabase.co:5432/postgres (Asegúrate de que sea la URL real que te funcionó con Prisma).
+Key: JWT_SECRET Value: matrix_silenciosa_delta_472 (Puedes poner lo que quieras, es para la seguridad de los tokens).
+Key: PORT Value: 3005
+Una vez llenes eso, dale al botón blanco de abajo que dice "Deploy Web Service".
+
+Render empezará a compilar tu código. Tardará un par de minutos. Si todo sale bien, verás un mensaje que dice "Your service is live" y arriba a la izquierda te darán una URL (ej: https://sistema-ventas-nextjs.onrender.com).
