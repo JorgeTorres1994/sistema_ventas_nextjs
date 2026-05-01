@@ -256,7 +256,9 @@ export default function KardexPage() {
                              <span className="text-sm font-black text-gray-900">{move.nextStock}</span>
                           </td>
                           <td className="px-4 py-6 text-center bg-blue-50/10">
-                             <span className="text-[11px] font-bold text-blue-600">S/ {(Number(move.nextValue) / move.nextStock).toFixed(2)}</span>
+                               <span className="text-[11px] font-bold text-blue-600">
+                                 S/ {move.nextStock > 0 ? (Number(move.nextValue) / move.nextStock).toFixed(2) : '0.00'}
+                               </span>
                           </td>
                           <td className="px-4 py-6 text-center bg-blue-50/10">
                              <span className="text-sm font-black text-blue-700">S/ {Number(move.nextValue).toFixed(2)}</span>
