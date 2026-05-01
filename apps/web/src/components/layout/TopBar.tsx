@@ -36,7 +36,7 @@ const TopBar = () => {
   }, []);
 
   const userAvatar = user?.avatarUrl 
-    ? (user.avatarUrl.startsWith('http') ? user.avatarUrl : `https://nexus-api.onrender.com${user.avatarUrl}`)
+    ? (user.avatarUrl.startsWith('http') ? user.avatarUrl : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}${user.avatarUrl}`)
     : null;
 
   return (

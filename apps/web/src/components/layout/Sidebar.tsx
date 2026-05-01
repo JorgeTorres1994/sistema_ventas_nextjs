@@ -111,7 +111,7 @@ const Sidebar = () => {
       <div>
         <div className="flex items-center gap-3 p-6 mb-2">
           {settings?.logoUrl ? (
-            <img src={`http://localhost:3005${settings.logoUrl}`} alt="Logo" className="w-10 h-10 rounded-lg object-cover" />
+            <img src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}${settings.logoUrl}`} alt="Logo" className="w-10 h-10 rounded-lg object-cover" />
           ) : (
             <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm">
               <img src="/logo.png" alt="Nexus Genesis" className="w-full h-full object-contain p-1" />

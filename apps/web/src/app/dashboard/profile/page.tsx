@@ -116,7 +116,7 @@ export default function ProfilePage() {
 
   const userInitial = user?.name?.charAt(0) || 'U';
   const displayAvatar = formData.avatarUrl
-    ? (formData.avatarUrl.startsWith('http') ? formData.avatarUrl : `https://nexus-api.onrender.com${formData.avatarUrl}`)
+    ? (formData.avatarUrl.startsWith('http') ? formData.avatarUrl : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}${formData.avatarUrl}`)
     : null;
 
   return (
