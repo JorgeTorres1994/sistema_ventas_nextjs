@@ -1,8 +1,18 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3005',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005',
 });
+
+// Helper to ensure role is a string and handle object structure safely
+const sanitizeUser = (user: any) => {
+  if (!user) return user;
+  const sanitized = { ...user };
+  if (typeof user.role === 'object' && user.role !== null) {
+    sanitized.role = user.role.name || 'Usuario';
+  }
+  return sanitized;
+};
 
 // Assuming no authentication is strictly needed for the isolated endpoint locally,
 // but adding interceptors just in case you add auth tokens later.
@@ -22,8 +32,9 @@ api.interceptors.request.use(
 export const login = async (credentials: any) => {
   const response = await api.post('/auth/login', credentials);
   if (response.data.access_token) {
+    const sanitizedUser = sanitizeUser(response.data.user);
     localStorage.setItem('token', response.data.access_token);
-    localStorage.setItem('user', JSON.stringify(response.data.user));
+    localStorage.setItem('user', JSON.stringify(sanitizedUser));
   }
   return response.data;
 };
@@ -429,12 +440,12 @@ export const toggleUserStatus = async (id: string) => {
 
 export const getMe = async () => {
   const response = await api.get('/users/me');
-  return response.data;
+  return sanitizeUser(response.data);
 };
 
 export const updateMyProfile = async (data: any) => {
   const response = await api.put('/users/me', data);
-  return response.data;
+  return sanitizeUser(response.data);
 };
 
 export const uploadAvatar = async (file: File) => {
