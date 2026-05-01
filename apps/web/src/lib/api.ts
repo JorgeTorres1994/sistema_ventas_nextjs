@@ -440,6 +440,7 @@ export const toggleUserStatus = async (id: string) => {
 
 export const getMe = async () => {
   const response = await api.get('/users/me');
+  console.log('DEBUG USER DATA:', response.data);
   const sanitized = sanitizeUser(response.data);
   localStorage.setItem('user', JSON.stringify(sanitized));
   return sanitized;

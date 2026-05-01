@@ -87,7 +87,7 @@ const TopBar = () => {
                 {user?.name || 'Usuario'}
               </p>
               <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider">
-                {typeof user?.role === 'object' ? user?.role?.name : (user?.role === 'ADMIN' ? 'Administrador' : 'Colaborador')}
+                {String(user?.role?.name || user?.role || 'Colaborador')}
               </p>
             </div>
             <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />

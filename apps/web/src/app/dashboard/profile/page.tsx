@@ -159,7 +159,7 @@ export default function ProfilePage() {
                       <h2 className="text-2xl font-black text-gray-900">{user?.name}</h2>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="px-2 py-0.5 bg-blue-50 rounded-md text-[10px] font-black text-blue-600 uppercase tracking-wider border border-blue-100">
-                          {typeof user?.role === 'object' ? user?.role?.name : user?.role}
+                          {String(user?.role?.name || user?.role || 'Usuario')}
                         </span>
                         <span className="text-gray-400 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
                           <ShieldCheck className="w-3.5 h-3.5 text-blue-500" /> Cuenta Verificada
