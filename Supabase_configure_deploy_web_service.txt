@@ -9,7 +9,7 @@ Selecciona el plan "Free" (el primero de arriba a la izquierda que dice $0/month
 3. Variables de Entorno (Environment Variables)
 Baja hasta la sección de "Environment Variables" y haz clic en "Add Environment Variable" para añadir estas tres:
 
-Key: DATABASE_URL Value: postgresql://postgres:Sukitteiinayo1@db.tpwicvbekroujrossswp.supabase.co:5432/postgres (Asegúrate de que sea la URL real que te funcionó con Prisma).
+Key: DATABASE_URL Value: postgresql://postgres.tpwicvbekroujrossswp:Sukitteiinayo1@aws-1-us-west-2.pooler.supabase.com:6543/postgres?pgbouncer=true (Asegúrate de que sea la URL real que te funcionó con Prisma).
 Key: JWT_SECRET Value: matrix_silenciosa_delta_472 (Puedes poner lo que quieras, es para la seguridad de los tokens).
 Key: PORT Value: 3005
 Una vez llenes eso, dale al botón blanco de abajo que dice "Deploy Web Service".
