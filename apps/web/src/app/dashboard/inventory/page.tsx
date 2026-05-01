@@ -265,7 +265,7 @@ export default function InventoryPage() {
           </div>
         </div>
 
-        <main className="flex-1 p-8 space-y-8">
+        <main className="flex-1 p-8 space-y-8 overflow-y-auto scroll-smooth">
 
           {/* Summary Cards */}
           <div className="grid grid-cols-4 gap-6">

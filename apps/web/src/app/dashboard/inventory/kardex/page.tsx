@@ -39,7 +39,7 @@ export default function KardexPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await getProducts({ limit: 100 });
+        const response = await getProducts({ limit: 1000 });
         setProducts(response.data);
         if (response.data.length > 0) {
           setSelectedProductId(response.data[0].id);

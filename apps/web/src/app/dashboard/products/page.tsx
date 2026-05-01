@@ -100,7 +100,7 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        <main className="flex-1 overflow-y-auto p-8 space-y-6 scroll-smooth hide-scrollbar">
+        <main className="flex-1 overflow-y-auto p-8 space-y-6 scroll-smooth">
           {/* Controls Bar */}
           <div className="flex items-center justify-between gap-4">
              {/* Category Pills */}
@@ -245,39 +245,7 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          {/* Bottom Promo Cards (Exact Design Match) */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-             <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex items-start gap-6">
-                <div className="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center shrink-0">
-                  <AlertCircle className="w-6 h-6 text-rose-500" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-black text-gray-900 leading-none">Alertas de Stock Bajo</h3>
-                    <span className="bg-rose-100 text-rose-600 px-2 py-0.5 rounded text-[10px] font-black uppercase">Urgente</span>
-                  </div>
-                  <p className="text-sm text-gray-500 font-medium mb-4">12 productos están actualmente por debajo de su umbral mínimo.</p>
-                  <button className="text-xs font-black text-indigo-600 underline uppercase tracking-widest">Ver reporte de reposición →</button>
-                </div>
-             </div>
 
-             <div className="col-span-1 lg:col-span-2 bg-indigo-600 p-8 rounded-[2rem] shadow-2xl shadow-indigo-100 relative overflow-hidden flex items-center justify-between group">
-                {/* Background Decor */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl" />
-                
-                <div className="relative z-10 max-w-lg">
-                  <h3 className="text-2xl font-black text-white mb-2">Optimización Inteligente de Inventario</h3>
-                  <p className="text-indigo-100 font-medium mb-6">Aproveche nuestro sistema impulsado por IA para predecir faltantes antes de que ocurran basándose en tendencias estacionales.</p>
-                  <button className="bg-white text-indigo-600 px-8 py-3 rounded-2xl font-black text-sm hover:scale-105 transition-all shadow-xl">Probar Pronóstico IA</button>
-                </div>
-
-                <div className="relative z-10 hidden md:block">
-                  <div className="w-24 h-24 bg-white/10 backdrop-blur-3xl rounded-3xl flex items-center justify-center border border-white/20 hover:rotate-12 transition-transform cursor-pointer">
-                    <Plus className="w-10 h-10 text-white" />
-                  </div>
-                </div>
-             </div>
-          </div>
         </main>
       </div>
     </div>
