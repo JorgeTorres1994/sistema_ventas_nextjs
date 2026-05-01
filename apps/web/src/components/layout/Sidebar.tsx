@@ -38,7 +38,9 @@ const Sidebar = () => {
       const userStr = localStorage.getItem('user');
       if (userStr) {
         const user = JSON.parse(userStr);
-        setIsAdmin(user.role?.name === 'Administrador' || user.role?.name === 'ADMIN' || user.role === 'ADMIN');
+        // Emergency sanitization
+        const roleName = typeof user.role === 'object' ? user.role?.name : user.role;
+        setIsAdmin(roleName === 'Administrador' || roleName === 'ADMIN');
         setPermissions(user.permissions || []);
       }
     };
