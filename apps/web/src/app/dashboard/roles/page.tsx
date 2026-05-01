@@ -69,7 +69,8 @@ export default function RolesPage() {
         if (userStr) {
             const loggedUser = JSON.parse(userStr);
             // Temporary check until backend permissions are fully enforced
-            if (loggedUser.role !== 'Administrador' && loggedUser.role !== 'ADMIN') {
+            const roleName = typeof loggedUser.role === 'object' ? loggedUser.role?.name : loggedUser.role;
+            if (roleName !== 'Administrador' && roleName !== 'ADMIN') {
                 router.push('/dashboard');
                 return;
             }

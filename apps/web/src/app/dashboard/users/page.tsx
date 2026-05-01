@@ -57,7 +57,8 @@ export default function UsersPage() {
         const userStr = localStorage.getItem('user');
         if (userStr) {
             const loggedUser = JSON.parse(userStr);
-            if (loggedUser.role !== 'Administrador' && loggedUser.role !== 'ADMIN') {
+            const roleName = typeof loggedUser.role === 'object' ? loggedUser.role?.name : loggedUser.role;
+            if (roleName !== 'Administrador' && roleName !== 'ADMIN') {
                 router.push('/dashboard');
                 return;
             }
