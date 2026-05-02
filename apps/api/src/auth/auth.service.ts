@@ -83,7 +83,7 @@ export class AuthService {
         }
 
         const roleName = (user as any).role?.name || 'Vendedor';
-        let permissions = [];
+        let permissions: string[] = [];
         
         // Extraer permisos de la relación si existe
         if ((user as any).role?.permissions) {
