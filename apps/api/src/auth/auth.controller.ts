@@ -18,6 +18,16 @@ export class AuthController {
         return this.authService.login(credentials.email, credentials.password);
     }
 
+    @Post('forgot-password')
+    async forgotPassword(@Body('email') email: string) {
+        return this.authService.forgotPassword(email);
+    }
+
+    @Post('reset-password')
+    async resetPassword(@Body() data: any) {
+        return this.authService.resetPassword(data.email, data.code, data.newPassword);
+    }
+
     @Get('google')
     @UseGuards(GoogleAuthGuard)
     async googleAuth(@Req() req: any) {}

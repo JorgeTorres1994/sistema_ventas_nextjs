@@ -37,8 +37,9 @@ export default function LoginPage() {
       await login({ email, password });
       router.push('/dashboard');
     } catch (err: any) {
-      console.error('Login failed:', err);
-      setError(err.response?.data?.message || 'Error al iniciar sesión. Verifica tus credenciales.');
+      const msg = err.response?.data?.message || 'Error al iniciar sesión. Verifica tus credenciales.';
+      console.log('Login failed:', msg);
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -102,7 +103,7 @@ export default function LoginPage() {
               />
 
               <div className="flex justify-end -mt-4 px-1">
-                <Link href="#" className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors">
+                <Link href="/forgot-password" className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors">
                   ¿Olvidaste tu contraseña?
                 </Link>
               </div>

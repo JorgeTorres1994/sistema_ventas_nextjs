@@ -6,11 +6,62 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
+    private resetCodes = new Map<string, string>();
+
     constructor(
         private usersService: UsersService,
         private jwtService: JwtService,
         private auditService: AuditService,
     ) { }
+
+    async forgotPassword(email: string) {
+        const user = await this.usersService.findByEmail(email);
+        if (!user) {
+            return { message: 'Si el correo existe, se han enviado las instrucciones.' };
+        }
+
+        const roleName = (user as any).role?.name || 'Usuario';
+        const isAdmin = roleName === 'Administrador' || roleName === 'ADMIN';
+
+        if (isAdmin) {
+            const code = Math.floor(100000 + Math.random() * 900000).toString();
+            this.resetCodes.set(email, code);
+            console.log(`\n\n=========================================\n[SMS SIMULADO para ${email}]:\nTu código de recuperación es: ${code}\n=========================================\n\n`);
+            return { 
+                status: 'CODE_SENT', 
+                message: 'Se ha enviado un código de 6 dígitos a tu dispositivo móvil/correo.'
+            };
+        } else {
+            await this.auditService.logAction(
+                null as any,
+                'AUTH',
+                'PASSWORD_RESET_REQUEST',
+                `El usuario ${email} ha solicitado un restablecimiento de contraseña.`,
+                { email }
+            );
+            return {
+                status: 'NOTIFICATION_SENT',
+                message: 'Tu solicitud ha sido enviada al Administrador del sistema. Él restablecerá tu acceso pronto.'
+            };
+        }
+    }
+
+    async resetPassword(email: string, code: string, newPassword: string) {
+        const storedCode = this.resetCodes.get(email);
+        if (!storedCode || storedCode !== code) {
+            throw new UnauthorizedException('Código inválido o expirado.');
+        }
+
+        const user = await this.usersService.findByEmail(email);
+        if (!user) throw new UnauthorizedException('Usuario no encontrado.');
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await this.usersService.update(user.id, { password: hashedPassword });
+        
+        this.resetCodes.delete(email);
+
+        return { message: 'Contraseña actualizada correctamente.' };
+    }
 
     async register(data: any) {
         const userCount = await this.usersService.count();
