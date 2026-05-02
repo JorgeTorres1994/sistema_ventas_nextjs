@@ -7,13 +7,47 @@ import { logout } from '@/lib/api';
 const TopBar = () => {
   const [user, setUser] = useState<any>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  const fetchNotifications = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}/audit/notifications`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setNotifications(data);
+      }
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
+
+  const markAllAsRead = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}/audit/mark-read`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    } catch (error) {
+      console.error('Error marking notifications as read:', error);
+    }
+  };
 
   useEffect(() => {
     const loadUser = () => {
       const userData = localStorage.getItem('user');
       if (userData) {
         setUser(JSON.parse(userData));
+        fetchNotifications();
       }
     };
 
@@ -22,6 +56,9 @@ const TopBar = () => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
+        setIsNotificationsOpen(false);
       }
     };
 
@@ -62,9 +99,73 @@ const TopBar = () => {
         
         <div className="w-px h-8 bg-[#E5E7EB]"></div>
 
-        <div className="relative cursor-pointer group">
-          <Bell className="w-5 h-5 text-[#4B5563] group-hover:text-blue-600 transition-colors" />
-          <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-white translate-x-0.5 -translate-y-0.5"></span>
+        <div className="relative" ref={notifRef}>
+          <div 
+            className="cursor-pointer group p-2 hover:bg-gray-50 rounded-full transition-colors"
+            onClick={() => {
+              setIsNotificationsOpen(!isNotificationsOpen);
+              if (!isNotificationsOpen && notifications.some(n => !n.isRead)) {
+                markAllAsRead();
+              }
+            }}
+          >
+            <Bell className="w-5 h-5 text-[#4B5563] group-hover:text-blue-600 transition-colors" />
+            {notifications.some(n => !n.isRead) && (
+              <span className="absolute top-1 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+            )}
+          </div>
+
+          {/* Notifications Dropdown */}
+          {isNotificationsOpen && (
+            <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-[0px_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-200 z-50">
+              <div className="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
+                <p className="text-sm font-black text-gray-900">Notificaciones</p>
+                <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
+                  {notifications.filter(n => !n.isRead).length} nuevas
+                </span>
+              </div>
+              <div className="max-h-[300px] overflow-y-auto">
+                {notifications.length > 0 ? (
+                  notifications.map((notif) => (
+                    <div key={notif.id} className={`p-4 border-b border-gray-50 flex gap-3 hover:bg-gray-50/50 transition-colors ${!notif.isRead ? 'bg-blue-50/20' : ''}`}>
+                      <div className="mt-1">
+                        {notif.module === 'AUTH' ? (
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${notif.action === 'SECURITY_ALERT' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
+                            <User className="w-4 h-4" />
+                          </div>
+                        ) : notif.module === 'USERS' ? (
+                          <div className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+                            <SettingsIcon className="w-4 h-4" />
+                          </div>
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center">
+                            <Bell className="w-4 h-4" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-gray-900 leading-tight mb-1">{notif.description}</p>
+                        <p className="text-xs text-gray-500 font-medium">{new Date(notif.createdAt).toLocaleString()}</p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-6 text-center text-sm font-medium text-gray-400">
+                    No tienes notificaciones
+                  </div>
+                )}
+              </div>
+              <div className="p-3 border-t border-gray-50 text-center bg-gray-50/50">
+                <Link 
+                  href="/dashboard/audit" 
+                  onClick={() => setIsNotificationsOpen(false)}
+                  className="text-xs font-black text-blue-600 hover:text-blue-700 transition-colors uppercase tracking-widest"
+                >
+                  Ver Todo El Historial
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* User Profile Area */}

@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { AuditService } from './audit.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { PermissionsGuard } from '../auth/permissions.guard.js';
@@ -27,5 +27,17 @@ export class AuditController {
       endDate,
       search,
     });
+  }
+
+  @Get('notifications')
+  @RequirePermissions('audit:read')
+  async getNotifications() {
+    return this.auditService.getNotifications();
+  }
+
+  @Post('mark-read')
+  @RequirePermissions('audit:update')
+  async markAllAsRead() {
+    return this.auditService.markAllAsRead();
   }
 }

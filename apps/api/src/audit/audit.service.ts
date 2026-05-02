@@ -72,4 +72,23 @@ export class AuditService {
       take: 200 // Limit for performance
     });
   }
+
+  async getNotifications() {
+    return (this.prisma as any).auditLog.findMany({
+      take: 10,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: {
+          select: { name: true, avatarUrl: true }
+        }
+      }
+    });
+  }
+
+  async markAllAsRead() {
+    return (this.prisma as any).auditLog.updateMany({
+      where: { isRead: false },
+      data: { isRead: true }
+    });
+  }
 }
