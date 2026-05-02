@@ -44,6 +44,19 @@ export default function SettingsPage() {
     }, []);
 
     useEffect(() => {
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            const user = JSON.parse(userStr);
+            const roleName = typeof user.role === 'object' ? user.role?.name : user.role;
+            if (roleName !== 'Administrador' && roleName !== 'ADMIN') {
+                window.location.href = '/dashboard';
+                return;
+            }
+        } else {
+            window.location.href = '/login';
+            return;
+        }
+
         if (settings) {
             setFormData(settings);
         }

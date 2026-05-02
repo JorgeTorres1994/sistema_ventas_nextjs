@@ -47,6 +47,11 @@ export const login = async (credentials: any) => {
   return response.data;
 };
 
+export const register = async (userData: any) => {
+  const response = await api.post('/auth/register', userData);
+  return response.data;
+};
+
 export const getDashboardData = async () => {
   try {
     const response = await api.get('/reports/dashboard');

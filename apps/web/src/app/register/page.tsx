@@ -6,6 +6,7 @@ import AuthInput from '@/components/ui/AuthInput';
 import AuthButton from '@/components/ui/AuthButton';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { register } from '@/lib/api';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -33,13 +34,17 @@ export default function RegisterPage() {
     }
 
     try {
-      // Simulating registration process
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await register({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password
+      });
       toast.success('Cuenta creada exitosamente. Redirigiendo...');
       router.push('/login');
     } catch (err: any) {
-      console.error('Registration failed:', err);
-      setError('Error al crear la cuenta. Inténtalo de nuevo.');
+      const msg = err.response?.data?.message || 'Error al crear la cuenta. Inténtalo de nuevo.';
+      console.log('Registration failed:', msg);
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -166,14 +171,14 @@ export default function RegisterPage() {
             </div>
 
             {/* Social Actions */}
-            <div className="grid grid-cols-2 gap-4">
-              <button className="flex items-center justify-center gap-2 h-11 border border-outline-variant/40 rounded-xl hover:bg-surface-low transition-colors duration-200 group">
+            <div className="w-full">
+              <button 
+                type="button"
+                onClick={() => window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}/auth/google`}
+                className="w-full flex items-center justify-center gap-2 h-11 border border-outline-variant/40 rounded-xl hover:bg-surface-low transition-colors duration-200 group"
+              >
                 <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBt5pmd53KAQzwKqL8pzJb1N15hcDxI9iJtW_AKNIkjU8qbynrAkK6xXi41SgaXlufv_prrJPe_i_JwjrRS_-GOJc62i9EDaUjYXeLXo-8elyWJTsEHQkmMO1jvbwK4Y5LYNnTYqX7yXCSW7mE4a60zHy7gPaT-sCwlMB7muHRmnVuxF1AB8ndz_URLKyHo8Eyryx4ux3LVN43JurJpjDLxML0gxsf-lziMN3UkwTWqE6LzF91jxw3zmFjESRwU5w3I4gS11X47yP0" alt="Google" className="w-5 h-5 opacity-80 group-hover:opacity-100" />
-                <span className="text-sm font-semibold text-foreground">Google</span>
-              </button>
-              <button className="flex items-center justify-center gap-2 h-11 border border-outline-variant/40 rounded-xl hover:bg-surface-low transition-colors duration-200 group">
-                <span className="material-symbols-outlined text-xl text-on-surface-variant group-hover:text-foreground">terminal</span>
-                <span className="text-sm font-semibold text-foreground">GitHub</span>
+                <span className="text-sm font-semibold text-foreground">Continuar con Google</span>
               </button>
             </div>
           </div>

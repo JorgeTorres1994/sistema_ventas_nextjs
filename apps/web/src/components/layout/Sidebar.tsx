@@ -159,7 +159,7 @@ const Sidebar = () => {
       </div>
 
       <div className="p-4 border-t border-[#E5E7EB] space-y-1">
-        {hasPermission('settings') && (
+        {isAdmin && (
           <Link href="/dashboard/settings">
             <div className={`flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-colors ${
               pathname === '/dashboard/settings'

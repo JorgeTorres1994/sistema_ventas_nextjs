@@ -116,6 +116,9 @@ export default function ProfilePage() {
   }
 
   const userInitial = user?.name?.charAt(0) || 'U';
+  const roleName = typeof user?.role === 'object' ? user?.role?.name : user?.role;
+  const isAdmin = roleName === 'Administrador' || roleName === 'ADMIN';
+
   const displayAvatar = formData.avatarUrl
     ? (formData.avatarUrl.startsWith('http') ? formData.avatarUrl : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}${formData.avatarUrl}`)
     : null;
@@ -151,9 +154,9 @@ export default function ProfilePage() {
                           )}
                         </div>
                       </div>
-                      <label className="absolute bottom-2 -right-2 w-10 h-10 bg-white rounded-xl shadow-lg border border-gray-100 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all group-hover:scale-110 active:scale-95">
+                      <label className={`absolute bottom-2 -right-2 w-10 h-10 bg-white rounded-xl shadow-lg border border-gray-100 flex items-center justify-center transition-all group-hover:scale-110 active:scale-95 ${!isAdmin ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-gray-50'}`}>
                         <Camera className="w-5 h-5 text-blue-600" />
-                        <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} />
+                        <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} disabled={!isAdmin} />
                       </label>
                     </div>
                     <div className="mb-2">
@@ -185,7 +188,8 @@ export default function ProfilePage() {
                               name="name"
                               value={formData.name}
                               onChange={handleInputChange}
-                              className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-[20px] focus:bg-white focus:border-blue-500 transition-all outline-none font-bold text-gray-700 shadow-sm"
+                              disabled={!isAdmin}
+                              className={`w-full px-5 py-4 border border-transparent rounded-[20px] focus:outline-none transition-all font-bold text-gray-700 shadow-sm ${!isAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-gray-50 focus:bg-white focus:border-blue-500'}`}
                               placeholder="Ingrese su nombre"
                             />
                           </div>
@@ -221,7 +225,8 @@ export default function ProfilePage() {
                             placeholder="••••••••"
                             value={formData.password}
                             onChange={handleInputChange}
-                            className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-[20px] focus:bg-white focus:border-blue-500 transition-all outline-none font-bold text-gray-700 shadow-sm"
+                            disabled={!isAdmin}
+                            className={`w-full px-5 py-4 border border-transparent rounded-[20px] focus:outline-none transition-all font-bold text-gray-700 shadow-sm ${!isAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-gray-50 focus:bg-white focus:border-blue-500'}`}
                           />
                         </div>
                         <div>
@@ -232,7 +237,8 @@ export default function ProfilePage() {
                             placeholder="••••••••"
                             value={formData.confirmPassword}
                             onChange={handleInputChange}
-                            className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-[20px] focus:bg-white focus:border-blue-500 transition-all outline-none font-bold text-gray-700 shadow-sm"
+                            disabled={!isAdmin}
+                            className={`w-full px-5 py-4 border border-transparent rounded-[20px] focus:outline-none transition-all font-bold text-gray-700 shadow-sm ${!isAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-gray-50 focus:bg-white focus:border-blue-500'}`}
                           />
                         </div>
                       </div>
@@ -250,11 +256,11 @@ export default function ProfilePage() {
                   </button>
                   <button
                     type="submit"
-                    disabled={saving}
-                    className="px-12 py-4 bg-blue-600 text-white font-black text-xs uppercase tracking-[0.2em] rounded-[22px] hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-3"
+                    disabled={saving || !isAdmin}
+                    className={`px-12 py-4 text-white font-black text-xs uppercase tracking-[0.2em] rounded-[22px] shadow-xl transition-all flex items-center gap-3 ${(!isAdmin || saving) ? 'bg-gray-400 cursor-not-allowed shadow-none' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-100 active:scale-95'}`}
                   >
-                    {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                    Actualizar Perfil
+                    {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : (!isAdmin ? <Lock className="w-5 h-5" /> : <Save className="w-5 h-5" />)}
+                    {isAdmin ? 'Actualizar Perfil' : 'Solo Lectura'}
                   </button>
                 </div>
             </section>

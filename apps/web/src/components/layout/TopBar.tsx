@@ -76,6 +76,9 @@ const TopBar = () => {
     ? (user.avatarUrl.startsWith('http') ? user.avatarUrl : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}${user.avatarUrl}`)
     : null;
 
+  const roleName = typeof user?.role === 'object' ? user?.role?.name : user?.role;
+  const isAdmin = roleName === 'Administrador' || roleName === 'ADMIN';
+
   return (
     <header className="h-[88px] border-b border-[#E5E7EB] bg-white flex items-center justify-between px-8 w-full sticky top-0 z-30">
       <div className="relative w-96">
@@ -212,16 +215,18 @@ const TopBar = () => {
                   </div>
                   Mi Perfil
                 </Link>
-                <Link 
-                  href="/dashboard/settings"
-                  onClick={() => setIsDropdownOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-gray-600 hover:bg-indigo-50 hover:text-indigo-700 rounded-xl transition-all group"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-100">
-                    <SettingsIcon className="w-4 h-4" />
-                  </div>
-                  Configuración
-                </Link>
+                {isAdmin && (
+                  <Link 
+                    href="/dashboard/settings"
+                    onClick={() => setIsDropdownOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-gray-600 hover:bg-indigo-50 hover:text-indigo-700 rounded-xl transition-all group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-100">
+                      <SettingsIcon className="w-4 h-4" />
+                    </div>
+                    Configuración
+                  </Link>
+                )}
               </div>
               <div className="p-2 border-t border-gray-50">
                 <button 

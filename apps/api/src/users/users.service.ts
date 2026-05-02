@@ -23,6 +23,10 @@ export class UsersService {
         });
     }
 
+    async count(): Promise<number> {
+        return this.prisma.user.count();
+    }
+
     async findAll(filters: { search?: string; roleId?: string; isActive?: boolean } = {}): Promise<User[]> {
         const { search, roleId, isActive } = filters;
         return this.prisma.user.findMany({
