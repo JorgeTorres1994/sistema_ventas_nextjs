@@ -111,7 +111,10 @@ export default function LoginPage() {
 
             {/* Social Actions */}
             <div className="grid grid-cols-2 gap-4">
-              <button className="flex items-center justify-center gap-2 h-11 border border-outline-variant/40 rounded-xl hover:bg-surface-low transition-colors duration-200 group">
+              <button 
+                onClick={() => window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}/auth/google`}
+                className="flex items-center justify-center gap-2 h-11 border border-outline-variant/40 rounded-xl hover:bg-surface-low transition-colors duration-200 group"
+              >
                 <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBt5pmd53KAQzwKqL8pzJb1N15hcDxI9iJtW_AKNIkjU8qbynrAkK6xXi41SgaXlufv_prrJPe_i_JwjrRS_-GOJc62i9EDaUjYXeLXo-8elyWJTsEHQkmMO1jvbwK4Y5LYNnTYqX7yXCSW7mE4a60zHy7gPaT-sCwlMB7muHRmnVuxF1AB8ndz_URLKyHo8Eyryx4ux3LVN43JurJpjDLxML0gxsf-lziMN3UkwTWqE6LzF91jxw3zmFjESRwU5w3I4gS11X47yP0" alt="Google" className="w-5 h-5 opacity-80 group-hover:opacity-100" />
                 <span className="text-sm font-semibold text-foreground">Google</span>
               </button>
