@@ -62,15 +62,18 @@ export class AuthService {
         let user = await this.usersService.findByEmail(email);
 
         if (!user) {
-            // Asignar rol de Vendedor por defecto
-            const role = await (this.usersService as any).prisma.role.findUnique({ where: { name: 'Vendedor' } });
+            // Buscar el rol de Vendedor por defecto
+            const roles = await (this.usersService as any).prisma.role.findMany({
+                where: { name: { contains: 'Vendedor', mode: 'insensitive' } }
+            });
+            const roleId = roles.length > 0 ? roles[0].id : undefined;
             
             user = await this.usersService.create({
                 email,
                 name: `${firstName} ${lastName}`,
                 password: '', // Sin contraseña para OAuth
                 avatarUrl: picture,
-                roleId: role?.id,
+                role: roleId ? { connect: { id: roleId } } : undefined,
             });
         }
 
