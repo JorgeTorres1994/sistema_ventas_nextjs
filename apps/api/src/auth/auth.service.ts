@@ -118,6 +118,7 @@ export class AuthService {
                 name: user.name,
                 role: roleName,
                 permissions,
+                avatarUrl: user.avatarUrl,
             },
             access_token: await this.jwtService.signAsync(payload),
         };
@@ -284,6 +285,7 @@ export class AuthService {
                 name: user.name,
                 role: roleName,
                 permissions,
+                avatarUrl: user.avatarUrl,
             },
             access_token: await this.jwtService.signAsync(payload),
         };

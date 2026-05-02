@@ -466,6 +466,9 @@ export const getMe = async () => {
   console.log('DEBUG USER DATA:', response.data);
   const sanitized = sanitizeUser(response.data);
   localStorage.setItem('user', JSON.stringify(sanitized));
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('storage'));
+  }
   return sanitized;
 };
 
