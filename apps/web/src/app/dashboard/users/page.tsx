@@ -106,10 +106,19 @@ export default function UsersPage() {
         setLoadingAction(true);
         const toastId = toast.loading('Actualizando permisos...');
         try {
-            await updateUser(selectedUser.id, {
+            const payload: any = {
                 name: formData.name,
                 roleId: formData.roleId
-            });
+            };
+            if (formData.password && formData.password.trim().length >= 6) {
+                payload.password = formData.password;
+            } else if (formData.password && formData.password.trim().length > 0 && formData.password.trim().length < 6) {
+                toast.error('La nueva contraseña debe tener al menos 6 caracteres', { id: toastId });
+                setLoadingAction(false);
+                return;
+            }
+            
+            await updateUser(selectedUser.id, payload);
             toast.success('Usuario actualizado correctamente', { id: toastId });
             setIsEditModalOpen(false);
             fetchData();
@@ -138,7 +147,8 @@ export default function UsersPage() {
             name: user.name, 
             email: user.email, 
             password: '', 
-            roleId: user.roleId || '' 
+            roleId: user.roleId || '',
+            authProvider: user.authProvider || 'EMAIL'
         });
         setIsEditModalOpen(true);
     };
@@ -395,20 +405,25 @@ export default function UsersPage() {
                                 </div>
                             </div>
 
-                            {isAddModalOpen && formData.authProvider === 'EMAIL' && (
+                            {(isAddModalOpen || isEditModalOpen) && formData.authProvider === 'EMAIL' && (
                                 <div className="space-y-2">
-                                    <label className="block text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Contraseña</label>
+                                    <label className="block text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">
+                                        {isEditModalOpen ? 'Nueva Contraseña' : 'Contraseña'}
+                                    </label>
                                     <div className="relative">
                                         <Key className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4" />
                                         <input 
                                             type="password" 
                                             className="w-full pl-12 pr-6 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-bold shadow-sm"
-                                            placeholder="••••••••"
+                                            placeholder={isEditModalOpen ? '(Opcional) Cambiar contraseña' : '••••••••'}
                                             required={isAddModalOpen}
                                             value={formData.password}
                                             onChange={(e) => setFormData({...formData, password: e.target.value})}
                                         />
                                     </div>
+                                    {isEditModalOpen && (
+                                        <p className="text-[10px] text-gray-400 ml-2">Deje en blanco si no desea cambiar la contraseña actual del usuario.</p>
+                                    )}
                                 </div>
                             )}
 
