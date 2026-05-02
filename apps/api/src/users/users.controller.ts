@@ -132,10 +132,12 @@ export class UsersController {
     @Put(':id')
     @RequirePermissions('users:update')
     async update(@Param('id') id: string, @Body() data: any, @Request() req: any) {
+        console.log(`[UPDATE USER] ID: ${id}, Payload:`, data);
         const { password, email, ...updateData } = data;
         
         if (password) {
             updateData.password = await bcrypt.hash(password, 10);
+            console.log(`[UPDATE USER] Contraseña hasheada lista para guardar.`);
         }
 
         const user = await this.usersService.update(id, updateData);
