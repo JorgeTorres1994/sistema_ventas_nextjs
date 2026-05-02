@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import AuthInput from '@/components/ui/AuthInput';
 import AuthButton from '@/components/ui/AuthButton';
@@ -8,7 +8,7 @@ import { login } from '@/lib/api';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
@@ -76,7 +76,7 @@ export default function LoginPage() {
                 id="email"
                 label="Correo Electrónico"
                 type="email"
-                placeholder="Ingresa tu correo"
+                placeholder="admin@admin.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 successIcon={email === 'admin@admin.com'}
@@ -164,5 +164,13 @@ export default function LoginPage() {
         </div>
       </footer>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
