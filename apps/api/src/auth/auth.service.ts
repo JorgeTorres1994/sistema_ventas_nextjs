@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/co
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service.js';
 import { AuditService } from '../audit/audit.service.js';
+import { EmailService } from './email.service.js';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -12,6 +13,7 @@ export class AuthService {
         private usersService: UsersService,
         private jwtService: JwtService,
         private auditService: AuditService,
+        private emailService: EmailService,
     ) { }
 
     async forgotPassword(email: string) {
@@ -26,10 +28,18 @@ export class AuthService {
         if (isAdmin) {
             const code = Math.floor(100000 + Math.random() * 900000).toString();
             this.resetCodes.set(email, code);
-            console.log(`\n\n=========================================\n[SMS SIMULADO para ${email}]:\nTu código de recuperación es: ${code}\n=========================================\n\n`);
+            
+            // Log local para respaldo
+            console.log(`\n\n=========================================\n[LOG para ${email}]:\nTu código de recuperación es: ${code}\n=========================================\n\n`);
+            
+            // Envío vía Email
+            const sent = await this.emailService.sendVerificationCode(email, code);
+
             return { 
                 status: 'CODE_SENT', 
-                message: 'Se ha enviado un código de 6 dígitos a tu dispositivo móvil/correo.'
+                message: sent 
+                    ? 'Se ha enviado un código de seguridad a tu correo electrónico.' 
+                    : 'Se ha generado un código de seguridad (Ver consola del servidor).'
             };
         } else {
             await this.auditService.logAction(

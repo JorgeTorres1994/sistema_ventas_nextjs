@@ -7,6 +7,8 @@ import { JwtStrategy } from './jwt.strategy.js';
 import { GoogleStrategy } from './google.strategy.js';
 import { UsersModule } from '../users/users.module.js';
 
+import { EmailService } from './email.service.js';
+
 @Module({
   imports: [
     PassportModule,
@@ -16,7 +18,7 @@ import { UsersModule } from '../users/users.module.js';
       signOptions: { expiresIn: '7d' },
     }),
   ],
-  providers: [AuthService, JwtStrategy, GoogleStrategy],
+  providers: [AuthService, JwtStrategy, GoogleStrategy, EmailService],
   controllers: [AuthController],
   exports: [AuthService],
 })
