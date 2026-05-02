@@ -66,6 +66,8 @@ model User {
   createdAt      DateTime?      @default(now())
   updatedAt      DateTime       @updatedAt
   roleId         String?
+  authProvider   String?        @default("EMAIL")
+  authProviderId String?
 
   role           Role?          @relation(fields: [roleId], references: [id])
   sales          Sale[]
@@ -320,6 +322,7 @@ model AuditLog {
   details     Json?     // Almacenar el payload o cambios
   ipAddress   String?
   userAgent   String?
+  isRead      Boolean   @default(false)
   createdAt   DateTime? @default(now())
 
   user        User?     @relation(fields: [userId], references: [id])

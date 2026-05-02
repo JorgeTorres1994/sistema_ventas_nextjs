@@ -7,7 +7,7 @@ import TopBar from '@/components/layout/TopBar';
 import { 
     Users, User as UserIcon, Search, Download, 
     UserPlus, Shield, ShieldCheck, UserX, UserCheck, Key, 
-    Trash2, X, MoreVertical, Building2
+    Trash2, X, MoreVertical, Building2, Mail
 } from 'lucide-react';
 import { getUsers, createUser, updateUser, toggleUserStatus, getRoles } from '@/lib/api';
 import { toast } from 'sonner';
@@ -29,7 +29,8 @@ export default function UsersPage() {
         name: '', 
         email: '', 
         password: '', 
-        roleId: '' 
+        roleId: '',
+        authProvider: 'EMAIL'
     });
     const [loadingAction, setLoadingAction] = useState(false);
 
@@ -77,7 +78,9 @@ export default function UsersPage() {
         if (!formData.name.trim()) return toast.error('El nombre es obligatorio');
         if (!formData.email.trim()) return toast.error('El correo es obligatorio');
         if (!formData.roleId) return toast.error('Debe asignar un rol');
-        if (formData.password.length < 6) return toast.error('La contraseña debe tener al menos 6 caracteres');
+        if (formData.authProvider === 'EMAIL' && formData.password.length < 6) {
+            return toast.error('La contraseña debe tener al menos 6 caracteres');
+        }
 
         setLoadingAction(true);
         const toastId = toast.loading('Registrando nuevo usuario...');
@@ -85,7 +88,7 @@ export default function UsersPage() {
             await createUser(formData);
             toast.success('Usuario creado correctamente', { id: toastId });
             setIsAddModalOpen(false);
-            setFormData({ name: '', email: '', password: '', roleId: '' });
+            setFormData({ name: '', email: '', password: '', roleId: '', authProvider: 'EMAIL' });
             fetchData();
         } catch (error: any) {
             const msg = error.response?.data?.message || 'Error al crear usuario';
@@ -221,7 +224,7 @@ export default function UsersPage() {
                             
                             <button 
                                 onClick={() => {
-                                    setFormData({ name: '', email: '', password: '', roleId: '' });
+                                    setFormData({ name: '', email: '', password: '', roleId: '', authProvider: 'EMAIL' });
                                     setIsAddModalOpen(true);
                                 }}
                                 className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
@@ -238,6 +241,7 @@ export default function UsersPage() {
                                     <tr className="bg-gray-50/50">
                                         <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Nombre del Miembro</th>
                                         <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Rol Asignado</th>
+                                        <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Acceso</th>
                                         <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Estado</th>
                                         <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB] text-right">Acciones</th>
                                     </tr>
@@ -245,13 +249,13 @@ export default function UsersPage() {
                                 <tbody>
                                     {isLoading ? (
                                         <tr>
-                                            <td colSpan={4} className="px-8 py-20 text-center">
+                                            <td colSpan={5} className="px-8 py-20 text-center">
                                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
                                             </td>
                                         </tr>
                                     ) : users.length === 0 ? (
                                         <tr>
-                                            <td colSpan={4} className="px-8 py-20 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">
+                                            <td colSpan={5} className="px-8 py-20 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">
                                                 No se encontraron resultados
                                             </td>
                                         </tr>
@@ -275,6 +279,21 @@ export default function UsersPage() {
                                                     }`}>
                                                         {user.role?.name || 'Sin Rol'}
                                                     </span>
+                                                </td>
+                                                <td className="px-8 py-5">
+                                                    <div className="flex items-center gap-2">
+                                                        {user.authProvider === 'GOOGLE' ? (
+                                                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-700 rounded-lg border border-amber-100/50">
+                                                                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div>
+                                                                <span className="text-[10px] font-bold uppercase tracking-tight">Google</span>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 text-slate-500 rounded-lg border border-slate-100">
+                                                                <Mail className="w-3 h-3" />
+                                                                <span className="text-[10px] font-bold uppercase tracking-tight">Email</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </td>
                                                 <td className="px-8 py-5">
                                                     <div className="flex items-center gap-2">
@@ -348,7 +367,35 @@ export default function UsersPage() {
                                 </div>
                             )}
 
-                            {isAddModalOpen && (
+                            <div className="space-y-2">
+                                <label className="block text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Método de Acceso</label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button 
+                                        type="button"
+                                        onClick={() => setFormData({...formData, authProvider: 'EMAIL'})}
+                                        className={`py-3 rounded-2xl text-xs font-bold transition-all border ${
+                                            formData.authProvider === 'EMAIL' 
+                                            ? 'bg-slate-900 text-white border-slate-900 shadow-lg shadow-slate-200' 
+                                            : 'bg-gray-50 text-gray-500 border-transparent hover:bg-gray-100'
+                                        }`}
+                                    >
+                                        Email y Clave
+                                    </button>
+                                    <button 
+                                        type="button"
+                                        onClick={() => setFormData({...formData, authProvider: 'GOOGLE'})}
+                                        className={`py-3 rounded-2xl text-xs font-bold transition-all border ${
+                                            formData.authProvider === 'GOOGLE' 
+                                            ? 'bg-amber-500 text-white border-amber-500 shadow-lg shadow-amber-100' 
+                                            : 'bg-gray-50 text-gray-500 border-transparent hover:bg-gray-100'
+                                        }`}
+                                    >
+                                        Google OAuth
+                                    </button>
+                                </div>
+                            </div>
+
+                            {isAddModalOpen && formData.authProvider === 'EMAIL' && (
                                 <div className="space-y-2">
                                     <label className="block text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Contraseña</label>
                                     <div className="relative">

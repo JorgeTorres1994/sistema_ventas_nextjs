@@ -19,6 +19,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { UsersService } from './users.service.js';
+import { AuditService } from '../audit/audit.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { PermissionsGuard } from '../auth/permissions.guard.js';
 import { RequirePermissions } from '../auth/permissions.decorator.js';
@@ -27,7 +28,10 @@ import * as bcrypt from 'bcrypt';
 @Controller('users')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 export class UsersController {
-    constructor(private readonly usersService: UsersService) { }
+    constructor(
+        private readonly usersService: UsersService,
+        private readonly auditService: AuditService,
+    ) { }
 
     @Get()
     @RequirePermissions('users:read')
@@ -94,22 +98,40 @@ export class UsersController {
 
     @Post()
     @RequirePermissions('users:create')
-    async create(@Body() data: any) {
+    async create(@Body() data: any, @Request() req: any) {
         const existing = await this.usersService.findByEmail(data.email);
-        if (existing) throw new ConflictException('Email already registered');
+        if (existing) throw new ConflictException('El correo ya está registrado');
 
-        const hashedPassword = await bcrypt.hash(data.password, 10);
+        const { password, ...userData } = data;
+        let hashedPassword = '';
+        
+        if (data.authProvider === 'GOOGLE') {
+            hashedPassword = ''; // No requiere password
+        } else {
+            hashedPassword = await bcrypt.hash(password || '', 10);
+        }
+
         const user = await this.usersService.create({
-            ...data,
+            ...userData,
             password: hashedPassword,
-        });
-        const { password, ...result } = user;
+        } as any);
+
+        await this.auditService.logAction(
+            (req as any).user.userId,
+            'USERS',
+            'CREATE',
+            `Usuario creado manualmente: ${user.email} (${user.name})`,
+            { userId: user.id, email: user.email },
+            req as any
+        );
+        
+        const { password: _, ...result } = user;
         return result;
     }
 
     @Put(':id')
     @RequirePermissions('users:update')
-    async update(@Param('id') id: string, @Body() data: any) {
+    async update(@Param('id') id: string, @Body() data: any, @Request() req: any) {
         const { password, email, ...updateData } = data;
         
         if (password) {
@@ -117,14 +139,35 @@ export class UsersController {
         }
 
         const user = await this.usersService.update(id, updateData);
+
+        await this.auditService.logAction(
+            (req as any).user.userId,
+            'USERS',
+            'UPDATE',
+            `Usuario actualizado: ${user.email}`,
+            { userId: user.id, updates: updateData },
+            req as any
+        );
+
         const { password: _, ...result } = user;
         return result;
     }
 
     @Patch(':id/status')
     @RequirePermissions('users:update')
-    async toggleStatus(@Param('id') id: string) {
-        return this.usersService.toggleStatus(id);
+    async toggleStatus(@Param('id') id: string, @Request() req: any) {
+        const user = await this.usersService.toggleStatus(id);
+
+        await this.auditService.logAction(
+            (req as any).user.userId,
+            'USERS',
+            'STATUS_TOGGLE',
+            `Estado del usuario ${user.email} cambiado a ${user.isActive ? 'ACTIVO' : 'INACTIVO'}`,
+            { userId: user.id, isActive: user.isActive },
+            req as any
+        );
+
+        return user;
     }
 
     @Delete(':id')
