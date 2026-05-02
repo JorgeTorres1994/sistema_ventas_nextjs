@@ -75,10 +75,35 @@ export class AuthService {
                 avatarUrl: picture,
                 role: roleId ? { connect: { id: roleId } } : undefined,
             });
+        } else {
+            // Actualizar avatar si cambió o no tenía
+            if (!user.avatarUrl || user.avatarUrl !== picture) {
+                user = await this.usersService.update(user.id, { avatarUrl: picture });
+            }
         }
 
         const roleName = (user as any).role?.name || 'Vendedor';
-        const permissions = (user as any).role?.permissions?.map((rp: any) => rp.permission.name) || [];
+        let permissions = [];
+        
+        // Extraer permisos de la relación si existe
+        if ((user as any).role?.permissions) {
+            permissions = (user as any).role?.permissions.map((rp: any) => rp.permission?.name || rp.permissionId);
+        }
+
+        // Fallback: Si el rol no tiene permisos configurados, dar acceso básico de Vendedor
+        if (permissions.length === 0) {
+            permissions = [
+                'dashboard:read', 
+                'pos:read', 
+                'cash:read', 
+                'sales:read', 
+                'products:read', 
+                'inventory:read', 
+                'customers:read',
+                'expenses:read',
+                'credits:read'
+            ];
+        }
 
         const payload = { sub: user.id, email: user.email, role: roleName, permissions };
         return {

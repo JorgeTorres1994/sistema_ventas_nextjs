@@ -42,12 +42,35 @@ export class UsersService {
     async findById(id: string): Promise<User | null> {
         return this.prisma.user.findUnique({ 
             where: { id },
-            include: { role: true }
+            include: { 
+                role: {
+                    include: {
+                        permissions: {
+                            include: {
+                                permission: true
+                            }
+                        }
+                    }
+                }
+            }
         });
     }
 
     async create(data: Prisma.UserCreateInput): Promise<User> {
-        return this.prisma.user.create({ data });
+        return this.prisma.user.create({ 
+            data,
+            include: { 
+                role: {
+                    include: {
+                        permissions: {
+                            include: {
+                                permission: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
     async update(id: string, data: Prisma.UserUpdateInput): Promise<User> {

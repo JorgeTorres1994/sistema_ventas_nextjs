@@ -8,9 +8,17 @@ const api = axios.create({
 const sanitizeUser = (user: any) => {
   if (!user) return user;
   const sanitized = { ...user };
+  
+  // Handle role as string and extract name if object
   if (typeof user.role === 'object' && user.role !== null) {
     sanitized.role = user.role.name || 'Usuario';
+    
+    // Flatten permissions if they exist in the role object
+    if (user.role.permissions && Array.isArray(user.role.permissions)) {
+      sanitized.permissions = user.role.permissions.map((p: any) => p.permission?.name || p.permissionId);
+    }
   }
+  
   return sanitized;
 };
 
