@@ -8,9 +8,9 @@ import {
   Search, UserPlus, ChevronLeft, ChevronRight, MoreVertical,
   X, Mail, Phone, MapPin, ShoppingBag, TrendingUp, Calendar,
   User, Hash, CheckCircle, AlertCircle, Edit2, ToggleLeft,
-  ToggleRight
+  ToggleRight, Users, UserCheck, UserMinus
 } from 'lucide-react';
-import { getCustomers, getCustomerById, toggleCustomerStatus } from '@/lib/api';
+import { getCustomers, getCustomerById, toggleCustomerStatus, getCustomerStats } from '@/lib/api';
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 function initials(name: string) {
@@ -28,7 +28,7 @@ function StatusBadge({ isActive }: { isActive: boolean }) {
   return isActive ? (
     <span className="px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-50 text-emerald-700 border border-emerald-100">Activo</span>
   ) : (
-    <span className="px-2.5 py-1 rounded-full text-[11px] font-black bg-gray-50 text-gray-400 border border-gray-100">Inactivo</span>
+    <span className="px-2.5 py-1 rounded-full text-[11px] font-black bg-rose-50 text-rose-600 border border-rose-100">Inactivo</span>
   );
 }
 
@@ -49,10 +49,12 @@ function CustomerDetailDrawer({
   customerId,
   onClose,
   onEdit,
+  onStatusChange
 }: {
   customerId: string;
   onClose: () => void;
   onEdit: (c: any) => void;
+  onStatusChange?: () => void;
 }) {
   const router = useRouter();
   const [customer, setCustomer] = useState<any>(null);
@@ -72,6 +74,7 @@ function CustomerDetailDrawer({
     try {
       const updated = await toggleCustomerStatus(customerId);
       setCustomer((prev: any) => ({ ...prev, isActive: updated.isActive }));
+      if (onStatusChange) onStatusChange();
     } catch (e) { console.error(e); }
     finally { setToggling(false); }
   };
@@ -106,7 +109,7 @@ function CustomerDetailDrawer({
               <div className="flex justify-center mb-4">
                 <div className="relative">
                   <Avatar name={customer.name} size="lg" />
-                  <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-white ${customer.isActive ? 'bg-emerald-400' : 'bg-gray-300'}`} />
+                  <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-white ${customer.isActive ? 'bg-emerald-400' : 'bg-rose-400'}`} />
                 </div>
               </div>
               <h2 className="text-xl font-black text-gray-900">{customer.name}</h2>
@@ -250,6 +253,7 @@ export default function CustomersPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, withPurchases: 0 });
 
   const LIMIT = 10;
   const totalPages = Math.max(1, Math.ceil(total / LIMIT));
@@ -264,6 +268,9 @@ export default function CustomersPage() {
       const res = await getCustomers(params);
       setCustomers(res.data);
       setTotal(res.total);
+      
+      const statsRes = await getCustomerStats();
+      setStats(statsRes);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
   }, [page, search, statusFilter]);
@@ -329,6 +336,49 @@ export default function CustomersPage() {
             </select>
           </div>
 
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 group hover:shadow-md transition-all">
+              <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <Users className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Total Clientes</p>
+                <h3 className="text-2xl font-black text-gray-900">{stats.total}</h3>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 group hover:shadow-md transition-all">
+              <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <UserCheck className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Activos</p>
+                <h3 className="text-2xl font-black text-emerald-600">{stats.active}</h3>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 group hover:shadow-md transition-all">
+              <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <UserMinus className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Inactivos</p>
+                <h3 className="text-2xl font-black text-rose-600">{stats.inactive}</h3>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 group hover:shadow-md transition-all">
+              <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <ShoppingBag className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Con Compras</p>
+                <h3 className="text-2xl font-black text-amber-600">{stats.withPurchases}</h3>
+              </div>
+            </div>
+          </div>
+
           {/* Table */}
           <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="px-6 py-3 bg-gray-50/50 border-b border-gray-50 flex items-center justify-between">
@@ -368,14 +418,13 @@ export default function CustomersPage() {
                 ) : (
                   customers.map(customer => (
                     <tr key={customer.id}
-                      className="hover:bg-gray-50/60 transition-colors cursor-pointer group"
-                      onClick={() => setSelectedId(customer.id)}>
+                      className="hover:bg-gray-50/60 transition-colors group">
                       {/* Name */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="relative">
                             <Avatar name={customer.name} />
-                            <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${customer.isActive ? 'bg-emerald-400' : 'bg-gray-300'}`} />
+                            <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${customer.isActive ? 'bg-emerald-400' : 'bg-rose-400'}`} />
                           </div>
                           <div>
                             <p className="font-black text-sm text-gray-900">{customer.name}</p>
@@ -448,6 +497,7 @@ export default function CustomersPage() {
           customerId={selectedId}
           onClose={() => setSelectedId(null)}
           onEdit={(c) => { setSelectedId(null); router.push(`/dashboard/customers/${c.id}/edit`); }}
+          onStatusChange={fetchData}
         />
       )}
     </div>

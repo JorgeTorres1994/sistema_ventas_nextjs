@@ -114,4 +114,19 @@ export class CustomersService {
             data: { isActive: !customer.isActive },
         });
     }
+
+    async getStats() {
+        const [total, active, inactive, withPurchases] = await Promise.all([
+            this.prisma.customer.count(),
+            this.prisma.customer.count({ where: { isActive: true } }),
+            this.prisma.customer.count({ where: { isActive: false } }),
+            this.prisma.customer.count({ 
+                where: { 
+                    sales: { some: {} } 
+                } 
+            }),
+        ]);
+
+        return { total, active, inactive, withPurchases };
+    }
 }

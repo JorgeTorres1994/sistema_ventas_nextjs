@@ -285,6 +285,11 @@ export const toggleCustomerStatus = async (id: string) => {
   return response.data;
 };
 
+export const getCustomerStats = async () => {
+  const response = await api.get('/customers/stats/summary');
+  return response.data;
+};
+
 // --- Supplier Management ---
 
 export const getSuppliers = async (params: {

@@ -63,4 +63,9 @@ export class CustomersController {
         // Soft delete — set isActive to false instead of physical deletion
         return this.customersService.update(id, { isActive: false });
     }
+
+    @Get('stats/summary')
+    getStats() {
+        return this.customersService.getStats();
+    }
 }
