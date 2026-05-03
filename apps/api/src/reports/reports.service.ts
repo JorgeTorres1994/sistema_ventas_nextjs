@@ -45,7 +45,13 @@ export class ReportsService {
         const sales = await this.prisma.sale.findMany({
             where,
             include: { 
-                items: { include: { product: true } },
+                items: { 
+                    include: { 
+                        product: {
+                            include: { category: true }
+                        } 
+                    } 
+                },
                 payments: true
             },
             orderBy: { createdAt: 'asc' }
@@ -70,19 +76,30 @@ export class ReportsService {
             dailyMap.set(date, current);
         });
 
-        // 2. Revenue Distribution by payment method
+        // 2. Revenue Distribution by payment method & Category
         const paymentMap = new Map();
+        const categoryMap = new Map();
+
         sales.forEach(sale => {
+            // Payment methods
             sale.payments.forEach(p => {
                 const method = p.method || 'CASH';
                 const current = paymentMap.get(method) || 0;
                 paymentMap.set(method, current + Number(p.amount));
             });
+
+            // Categories
+            sale.items.forEach(item => {
+                const catName = item.product?.category?.name || 'General';
+                const current = categoryMap.get(catName) || 0;
+                categoryMap.set(catName, current + (Number(item.price) * item.quantity));
+            });
         });
 
         return {
             performance: Array.from(dailyMap.values()),
-            distribution: Array.from(paymentMap.entries()).map(([name, value]) => ({ name, value }))
+            paymentDistribution: Array.from(paymentMap.entries()).map(([name, value]) => ({ name, value })),
+            categoryDistribution: Array.from(categoryMap.entries()).map(([name, value]) => ({ name, value }))
         };
     }
 
@@ -160,7 +177,7 @@ export class ReportsService {
                 current: p.revenue,
                 previous: p.revenue * 0.85
             })),
-            revenueBreakdown: charts.distribution,
+            revenueBreakdown: charts.categoryDistribution,
             recentOrders: recentOrders
         };
     }

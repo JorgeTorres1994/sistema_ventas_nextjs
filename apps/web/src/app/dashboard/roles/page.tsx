@@ -19,6 +19,7 @@ const moduleTranslations: Record<string, string> = {
     sales: 'Ventas y Comprobantes',
     customers: 'Gestión de Clientes',
     products: 'Catálogo de Productos',
+    categories: 'Categorías de Productos',
     inventory: 'Control de Inventario',
     suppliers: 'Gestión de Proveedores',
     purchases: 'Compras y Abastecimiento',
@@ -27,7 +28,11 @@ const moduleTranslations: Record<string, string> = {
     roles: 'Roles y Seguridad',
     settings: 'Configuración General',
     expenses: 'Gastos y Egresos',
-    credits: 'Créditos y Cobranzas'
+    credits: 'Créditos y Cobranzas',
+    promotions: 'Promociones y Cupones',
+    audit: 'Auditoría y Seguridad',
+    quotations: 'Cotizaciones / Proformas',
+    invoicing: 'Facturación Electrónica'
 };
 
 export default function RolesPage() {
@@ -325,49 +330,46 @@ export default function RolesPage() {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {Object.entries(groupedPermissions).map(([moduleName, actions]: [string, any]) => (
-                                            <div key={moduleName} className="bg-white border border-gray-100 rounded-3xl p-6 hover:border-blue-200 transition-all group/row">
-                                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover/row:bg-blue-50 group-hover/row:text-blue-600 transition-colors">
-                                                            <ChevronRight className="w-5 h-5" />
-                                                        </div>
-                                                        <div>
-                                                            <h5 className="font-black text-gray-900 text-sm tracking-tight">{moduleTranslations[moduleName] || moduleName}</h5>
-                                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Configuración de acceso</p>
-                                                        </div>
-                                                    </div>
-
+                                            <div key={moduleName} className="bg-white border border-gray-100 rounded-3xl p-5 hover:border-blue-200 transition-all group/row relative overflow-hidden">
+                                                <div className="flex items-center justify-between gap-4 mb-4">
                                                     <div className="flex items-center gap-3">
-                                                        {actions.map((action: any) => {
-                                                            const isSelected = formData.permissionIds.includes(action.id);
-                                                            return (
-                                                                <button
-                                                                    key={action.id}
-                                                                    type="button"
-                                                                    onClick={() => togglePermission(action.id)}
-                                                                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border-2 transition-all ${
-                                                                        isSelected 
-                                                                        ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-100' 
-                                                                        : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200'
-                                                                    }`}
-                                                                >
-                                                                    {action.action === 'read' ? 'Ver' : 
-                                                                     action.action === 'create' ? 'Crear' :
-                                                                     action.action === 'update' ? 'Editar' : 'Borrar'}
-                                                                </button>
-                                                            );
-                                                        })}
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => toggleModule(moduleName, actions)}
-                                                            className="ml-4 p-2 text-gray-300 hover:text-blue-600 transition-colors"
-                                                            title="Marcar todo el módulo"
-                                                        >
-                                                            <CheckCircle2 className="w-5 h-5" />
-                                                        </button>
+                                                        <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+                                                            <ShieldCheck className="w-4 h-4" />
+                                                        </div>
+                                                        <h5 className="font-black text-gray-900 text-[11px] uppercase tracking-wider">{moduleTranslations[moduleName] || moduleName}</h5>
                                                     </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => toggleModule(moduleName, actions)}
+                                                        className="p-1.5 text-gray-300 hover:text-blue-600 transition-colors"
+                                                        title="Marcar todo el módulo"
+                                                    >
+                                                        <CheckCircle2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+
+                                                <div className="flex flex-wrap gap-2">
+                                                    {actions.map((action: any) => {
+                                                        const isSelected = formData.permissionIds.includes(action.id);
+                                                        return (
+                                                            <button
+                                                                key={action.id}
+                                                                type="button"
+                                                                onClick={() => togglePermission(action.id)}
+                                                                className={`flex-1 min-w-[70px] py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border-2 transition-all ${
+                                                                    isSelected 
+                                                                    ? 'bg-blue-600 border-blue-600 text-white shadow-sm shadow-blue-100' 
+                                                                    : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200'
+                                                                }`}
+                                                            >
+                                                                {action.action === 'read' ? 'Ver' : 
+                                                                 action.action === 'create' ? 'Crear' :
+                                                                 action.action === 'update' ? 'Edit' : 'Borr'}
+                                                            </button>
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
                                         ))}
