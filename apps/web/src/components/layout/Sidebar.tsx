@@ -79,6 +79,7 @@ const Sidebar = () => {
       title: 'Logística',
       items: [
         { name: 'Productos', icon: Package, path: '/products', permission: 'products' },
+        { name: 'Categorías', icon: Tag, path: '/categories', permission: 'products' },
         { name: 'Inventario', icon: Boxes, path: '/inventory', permission: 'inventory' },
         { name: 'Kardex Valorizado', icon: BarChart3, path: '/inventory/kardex', permission: 'inventory' },
         { name: 'Proveedores', icon: Building2, path: '/suppliers', permission: 'suppliers' },

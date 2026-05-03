@@ -5,7 +5,7 @@ import {
   Upload, Info, ToggleRight, ToggleLeft, 
   ChevronDown, Save, Loader2, Link as LinkIcon 
 } from 'lucide-react';
-import api, { createProduct, updateProduct, uploadProductImage } from '@/lib/api';
+import api, { createProduct, updateProduct, uploadProductImage, getActiveCategories } from '@/lib/api';
 
 interface ProductFormProps {
   initialData?: any;
@@ -32,9 +32,9 @@ export default function ProductForm({ initialData, isEdit }: ProductFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // Fetch categories
-    api.get('/products/categories/all')
-       .then(res => setCategories(res.data))
+    // Fetch ONLY active categories for products
+    getActiveCategories()
+       .then(data => setCategories(data))
        .catch(err => console.error("No se pudieron cargar las categorías", err));
   }, []);
 
