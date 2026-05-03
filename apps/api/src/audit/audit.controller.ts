@@ -18,6 +18,8 @@ export class AuditController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
     @Query('search') search?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
   ) {
     return this.auditService.getLogs({
       module,
@@ -26,6 +28,8 @@ export class AuditController {
       startDate,
       endDate,
       search,
+      page,
+      limit,
     });
   }
 

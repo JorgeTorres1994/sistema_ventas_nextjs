@@ -41,8 +41,13 @@ export class AuditService {
     startDate?: string;
     endDate?: string;
     search?: string;
+    page?: number;
+    limit?: number;
   }) {
     const where: any = {};
+    const page = Number(filters.page) || 1;
+    const limit = Number(filters.limit) || 10;
+    const skip = (page - 1) * limit;
 
     if (filters.module) where.module = filters.module;
     if (filters.action) where.action = filters.action;
@@ -61,16 +66,22 @@ export class AuditService {
       ];
     }
 
-    return (this.prisma as any).auditLog.findMany({
-      where,
-      include: {
-        user: {
-          select: { name: true, email: true }
-        }
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 200 // Limit for performance
-    });
+    const [data, total] = await Promise.all([
+      (this.prisma as any).auditLog.findMany({
+        where,
+        include: {
+          user: {
+            select: { name: true, email: true, avatarUrl: true }
+          }
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit
+      }),
+      (this.prisma as any).auditLog.count({ where })
+    ]);
+
+    return { data, total };
   }
 
   async getNotifications() {
