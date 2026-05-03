@@ -1,4 +1,4 @@
-import { Controller, Post, Param, UseGuards, Get, Res, Header } from '@nestjs/common';
+import { Controller, Post, Param, UseGuards, Get, Res, Header, Query } from '@nestjs/common';
 import type { Response } from 'express';
 import { InvoicingService } from './invoicing.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
@@ -23,23 +23,53 @@ export class InvoicingController {
   }
 
   @Get('view/:saleId')
-  @Header('Content-Type', 'text/html')
-  async viewInvoice(@Param('saleId') saleId: string, @Res() res: Response) {
+  async viewInvoice(
+    @Param('saleId') saleId: string, 
+    @Query('type') type: string,
+    @Res() res: Response
+  ) {
     const sale = await this.invoicingService.getSaleDataForView(saleId);
     
+    if (!sale || !sale.id) {
+      return res.status(404).send('Comprobante no encontrado');
+    }
+
+    const formattedNumber = `${sale.series}-${sale.correlative ? sale.correlative.toString().padStart(8, '0') : '00000000'}`;
+
     const html = `
     <html>
       <head>
-        <title>Comprobante Electrónico - ${sale.series}-${sale.correlative}</title>
+        <title>${sale.documentType}-${formattedNumber}</title>
         <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+          @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; padding: 0 !important; }
+            .invoice-card { box-shadow: none !important; border: none !important; }
+          }
+        </style>
       </head>
-      <body class="bg-gray-100 p-10 font-sans">
-        <div class="max-w-3xl mx-auto bg-white p-12 shadow-2xl rounded-sm border-t-8 border-indigo-600">
+      <body class="bg-gray-100 p-4 sm:p-10 font-sans">
+        <!-- Floating Actions -->
+        <div class="max-w-3xl mx-auto mb-6 no-print flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+           <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              </div>
+              <p class="text-sm font-black text-gray-900 uppercase tracking-tight">Vista de Impresión Oficial</p>
+           </div>
+           <button onclick="document.title='${sale.documentType}-${formattedNumber}'; window.print();" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-indigo-100 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              Imprimir o Guardar PDF
+           </button>
+        </div>
+
+        <div class="max-w-3xl mx-auto bg-white p-8 sm:p-12 shadow-2xl rounded-sm border-t-8 border-indigo-600 invoice-card">
           <div class="flex justify-between items-start mb-12">
             <div>
               <h1 class="text-3xl font-black text-gray-900 mb-2">${sale.businessName || 'NEXUS GENESIS'}</h1>
-              <p class="text-sm text-gray-500">RUC: 20600000000</p>
-              <p class="text-sm text-gray-500">Dirección: Av. Empresarial 123, Lima</p>
+              <p class="text-sm text-gray-500 font-bold">RUC: 20600000000</p>
+              <p class="text-sm text-gray-500 font-medium">Dirección: Av. Empresarial 123, Lima</p>
             </div>
             <div class="border-4 border-indigo-600 p-6 text-center rounded-lg">
               <p class="text-lg font-black text-indigo-600 uppercase tracking-widest">${sale.documentType}</p>
@@ -51,12 +81,12 @@ export class InvoicingController {
             <div>
               <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Señor(es):</p>
               <p class="text-sm font-black text-gray-900 uppercase">${sale.customer?.name || 'Consumidor Final'}</p>
-              <p class="text-sm text-gray-500 mt-1">DNI/RUC: ${sale.customer?.dni || '-'}</p>
+              <p class="text-sm text-gray-500 mt-1 font-bold">DNI/RUC: ${sale.customer?.dni || '-'}</p>
             </div>
             <div class="text-right">
               <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Fecha de Emisión:</p>
               <p class="text-sm font-black text-gray-900">${sale.createdAt ? new Date(sale.createdAt).toLocaleDateString() : 'N/A'}</p>
-              <p class="text-sm text-gray-500 mt-1">Moneda: SOLES (PEN)</p>
+              <p class="text-sm text-gray-500 mt-1 font-bold">Moneda: SOLES (PEN)</p>
             </div>
           </div>
 
@@ -73,7 +103,7 @@ export class InvoicingController {
               ${(sale.items || []).map(item => `
                 <tr>
                   <td class="py-4 px-4 text-sm font-bold text-gray-900">${item.quantity}</td>
-                  <td class="py-4 px-4 text-sm text-gray-600 uppercase font-medium">${item.product?.name}</td>
+                  <td class="py-4 px-4 text-sm text-gray-600 uppercase font-black">${item.product?.name}</td>
                   <td class="py-4 px-4 text-sm text-gray-900 text-right font-bold">S/ ${Number(item.price).toFixed(2)}</td>
                   <td class="py-4 px-4 text-sm text-gray-900 text-right font-black">S/ ${(Number(item.price) * item.quantity).toFixed(2)}</td>
                 </tr>
@@ -113,6 +143,7 @@ export class InvoicingController {
     </html>
     `;
     
+    res.setHeader('Content-Type', 'text/html');
     return res.send(html);
   }
 }

@@ -424,6 +424,8 @@ export default function SalesPage() {
             </button>
           </div>
 
+          <SalesSummary stats={stats} />
+
           <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
             <table className="w-full text-left">
               <thead>
@@ -474,8 +476,6 @@ export default function SalesPage() {
               </tbody>
             </table>
           </div>
-
-          <SalesSummary stats={stats} />
         </main>
       </div>
 

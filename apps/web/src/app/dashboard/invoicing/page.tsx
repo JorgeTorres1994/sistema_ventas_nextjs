@@ -234,27 +234,25 @@ export default function InvoicingLogPage() {
                               <td className="px-8 py-6">
                                  <div className="flex items-center justify-center gap-2">
                                     {doc.pdfUrl && (
-                                       <a href={doc.pdfUrl} target="_blank" rel="noreferrer" className="p-2 bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Ver PDF">
+                                       <a href={doc.pdfUrl} target="_blank" rel="noreferrer" className="p-2 bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Ver Comprobante">
                                           <ExternalLink className="w-4 h-4" />
-                                       </a>
-                                    )}
-                                    {doc.xmlUrl && (
-                                       <a href={doc.xmlUrl} target="_blank" rel="noreferrer" className="p-2 bg-gray-50 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all" title="Descargar XML">
-                                          <Download className="w-4 h-4" />
                                        </a>
                                     )}
                                  </div>
                               </td>
                               <td className="px-8 py-6 text-right">
-                                 {(doc.invoiceStatus !== 'SENT' || !doc.correlative) && (
-                                    <button 
-                                      onClick={() => handleRetry(doc.id)}
-                                      className="p-3 bg-gray-50 text-gray-400 hover:text-white hover:bg-blue-600 rounded-xl transition-all"
-                                      title="Re-sincronizar"
-                                    >
-                                       <RefreshCw className="w-4 h-4" />
-                                    </button>
-                                 )}
+                                 <button 
+                                   onClick={() => doc.invoiceStatus !== 'SENT' && handleRetry(doc.id)}
+                                   disabled={doc.invoiceStatus === 'SENT'}
+                                   className={`p-3 rounded-xl transition-all ${
+                                      doc.invoiceStatus === 'SENT' 
+                                        ? 'bg-gray-50 text-gray-200 cursor-not-allowed' 
+                                        : 'bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white shadow-lg shadow-blue-100 animate-pulse'
+                                   }`}
+                                   title={doc.invoiceStatus === 'SENT' ? "Documento ya sincronizado" : "Re-sincronizar con SUNAT"}
+                                 >
+                                    <RefreshCw className="w-4 h-4" />
+                                 </button>
                               </td>
                            </tr>
                         ))
