@@ -112,7 +112,7 @@ export default function KardexPage() {
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Kardex');
-    XLSX.utils.writeFile(wb, `Kardex_${kardexData.product.name}_${format(new Date(), 'yyyyMMdd')}.xlsx`);
+    XLSX.writeFile(wb, `Kardex_${kardexData.product.name}_${format(new Date(), 'yyyyMMdd')}.xlsx`);
     toast.success('Excel generado correctamente');
   };
 
