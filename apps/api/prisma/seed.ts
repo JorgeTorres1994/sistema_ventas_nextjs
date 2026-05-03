@@ -152,10 +152,31 @@ async function main() {
     ];
 
     console.log('Limpiando la base de datos...');
+    // Relaciones de segundo nivel / dependencias directas
+    await prisma.quotationItem.deleteMany();
+    await prisma.quotation.deleteMany();
+    await prisma.creditPayment.deleteMany();
+    await prisma.creditSale.deleteMany();
+    await prisma.creditPurchase.deleteMany();
+    await prisma.payment.deleteMany();
     await prisma.saleItem.deleteMany();
     await prisma.sale.deleteMany();
+    await prisma.purchaseItem.deleteMany();
+    await prisma.purchase.deleteMany();
+    await prisma.stockMovement.deleteMany();
+    await prisma.productPromotion.deleteMany();
+    await prisma.promotion.deleteMany();
+    await prisma.cashMovement.deleteMany();
+    await prisma.expense.deleteMany();
+    await prisma.expenseCategory.deleteMany();
+    await prisma.cashRegister.deleteMany();
+    await prisma.auditLog.deleteMany();
     await prisma.product.deleteMany();
+    await prisma.category.deleteMany();
+    await prisma.rolePermission.deleteMany();
+    await prisma.permission.deleteMany();
     await prisma.user.deleteMany();
+    // await prisma.role.deleteMany(); // Mantenemos los roles para evitar conflictos si ya están definidos
 
     console.log('Creando roles base...');
     let adminRole = await prisma.role.findFirst({ where: { name: 'Administrador' } });
