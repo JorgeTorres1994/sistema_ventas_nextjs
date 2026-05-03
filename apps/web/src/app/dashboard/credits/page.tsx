@@ -146,7 +146,7 @@ export default function CreditsPage() {
                 <div className="text-right">
                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total {activeTab === 'RECEIVABLES' ? 'Pendiente' : 'Adeudado'}</p>
                    <h2 className={`text-4xl font-black tracking-tighter ${activeTab === 'RECEIVABLES' ? 'text-blue-600' : 'text-rose-600'}`}>
-                     S/ {totalDebt.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                     S/ {totalDebt.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                    </h2>
                 </div>
               </div>

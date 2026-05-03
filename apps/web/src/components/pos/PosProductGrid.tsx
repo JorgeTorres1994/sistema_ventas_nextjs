@@ -142,7 +142,7 @@ export default function PosProductGrid({
                       <LayoutGrid className="w-8 h-8 text-gray-200" />
                     )}
                     
-                    <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-[8px] font-black tracking-widest border ${badgeColor}`}>
+                    <div className={`absolute top-2 left-2 lg:top-3 lg:left-auto lg:right-3 px-1.5 py-0.5 lg:px-2.5 lg:py-1 rounded-full text-[7px] lg:text-[8px] font-black tracking-tighter lg:tracking-widest border ${badgeColor}`}>
                       {badgeText}
                     </div>
                   </div>
