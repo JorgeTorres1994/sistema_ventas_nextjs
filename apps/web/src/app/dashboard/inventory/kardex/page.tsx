@@ -150,7 +150,7 @@ export default function KardexPage() {
       head: [['Fecha', 'Motivo', 'Ent. Cant', 'Ent. CU', 'Ent. Tot', 'Sal. Cant', 'Sal. CU', 'Sal. Tot', 'Stock', 'CP', 'Valor T']],
       body: tableData,
       theme: 'grid',
-      headStyles: { fillGray: [40, 40, 40], textColor: 255, fontSize: 8, fontStyle: 'bold' },
+      headStyles: { fillColor: [40, 40, 40], textColor: 255, fontSize: 8, fontStyle: 'bold' },
       styles: { fontSize: 7 },
       columnStyles: {
         0: { cellWidth: 30 },
