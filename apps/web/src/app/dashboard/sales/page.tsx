@@ -215,7 +215,12 @@ const SaleDetailDrawer = ({ saleId, onClose, onCancelSale }: any) => {
                             </div>
                             <div>
                                <p className="text-sm font-black text-gray-900">{item.product?.name || 'Producto Desconocido'}</p>
-                               <p className="text-xs text-gray-400 font-bold">{item.quantity} unidades × {fmtCurrency(Number(item.price))}</p>
+                               <div className="flex items-center gap-2 mt-0.5">
+                                  <p className="text-xs text-gray-400 font-bold">{item.quantity} unidades × {fmtCurrency(Number(item.price))}</p>
+                                  <span className="text-[9px] font-black bg-indigo-50 text-indigo-500 px-1.5 py-0.5 rounded-md uppercase tracking-widest border border-indigo-100/50">
+                                     {item.product?.category?.name || 'General'}
+                                  </span>
+                               </div>
                             </div>
                          </div>
                          <div className="text-right">

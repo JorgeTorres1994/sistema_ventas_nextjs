@@ -19,7 +19,7 @@ interface SalesChartProps {
 const SalesChart = ({ data, isLoading }: SalesChartProps) => {
   if (isLoading) {
     return (
-      <div className="bg-white rounded-xl p-6 border border-[#E5E7EB] shadow-sm h-[420px] animate-pulse flex flex-col">
+      <div className="bg-white rounded-xl p-6 border border-[#E5E7EB] shadow-sm h-[450px] animate-pulse flex flex-col">
         <div className="w-48 h-6 bg-gray-200 rounded mb-2"></div>
         <div className="w-64 h-4 bg-gray-200 rounded mb-8"></div>
         <div className="flex-1 bg-gray-100 rounded-lg"></div>
@@ -41,7 +41,7 @@ const SalesChart = ({ data, isLoading }: SalesChartProps) => {
   };
 
   return (
-    <div className="bg-white rounded-xl p-6 border border-[#E5E7EB] shadow-sm h-[420px] flex flex-col">
+    <div className="bg-white rounded-xl p-6 border border-[#E5E7EB] shadow-sm h-[450px] flex flex-col">
       <div className="flex justify-between items-start mb-6">
         <div>
           <h2 className="text-xl font-bold text-[#111827] mb-1">Análisis de Ventas</h2>
