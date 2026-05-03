@@ -9,8 +9,8 @@ async function main() {
     // 1. Definir Módulos y Acciones
     const modules = [
         'dashboard', 'pos', 'cash', 'sales', 'customers', 
-        'products', 'inventory', 'suppliers', 'purchases', 
-        'reports', 'users', 'roles', 'settings', 'expenses', 'credits', 'promotions', 'audit'
+        'products', 'categories', 'inventory', 'suppliers', 'purchases', 
+        'reports', 'users', 'roles', 'settings', 'expenses', 'credits', 'promotions', 'audit', 'quotations', 'invoicing'
     ];
     const actions = ['read', 'create', 'update', 'delete'];
 

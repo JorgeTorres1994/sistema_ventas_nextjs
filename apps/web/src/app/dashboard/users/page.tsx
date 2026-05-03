@@ -274,12 +274,27 @@ export default function UsersPage() {
                                             <tr key={user.id} className="group hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0">
                                                 <td className="px-8 py-5">
                                                     <div className="flex items-center gap-4">
-                                                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold uppercase text-xs">
-                                                            {user.name.charAt(0)}
+                                                        <div className="relative group">
+                                                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-gray-100 to-gray-50 p-0.5 shadow-sm overflow-hidden flex items-center justify-center transition-transform group-hover:scale-105">
+                                                                {user.avatarUrl ? (
+                                                                    <img 
+                                                                        src={user.avatarUrl.startsWith('http') ? user.avatarUrl : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}${user.avatarUrl}`} 
+                                                                        alt={user.name} 
+                                                                        className="w-full h-full object-cover rounded-[14px]"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="w-full h-full rounded-[14px] bg-blue-50 flex items-center justify-center text-blue-600 font-black text-sm uppercase">
+                                                                        {user.name.charAt(0)}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            {user.isActive && (
+                                                                <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white shadow-sm"></div>
+                                                            )}
                                                         </div>
                                                         <div>
-                                                            <div className="font-bold text-gray-900">{user.name}</div>
-                                                            <div className="text-xs text-gray-400 font-medium">{user.email}</div>
+                                                            <div className="font-black text-gray-900 tracking-tight leading-tight">{user.name}</div>
+                                                            <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">{user.email}</div>
                                                         </div>
                                                     </div>
                                                 </td>
