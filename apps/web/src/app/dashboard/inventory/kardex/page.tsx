@@ -25,6 +25,10 @@ import { getKardex, getProducts } from '@/lib/api';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { FileText } from 'lucide-react';
 
 export default function KardexPage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -72,7 +76,7 @@ export default function KardexPage() {
     const colors: any = {
       'SALE': 'bg-blue-50 text-blue-600 border-blue-100',
       'PURCHASE': 'bg-emerald-50 text-emerald-600 border-emerald-100',
-      'ADJUSTMENT': 'bg-amber-50 text-amber-600 border-amber-100',
+      'ADJUSTMENT': 'bg-amber-50 text-amber-600 border-blue-100',
       'SALE_CANCELLED': 'bg-rose-50 text-rose-600 border-rose-100',
     };
     return (
@@ -83,6 +87,79 @@ export default function KardexPage() {
          reason === 'SALE_CANCELLED' ? 'Venta Anulada' : reason}
       </span>
     );
+  };
+
+  const handleExportExcel = () => {
+    if (!kardexData || kardexData.movements.length === 0) {
+      toast.error('No hay datos para exportar');
+      return;
+    }
+
+    const data = kardexData.movements.map((move: any) => ({
+      'Fecha': format(new Date(move.createdAt), 'dd/MM/yyyy HH:mm'),
+      'Movimiento': move.reason === 'SALE' ? 'Venta' : move.reason === 'PURCHASE' ? 'Compra' : move.reason === 'ADJUSTMENT' ? 'Ajuste' : move.reason,
+      'Entrada Cant': move.type === 'IN' ? move.quantity : 0,
+      'Entrada Costo U': move.type === 'IN' ? Number(move.unitCost) : 0,
+      'Entrada Total': move.type === 'IN' ? Number(move.totalCost) : 0,
+      'Salida Cant': move.type === 'OUT' ? move.quantity : 0,
+      'Salida Costo U': move.type === 'OUT' ? Number(move.unitCost) : 0,
+      'Salida Total': move.type === 'OUT' ? Number(move.totalCost) : 0,
+      'Saldo Cant': move.nextStock,
+      'Saldo Costo P': move.nextStock > 0 ? (Number(move.nextValue) / move.nextStock) : 0,
+      'Saldo Valor T': Number(move.nextValue)
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Kardex');
+    XLSX.utils.writeFile(wb, `Kardex_${kardexData.product.name}_${format(new Date(), 'yyyyMMdd')}.xlsx`);
+    toast.success('Excel generado correctamente');
+  };
+
+  const handleExportPDF = () => {
+    if (!kardexData || kardexData.movements.length === 0) {
+      toast.error('No hay datos para exportar');
+      return;
+    }
+
+    const doc = new jsPDF('l', 'mm', 'a4');
+    
+    // Header
+    doc.setFontSize(18);
+    doc.text('Kardex de Inventario Valorizado', 14, 20);
+    doc.setFontSize(10);
+    doc.text(`Producto: ${kardexData.product.name}`, 14, 28);
+    doc.text(`Fecha de Reporte: ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 14, 33);
+
+    const tableData = kardexData.movements.map((move: any) => [
+      format(new Date(move.createdAt), 'dd/MM/yyyy HH:mm'),
+      move.reason === 'SALE' ? 'Venta' : move.reason === 'PURCHASE' ? 'Compra' : 'Ajuste',
+      move.type === 'IN' ? move.quantity : '-',
+      move.type === 'IN' ? `S/ ${Number(move.unitCost).toFixed(2)}` : '-',
+      move.type === 'IN' ? `S/ ${Number(move.totalCost).toFixed(2)}` : '-',
+      move.type === 'OUT' ? move.quantity : '-',
+      move.type === 'OUT' ? `S/ ${Number(move.unitCost).toFixed(2)}` : '-',
+      move.type === 'OUT' ? `S/ ${Number(move.totalCost).toFixed(2)}` : '-',
+      move.nextStock,
+      `S/ ${move.nextStock > 0 ? (Number(move.nextValue) / move.nextStock).toFixed(2) : '0.00'}`,
+      `S/ ${Number(move.nextValue).toFixed(2)}`
+    ]);
+
+    autoTable(doc, {
+      startY: 40,
+      head: [['Fecha', 'Motivo', 'Ent. Cant', 'Ent. CU', 'Ent. Tot', 'Sal. Cant', 'Sal. CU', 'Sal. Tot', 'Stock', 'CP', 'Valor T']],
+      body: tableData,
+      theme: 'grid',
+      headStyles: { fillGray: [40, 40, 40], textColor: 255, fontSize: 8, fontStyle: 'bold' },
+      styles: { fontSize: 7 },
+      columnStyles: {
+        0: { cellWidth: 30 },
+        1: { cellWidth: 20 }
+      }
+    });
+
+    doc.save(`Kardex_${kardexData.product.name}.pdf`);
+    toast.success('PDF generado correctamente');
   };
 
   return (
@@ -103,11 +180,17 @@ export default function KardexPage() {
               </div>
               
               <div className="flex items-center gap-3">
-                <button className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-2xl text-sm font-bold hover:bg-gray-50 transition-all shadow-sm">
-                  <Printer className="w-5 h-5" />
-                  Imprimir
+                <button 
+                  onClick={handleExportPDF}
+                  className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-2xl text-sm font-bold hover:bg-gray-50 transition-all shadow-sm active:scale-95"
+                >
+                  <FileText className="w-5 h-5 text-rose-600" />
+                  Exportar PDF
                 </button>
-                <button className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 active:scale-95">
+                <button 
+                  onClick={handleExportExcel}
+                  className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-2xl text-sm font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 active:scale-95"
+                >
                   <Download className="w-5 h-5" />
                   Exportar Excel
                 </button>
