@@ -5,9 +5,14 @@ import Sidebar from '@/components/layout/Sidebar';
 import PosTopBar from '@/components/pos/PosTopBar';
 import PosProductGrid from '@/components/pos/PosProductGrid';
 import PosCartPanel from '@/components/pos/PosCartPanel';
-import { getProducts, createSale, createQuotation } from '@/lib/api';
+import { getProducts, createSale, createQuotation, getActiveCategories } from '@/lib/api';
 import { toast } from 'sonner';
 import { useSettings } from '@/components/SettingsProvider';
+
+interface Category {
+  id: string;
+  name: string;
+}
 
 interface Product {
   id: string;
@@ -15,7 +20,7 @@ interface Product {
   price: string | number;
   stock: number;
   imageUrl?: string;
-  category?: { name: string };
+  category?: { id: string, name: string };
   isActive?: boolean;
 }
 
@@ -27,9 +32,10 @@ interface CartItem {
 export default function PosPage() {
   // Products & Global search state
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('Todos');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | 'all'>('all');
 
   // Cart State
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -42,12 +48,24 @@ export default function PosPage() {
   const [pointsToRedeem, setPointsToRedeem] = useState(0);
   const [customerPoints, setCustomerPoints] = useState(0);
 
+  // Load Categories
+  useEffect(() => {
+    getActiveCategories()
+      .then(data => setCategories(data))
+      .catch(err => console.error("Error loading categories for POS", err));
+  }, []);
+
   // Debounce logic for Search
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true);
       try {
-        const response = await getProducts({ page: 1, limit: 100, search: searchQuery });
+        const response = await getProducts({ 
+          page: 1, 
+          limit: 100, 
+          search: searchQuery,
+          categoryId: selectedCategoryId === 'all' ? undefined : selectedCategoryId 
+        });
         setProducts(response.data);
       } catch (error) {
         console.error('Failed to load products:', error);
@@ -61,7 +79,7 @@ export default function PosPage() {
     }, 300);
 
     return () => clearTimeout(debounceTimer);
-  }, [searchQuery]);
+  }, [searchQuery, selectedCategoryId]);
 
   // Cart Handlers
   const handleAddToCart = useCallback((product: Product) => {
@@ -138,7 +156,12 @@ export default function PosPage() {
         }
       });
       handleClearCart();
-      const freshProducts = await getProducts({ page: 1, limit: 100, search: searchQuery });
+      const freshProducts = await getProducts({ 
+        page: 1, 
+        limit: 100, 
+        search: searchQuery,
+        categoryId: selectedCategoryId === 'all' ? undefined : selectedCategoryId 
+      });
       setProducts(freshProducts.data);
       
     } catch (error: any) {
@@ -191,8 +214,9 @@ export default function PosPage() {
             products={products} 
             isLoading={isLoading} 
             onAddToCart={handleAddToCart}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
+            selectedCategoryId={selectedCategoryId}
+            setSelectedCategoryId={setSelectedCategoryId}
+            categories={categories}
           />
           
           {/* Sidebar: Cart Panel */}
