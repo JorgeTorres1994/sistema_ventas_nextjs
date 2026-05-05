@@ -8,6 +8,7 @@ import PosCartPanel from '@/components/pos/PosCartPanel';
 import { getProducts, createSale, createQuotation, getActiveCategories } from '@/lib/api';
 import { toast } from 'sonner';
 import { useSettings } from '@/components/SettingsProvider';
+import { ShoppingCart } from 'lucide-react';
 
 interface Category {
   id: string;
