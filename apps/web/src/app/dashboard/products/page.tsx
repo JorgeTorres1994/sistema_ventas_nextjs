@@ -201,37 +201,39 @@ export default function ProductsPage() {
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
+      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden transition-all duration-300">
         <TopBar />
 
         {/* Module Header */}
-        <div className="px-8 py-6 bg-white border-b border-gray-100 flex items-center justify-between shrink-0">
+        <div className="px-4 lg:px-8 py-6 bg-white border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shrink-0">
           <div>
-            <nav className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">
+            <nav className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
               <span>Gestión de Inventario</span>
               <span>/</span>
               <span className="text-gray-900">Productos</span>
             </nav>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none">Productos</h1>
-            <p className="text-sm text-gray-500 mt-2 font-medium">Gestione y monitoree la disponibilidad de su stock minorista.</p>
+            <h1 className="text-2xl lg:text-3xl font-black text-gray-900 tracking-tight leading-none">Productos</h1>
+            <p className="text-xs lg:text-sm text-gray-500 mt-2 font-medium">Gestione y monitoree la disponibilidad de su stock minorista.</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
             <button 
               onClick={handlePrintReport}
-              className="p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors text-gray-500 border border-gray-100 shadow-sm active:scale-95"
+              className="flex-1 sm:flex-none p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors text-gray-500 border border-gray-100 shadow-sm active:scale-95 flex items-center justify-center"
               title="Exportar Reporte"
             >
               <Download className="w-5 h-5" />
             </button>
-            <Link href="/dashboard/products/new">
-              <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-black text-sm transition-all shadow-lg shadow-indigo-100 flex items-center gap-2">
-                Crear Producto
+            <Link href="/dashboard/products/new" className="flex-1 sm:flex-none">
+              <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-black text-sm transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2">
+                <Plus className="w-4 h-4 sm:hidden" />
+                <span className="hidden sm:inline">Crear Producto</span>
+                <span className="sm:hidden">Nuevo</span>
               </button>
             </Link>
           </div>
         </div>
 
-        <main className="flex-1 overflow-y-auto p-8 space-y-6 scroll-smooth">
+        <main className="flex-1 overflow-y-auto p-4 lg:p-8 space-y-6 scroll-smooth">
           {/* Enhanced Search Bar */}
           <div className="relative group">
               <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -293,7 +295,8 @@ export default function ProductsPage() {
 
           {/* Content Table */}
           <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden min-h-[400px]">
-            <table className="w-full text-left">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left min-w-[1000px]">
               <thead>
                 <tr className="bg-gray-50/50 border-b border-gray-100">
                   <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Producto</th>
@@ -371,6 +374,7 @@ export default function ProductsPage() {
                 ))}
               </tbody>
             </table>
+          </div>
 
             {/* Pagination Controls */}
             <div className="px-8 py-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">

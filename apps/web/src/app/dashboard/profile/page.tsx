@@ -105,7 +105,7 @@ export default function ProfilePage() {
     return (
       <div className="flex h-screen bg-gray-50 overflow-hidden">
         <Sidebar />
-        <div className="flex-1 flex flex-col ml-64">
+        <div className="flex-1 flex flex-col lg:ml-64 transition-all duration-300">
           <TopBar />
           <div className="flex-1 flex items-center justify-center">
             <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
@@ -126,13 +126,13 @@ export default function ProfilePage() {
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 overflow-hidden">
+      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden transition-all duration-300">
         <TopBar />
-        <main className="flex-1 overflow-y-auto p-8 bg-gray-50">
+        <main className="flex-1 overflow-y-auto p-4 lg:p-8 bg-gray-50">
           <div className="max-w-4xl mx-auto w-full">
-            <header className="mb-8">
-              <h1 className="text-3xl font-black text-gray-900 tracking-tight">Mi Perfil</h1>
-              <p className="text-gray-500 font-bold mt-1 uppercase text-xs tracking-widest leading-relaxed">Configuraciones de identidad y seguridad corporativa</p>
+            <header className="mb-8 px-4 lg:px-0">
+              <h1 className="text-2xl lg:text-3xl font-black text-gray-900 tracking-tight">Mi Perfil</h1>
+              <p className="text-gray-500 font-bold mt-1 uppercase text-[10px] lg:text-xs tracking-widest leading-relaxed">Configuraciones de identidad</p>
             </header>
 
             <form onSubmit={handleSave} className="space-y-8 pb-12">

@@ -157,39 +157,39 @@ export default function UsersPage() {
         <div className="flex h-screen bg-[#F9FAFB] overflow-hidden font-sans text-[#111827]">
             <Sidebar />
             
-            <div className="flex-1 flex flex-col ml-64 overflow-hidden">
+            <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden transition-all duration-300">
                 <TopBar />
                 
-                <main className="flex-1 overflow-y-auto bg-[#F9FAFB] p-8">
+                <main className="flex-1 overflow-y-auto bg-gray-50 px-4 lg:px-10 py-6 lg:py-8">
                     <div className="max-w-7xl mx-auto">
                         
                         {/* Header & Metrics */}
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
                             <div>
-                                <h1 className="text-3xl font-extrabold tracking-tight mb-2">Directorio del Equipo</h1>
-                                <p className="text-[#6B7280]">Gestione niveles de acceso y asigne roles a su personal administrativo.</p>
+                                <h1 className="text-2xl lg:text-3xl font-extrabold tracking-tight mb-2">Equipo</h1>
+                                <p className="text-xs lg:text-sm text-[#6B7280]">Gestione niveles de acceso.</p>
                             </div>
                             
-                            <div className="flex gap-4">
-                                <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-sm flex items-center gap-4 min-w-[200px]">
-                                    <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
-                                        <Users className="text-blue-600 w-6 h-6" />
+                            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                                <div className="bg-white p-4 lg:p-5 rounded-2xl border border-[#E5E7EB] shadow-sm flex items-center gap-4 flex-1 sm:min-w-[180px]">
+                                    <div className="w-10 lg:w-12 h-10 lg:h-12 rounded-xl bg-blue-50 flex items-center justify-center">
+                                        <Users className="text-blue-600 w-5 lg:w-6 h-5 lg:h-6" />
                                     </div>
                                     <div>
-                                        <p className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider">Miembros Activos</p>
+                                        <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider">Activos</p>
                                         <div className="flex items-baseline gap-2">
-                                            <span className="text-2xl font-bold">{users.filter(u => u.isActive).length}</span>
+                                            <span className="text-xl lg:text-2xl font-bold">{users.filter(u => u.isActive).length}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-sm flex items-center gap-4 min-w-[200px]">
-                                    <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center">
-                                        <ShieldCheck className="text-gray-400 w-6 h-6" />
+                                <div className="bg-white p-4 lg:p-5 rounded-2xl border border-[#E5E7EB] shadow-sm flex items-center gap-4 flex-1 sm:min-w-[180px]">
+                                    <div className="w-10 lg:w-12 h-10 lg:h-12 rounded-xl bg-gray-50 flex items-center justify-center">
+                                        <ShieldCheck className="text-gray-400 w-5 lg:w-6 h-5 lg:h-6" />
                                     </div>
                                     <div>
-                                        <p className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider">Roles Configurados</p>
+                                        <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider">Roles</p>
                                         <div className="flex items-baseline gap-2">
-                                            <span className="text-2xl font-bold">{roles.length}</span>
+                                            <span className="text-xl lg:text-2xl font-bold">{roles.length}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -197,35 +197,35 @@ export default function UsersPage() {
                         </div>
 
                         {/* Search & Actions Bar */}
-                        <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm mb-6 flex flex-col md:flex-row items-center justify-between p-4 gap-4">
-                            <div className="flex items-center gap-4 flex-1 w-full max-w-lg">
-                                <div className="relative flex-1">
+                        <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm mb-6 flex flex-col lg:flex-row items-center justify-between p-4 gap-4">
+                            <div className="flex flex-col sm:flex-row items-center gap-4 flex-1 w-full lg:max-w-xl">
+                                <div className="relative flex-1 w-full">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                                     <input 
                                         type="text"
-                                        placeholder="Buscar por nombre o correo..."
-                                        className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                        placeholder="Buscar..."
+                                        className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs lg:text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex gap-2 w-full sm:w-auto">
                                     <select 
-                                        className="bg-gray-50 border border-gray-100 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-500 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        className="flex-1 sm:flex-none bg-gray-50 border border-gray-100 px-3 py-2.5 rounded-xl text-[10px] lg:text-xs font-bold text-gray-500 focus:ring-2 focus:ring-blue-500 outline-none"
                                         value={roleFilter}
                                         onChange={(e) => setRoleFilter(e.target.value)}
                                     >
-                                        <option value="">Todos los Roles</option>
+                                        <option value="">Roles</option>
                                         {roles.map(role => (
                                             <option key={role.id} value={role.id}>{role.name}</option>
                                         ))}
                                     </select>
                                     <select 
-                                        className="bg-gray-50 border border-gray-100 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-500 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        className="flex-1 sm:flex-none bg-gray-50 border border-gray-100 px-3 py-2.5 rounded-xl text-[10px] lg:text-xs font-bold text-gray-500 focus:ring-2 focus:ring-blue-500 outline-none"
                                         value={statusFilter}
                                         onChange={(e) => setStatusFilter(e.target.value)}
                                     >
-                                        <option value="">Todos los Estados</option>
+                                        <option value="">Estados</option>
                                         <option value="active">Activo</option>
                                         <option value="inactive">Inactivo</option>
                                     </select>
@@ -237,23 +237,24 @@ export default function UsersPage() {
                                     setFormData({ name: '', email: '', password: '', roleId: '', authProvider: 'EMAIL' });
                                     setIsAddModalOpen(true);
                                 }}
-                                className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
+                                className="w-full lg:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl text-[10px] lg:text-sm font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
                             >
                                 <UserPlus className="w-4 h-4" />
-                                Crear Miembro
+                                Crear
                             </button>
                         </div>
 
                         {/* Table */}
                         <div className="bg-white rounded-3xl border border-[#E5E7EB] shadow-sm overflow-hidden">
-                            <table className="w-full text-left border-collapse">
+                            <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse min-w-[900px]">
                                 <thead>
                                     <tr className="bg-gray-50/50">
-                                        <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Nombre del Miembro</th>
-                                        <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Rol Asignado</th>
-                                        <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Acceso</th>
-                                        <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Estado</th>
-                                        <th className="px-8 py-5 text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB] text-right">Acciones</th>
+                                        <th className="px-8 py-5 text-[10px] lg:text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Miembro</th>
+                                        <th className="px-8 py-5 text-[10px] lg:text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Rol</th>
+                                        <th className="px-8 py-5 text-[10px] lg:text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Acceso</th>
+                                        <th className="px-8 py-5 text-[10px] lg:text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB]">Estado</th>
+                                        <th className="px-8 py-5 text-[10px] lg:text-[11px] font-bold text-[#6B7280] uppercase tracking-widest border-b border-[#E5E7EB] text-right">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -351,6 +352,7 @@ export default function UsersPage() {
                                     )}
                                 </tbody>
                             </table>
+                            </div>
                         </div>
                     </div>
                 </main>

@@ -108,44 +108,44 @@ export default function CreditsPage() {
     <div className="flex h-screen bg-[#F9FAFB] overflow-hidden font-sans text-[#111827]">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col ml-64 overflow-hidden">
+      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden transition-all duration-300">
         <TopBar />
         
-        <main className="flex-1 overflow-y-auto bg-[#F9FAFB] p-8">
+        <main className="flex-1 overflow-y-auto bg-[#F9FAFB] px-4 lg:px-10 py-6 lg:py-8">
           <div className="max-w-7xl mx-auto">
             
             {/* Header and Tabs */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-10">
-              <div>
-                <h1 className="text-3xl font-extrabold tracking-tight mb-4">Créditos y Cobranzas</h1>
-                <div className="flex bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm w-fit">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-8 mb-10">
+              <div className="w-full sm:w-auto">
+                <h1 className="text-2xl lg:text-3xl font-extrabold tracking-tight mb-4">Cobranzas</h1>
+                <div className="flex bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm w-full sm:w-fit">
                   <button 
                     onClick={() => setActiveTab('RECEIVABLES')}
-                    className={`px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                    className={`flex-1 sm:flex-none px-4 lg:px-8 py-3 rounded-xl text-[10px] lg:text-xs font-black uppercase tracking-widest transition-all ${
                       activeTab === 'RECEIVABLES' 
                         ? 'bg-blue-600 text-white shadow-lg shadow-blue-100' 
                         : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
                     }`}
                   >
-                    Por Cobrar (Clientes)
+                    Clientes
                   </button>
                   <button 
                     onClick={() => setActiveTab('PAYABLES')}
-                    className={`px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                    className={`flex-1 sm:flex-none px-4 lg:px-8 py-3 rounded-xl text-[10px] lg:text-xs font-black uppercase tracking-widest transition-all ${
                       activeTab === 'PAYABLES' 
                         ? 'bg-rose-600 text-white shadow-lg shadow-rose-100' 
                         : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
                     }`}
                   >
-                    Por Pagar (Proveedores)
+                    Proveedores
                   </button>
                 </div>
               </div>
               
               <div className="flex items-center gap-6">
-                <div className="text-right">
-                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total {activeTab === 'RECEIVABLES' ? 'Pendiente' : 'Adeudado'}</p>
-                   <h2 className={`text-4xl font-black tracking-tighter ${activeTab === 'RECEIVABLES' ? 'text-blue-600' : 'text-rose-600'}`}>
+                <div className="text-left sm:text-right">
+                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Pendiente</p>
+                   <h2 className={`text-3xl lg:text-4xl font-black tracking-tighter ${activeTab === 'RECEIVABLES' ? 'text-blue-600' : 'text-rose-600'}`}>
                      S/ {totalDebt.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                    </h2>
                 </div>
@@ -153,62 +153,59 @@ export default function CreditsPage() {
             </div>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-               <div className="bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm relative overflow-hidden group">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+               <div className="bg-white p-6 lg:p-8 rounded-[32px] lg:rounded-[40px] border border-gray-100 shadow-sm relative overflow-hidden group">
                   <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform">
                      <Clock className="w-20 h-20 text-gray-900" />
                   </div>
-                  <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Registros Vencidos</p>
+                  <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Vencidos</p>
                   <div className="flex items-end gap-3">
-                    <h3 className="text-4xl font-black text-gray-900 tracking-tighter">{overdueCount}</h3>
-                    <span className="text-xs font-bold text-rose-500 mb-2 uppercase tracking-tight">Requiere Atención</span>
+                    <h3 className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tighter">{overdueCount}</h3>
                   </div>
                </div>
 
-               <div className="bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm relative overflow-hidden group">
+               <div className="bg-white p-6 lg:p-8 rounded-[32px] lg:rounded-[40px] border border-gray-100 shadow-sm relative overflow-hidden group">
                   <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform">
                      <TrendingUp className="w-20 h-20 text-emerald-600" />
                   </div>
-                  <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Recuperación (Este Mes)</p>
+                  <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Recuperación</p>
                   <div className="flex items-end gap-3">
-                    <h3 className="text-4xl font-black text-gray-900 tracking-tighter">S/ 4,250</h3>
-                    <span className="text-xs font-bold text-emerald-500 mb-2 uppercase tracking-tight">+15.4%</span>
+                    <h3 className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tighter">S/ 4.2k</h3>
                   </div>
                </div>
 
-               <div className="bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm relative overflow-hidden group">
+               <div className="bg-white p-6 lg:p-8 rounded-[32px] lg:rounded-[40px] border border-gray-100 shadow-sm relative overflow-hidden group">
                   <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform">
                      <History className="w-20 h-20 text-blue-600" />
                   </div>
-                  <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Próximo Vencimiento</p>
+                  <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Próximo</p>
                   <div className="flex items-end gap-3">
-                    <h3 className="text-xl font-black text-gray-900 tracking-tight">En 3 días</h3>
-                    <span className="text-[10px] font-bold text-gray-400 mb-1 uppercase tracking-widest">S/ 1,200.00</span>
+                    <h3 className="text-lg lg:text-xl font-black text-gray-900 tracking-tight">3 días</h3>
                   </div>
                </div>
             </div>
 
             {/* List and Filters */}
-            <div className="bg-white rounded-[48px] border border-gray-100 shadow-sm overflow-hidden">
-               <div className="p-10 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-8">
-                  <div className="relative w-full md:w-96">
+            <div className="bg-white rounded-[32px] lg:rounded-[48px] border border-gray-100 shadow-sm overflow-hidden">
+               <div className="p-6 lg:p-10 border-b border-gray-50 flex flex-col lg:flex-row lg:items-center justify-between gap-6 lg:gap-8">
+                  <div className="relative w-full lg:w-96">
                     <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input 
                       type="text" 
-                      placeholder={`Buscar por ${activeTab === 'RECEIVABLES' ? 'cliente' : 'proveedor'}...`}
+                      placeholder={`Buscar...`}
                       className="w-full pl-14 pr-6 py-4 bg-gray-50 border-transparent rounded-[24px] text-sm font-bold focus:bg-white focus:border-blue-500 transition-all outline-none"
                       value={filters.search}
                       onChange={(e) => setFilters({...filters, search: e.target.value})}
                     />
                   </div>
                   
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 w-full lg:w-auto">
                     <select 
-                      className="px-6 py-4 bg-gray-50 border-transparent rounded-[20px] text-xs font-black text-gray-500 outline-none cursor-pointer hover:bg-gray-100 transition-colors uppercase tracking-widest"
+                      className="flex-1 lg:flex-none px-6 py-4 bg-gray-50 border-transparent rounded-[20px] text-[10px] lg:text-xs font-black text-gray-500 outline-none cursor-pointer hover:bg-gray-100 transition-colors uppercase tracking-widest"
                       value={filters.status}
                       onChange={(e) => setFilters({...filters, status: e.target.value})}
                     >
-                      <option value="">Todos los estados</option>
+                      <option value="">Estados</option>
                       <option value="PENDING">Pendientes</option>
                       <option value="PARTIAL">Abonados</option>
                       <option value="PAID">Pagados</option>
@@ -218,7 +215,7 @@ export default function CreditsPage() {
                </div>
 
                <div className="overflow-x-auto">
-                  <table className="w-full text-left">
+                  <table className="w-full text-left min-w-[900px]">
                     <thead>
                       <tr className="bg-gray-50/50">
                         <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Sujeto / Documento</th>
@@ -317,6 +314,7 @@ export default function CreditsPage() {
                       })}
                     </tbody>
                   </table>
+                </div>
                </div>
             </div>
           </div>

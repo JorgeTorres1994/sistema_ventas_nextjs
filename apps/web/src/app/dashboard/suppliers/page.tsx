@@ -301,30 +301,30 @@ export default function SuppliersPage() {
   return (
     <div className="flex h-screen bg-[#F9FAFB] overflow-hidden font-sans">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
+      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden transition-all duration-300">
         <TopBar />
 
         {/* Module Header */}
-        <div className="px-10 py-8 bg-transparent flex items-start justify-between shrink-0">
+        <div className="px-4 lg:px-10 py-6 lg:py-8 bg-transparent flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shrink-0">
           <div>
-            <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Proveedores</h1>
-            <p className="text-base text-gray-500 font-medium">Gestione su red global de proveedores y cadenas de abastecimiento.</p>
+            <h1 className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tight mb-2">Proveedores</h1>
+            <p className="text-xs lg:text-base text-gray-500 font-medium">Red global de abastecimiento.</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
               onClick={() => router.push('/dashboard/suppliers/new')}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 rounded-xl text-sm font-black text-white hover:bg-blue-700 shadow-lg shadow-blue-200/50 transition-all"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3.5 rounded-xl font-black text-sm hover:bg-blue-700 shadow-lg shadow-blue-200/50 transition-all flex items-center justify-center gap-2"
             >
-              <Plus className="w-5 h-5" /> Agregar Proveedor
+              <Plus className="w-5 h-5" /> <span className="hidden sm:inline">Agregar Proveedor</span> <span className="sm:hidden">Nuevo</span>
             </button>
           </div>
         </div>
 
-        <main className="flex-1 overflow-y-auto px-10 pb-10 space-y-6">
+        <main className="flex-1 overflow-y-auto px-4 lg:px-10 pb-10 space-y-6">
 
           {/* Filter Bar */}
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3 bg-white border border-gray-100 rounded-2xl px-5 py-3 flex-1 shadow-sm">
+          <div className="flex flex-col lg:flex-row items-center gap-4">
+            <div className="flex items-center gap-3 bg-white border border-gray-100 rounded-2xl px-5 py-3 w-full lg:flex-1 shadow-sm">
               <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
               <input
                 placeholder="Filtrar por nombre, región o categoría..."
@@ -339,7 +339,7 @@ export default function SuppliersPage() {
               )}
             </div>
 
-            <div className="bg-white border border-gray-100 rounded-2xl px-4 py-3 flex items-center gap-2 shadow-sm text-sm font-bold text-gray-600">
+            <div className="w-full lg:w-auto bg-white border border-gray-100 rounded-2xl px-4 py-3 flex items-center justify-center gap-2 shadow-sm text-sm font-bold text-gray-600">
                <Calendar className="w-4 h-4 text-gray-400" />
                <span>Últimos 30 Días</span>
             </div>
@@ -347,7 +347,7 @@ export default function SuppliersPage() {
             <select
               value={statusFilter}
               onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
-              className="px-5 py-3 bg-white border border-gray-100 rounded-2xl text-sm font-bold text-gray-600 focus:outline-none shadow-sm cursor-pointer"
+              className="w-full lg:w-auto px-5 py-3 bg-white border border-gray-100 rounded-2xl text-sm font-bold text-gray-600 focus:outline-none shadow-sm cursor-pointer"
             >
               <option value="">Estado: Todos</option>
               <option value="active">Activo</option>
@@ -357,8 +357,8 @@ export default function SuppliersPage() {
 
           {/* Table Container */}
           <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden">
-            
-            <table className="w-full text-left">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left min-w-[900px]">
               <thead>
                 <tr className="border-b border-gray-100 text-[11px] font-black text-gray-400 tracking-widest uppercase">
                   <th className="px-8 py-5">Nombre del Proveedor</th>
@@ -437,8 +437,9 @@ export default function SuppliersPage() {
                     </tr>
                   ))
                 )}
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
 
             {/* Pagination */}
             <div className="px-8 py-4 border-t border-gray-100 flex items-center justify-between bg-white">

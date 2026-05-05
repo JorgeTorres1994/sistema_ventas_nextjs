@@ -85,94 +85,89 @@ export default function MovementHistoryPage() {
   return (
     <div className="flex h-screen bg-[#F8F9FC] overflow-hidden font-sans text-slate-900">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-y-auto">
+      <div className="flex-1 flex flex-col lg:ml-64 overflow-y-auto transition-all duration-300">
 
         {/* Header */}
-        <header className="px-10 py-8 bg-white/50 backdrop-blur-md border-b border-gray-100 flex items-start justify-between sticky top-0 z-20">
+        <header className="px-4 lg:px-10 py-6 lg:py-8 bg-white/50 backdrop-blur-md border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sticky top-0 z-20">
           <div>
-            <nav className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">
+            <nav className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 lg:mb-3">
               <button onClick={() => router.push('/dashboard/inventory')} className="flex items-center gap-1 hover:text-indigo-600 transition-colors">
                 <ArrowLeft className="w-3 h-3" /> Inventario
               </button>
               <span className="opacity-30">/</span>
-              <span className="text-indigo-600">Historial de Movimientos</span>
+              <span className="text-indigo-600">Historial</span>
             </nav>
-            <h1 className="text-4xl font-black text-gray-900 tracking-tight leading-none">Movimientos de Stock</h1>
+            <h1 className="text-2xl lg:text-4xl font-black text-gray-900 tracking-tight leading-none">Movimientos</h1>
           </div>
-          <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-6 py-3.5 bg-white border border-gray-200 rounded-2xl text-sm font-black text-gray-600 hover:bg-gray-50 transition-colors shadow-sm">
-              <Download className="w-4 h-4" /> Exportar Datos
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-2xl text-xs font-black text-gray-600 hover:bg-gray-50 transition-colors shadow-sm">
+              <Download className="w-4 h-4" /> <span className="hidden sm:inline">Exportar</span>
             </button>
             <button
               onClick={() => router.push('/dashboard/inventory')}
-              className="flex items-center gap-2 px-6 py-3.5 bg-indigo-600 rounded-2xl text-sm font-black text-white hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all">
-              <Plus className="w-4 h-4" /> Ajuste Manual
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 rounded-2xl text-xs font-black text-white hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all">
+              <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Ajuste Manual</span> <span className="sm:hidden">Nuevo</span>
             </button>
           </div>
         </header>
 
-        <main className="flex-1 p-10 space-y-10">
+        <main className="flex-1 p-4 lg:p-10 space-y-8 lg:space-y-10">
 
           {/* Filters */}
-          <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 p-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 p-6 lg:p-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
               
               {/* Date Range */}
-              <div>
+              <div className="sm:col-span-2 lg:col-span-1">
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-1.5">
                   <Calendar className="w-3 h-3" /> Rango de Fechas
                 </label>
                 <div className="flex items-center gap-3">
                   <input type="date" value={startDate} onChange={e => { setStartDate(e.target.value); setPage(1); }}
-                    className="flex-1 px-4 py-3 bg-gray-50 rounded-xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-100 border-none appearance-none" />
+                    className="flex-1 px-4 py-3 bg-gray-50 rounded-xl text-[10px] lg:text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-100 border-none appearance-none" />
                   <span className="text-gray-300 font-black">→</span>
                   <input type="date" value={endDate} onChange={e => { setEndDate(e.target.value); setPage(1); }}
-                    className="flex-1 px-4 py-3 bg-gray-50 rounded-xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-100 border-none appearance-none" />
+                    className="flex-1 px-4 py-3 bg-gray-50 rounded-xl text-[10px] lg:text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-100 border-none appearance-none" />
                 </div>
               </div>
 
               {/* Movement Type */}
               <div>
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-1.5">
-                  <Filter className="w-3 h-3" /> Tipo de Movimiento
+                  <Filter className="w-3 h-3" /> Tipo
                 </label>
                 <select value={type} onChange={e => { setType(e.target.value); setPage(1); }}
-                  className="w-full px-5 py-3.5 bg-gray-50 rounded-xl text-sm font-black text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-100 border-none cursor-pointer">
-                  <option value="">Todos los Tipos</option>
-                  <option value="IN">ENTRADAS — Ingreso de Stock</option>
-                  <option value="OUT">SALIDAS — Salida de Stock</option>
+                  className="w-full px-5 py-3.5 bg-gray-50 rounded-xl text-[10px] lg:text-sm font-black text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-100 border-none cursor-pointer">
+                  <option value="">Todos</option>
+                  <option value="IN">ENTRADAS</option>
+                  <option value="OUT">SALIDAS</option>
                 </select>
               </div>
 
               {/* Reason */}
               <div>
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-1.5">
-                  <Filter className="w-3 h-3" /> Motivo del Ajuste
+                  <Filter className="w-3 h-3" /> Motivo
                 </label>
                 <select value={reason} onChange={e => { setReason(e.target.value); setPage(1); }}
-                  className="w-full px-5 py-3.5 bg-gray-50 rounded-xl text-sm font-black text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-100 border-none cursor-pointer">
+                  className="w-full px-5 py-3.5 bg-gray-50 rounded-xl text-[10px] lg:text-sm font-black text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-100 border-none cursor-pointer">
                   <option value="">Todos los Motivos</option>
-                  <option value="SALE">Venta a Cliente</option>
-                  <option value="PURCHASE">Orden de Compra</option>
-                  <option value="ADJUSTMENT">Ajuste Manual</option>
-                  <option value="SALE_CANCELLED">Venta Anulada</option>
-                  <option value="RETURN">Devolución</option>
-                  <option value="DAMAGE">Daño / Desmedro</option>
+                  <option value="SALE">Venta</option>
+                  <option value="PURCHASE">Compra</option>
+                  <option value="ADJUSTMENT">Ajuste</option>
+                  <option value="SALE_CANCELLED">Anulación</option>
                 </select>
               </div>
             </div>
 
             {(type || reason || startDate || endDate) && (
-              <div className="mt-6 pt-6 border-t border-gray-50 flex items-center gap-3">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Filtros Activos:</span>
+              <div className="mt-6 pt-6 border-t border-gray-50 flex flex-col sm:flex-row items-center gap-3">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Filtros:</span>
                 <div className="flex flex-wrap gap-2">
                   {type && <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black">{type}</span>}
-                  {reason && <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-tight">{reason}</span>}
-                  {startDate && <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black">Desde {startDate}</span>}
-                  {endDate && <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black">Hasta {endDate}</span>}
                 </div>
                 <button onClick={() => { setType(''); setReason(''); setStartDate(''); setEndDate(''); setPage(1); }}
-                  className="ml-auto text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline transition-all">
+                  className="sm:ml-auto w-full sm:w-auto text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline transition-all">
                   Limpiar Todo
                 </button>
               </div>
@@ -182,13 +177,14 @@ export default function MovementHistoryPage() {
           {/* Movement Table */}
           <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
             
-            <div className="px-8 py-4 bg-gray-50/50 border-b border-gray-50 flex items-center justify-between">
+            <div className="px-6 lg:px-8 py-4 bg-gray-50/50 border-b border-gray-50 flex items-center justify-between">
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                Mostrando {total === 0 ? 0 : (page - 1) * LIMIT + 1}–{Math.min(page * LIMIT, total)} de {total} movimientos
+                Logs de inventario
               </p>
             </div>
 
-            <table className="w-full text-left">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left min-w-[900px]">
               <thead>
                 <tr className="bg-gray-50/20 border-b border-gray-100">
                   <th className="px-10 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Fecha y Hora</th>
@@ -268,6 +264,7 @@ export default function MovementHistoryPage() {
                 )}
               </tbody>
             </table>
+            </div>
 
             {/* Pagination */}
             <div className="px-10 py-5 bg-white border-t border-gray-100 flex items-center justify-between">

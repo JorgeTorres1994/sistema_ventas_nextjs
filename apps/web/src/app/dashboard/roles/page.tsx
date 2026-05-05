@@ -184,14 +184,14 @@ export default function RolesPage() {
         <div className="flex h-screen bg-[#F9FAFB] overflow-hidden font-sans text-[#111827]">
             <Sidebar />
             
-            <div className="flex-1 flex flex-col ml-64 overflow-hidden">
+            <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden transition-all duration-300">
                 <TopBar />
                 
-                <main className="flex-1 overflow-y-auto bg-[#F9FAFB] p-8">
+                <main className="flex-1 overflow-y-auto bg-[#F9FAFB] p-4 lg:p-8">
                     <div className="max-w-7xl mx-auto">
                         
                         {/* Header */}
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
                             <div>
                                 <h1 className="text-3xl font-extrabold tracking-tight mb-2">Roles y Permisos</h1>
                                 <p className="text-[#6B7280]">Defina niveles de acceso granulares para cada módulo del sistema.</p>

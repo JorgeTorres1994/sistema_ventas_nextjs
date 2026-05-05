@@ -123,21 +123,21 @@ export default function ReportsPage() {
   return (
     <div className="flex h-screen bg-[#F8F9FC] overflow-hidden font-sans">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden" ref={reportRef}>
+      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden transition-all duration-300" ref={reportRef}>
         <TopBar />
 
         {/* Module Header */}
-        <div className="px-12 pt-12 pb-8 bg-transparent flex items-start justify-between shrink-0">
+        <div className="px-4 lg:px-12 pt-8 lg:pt-12 pb-8 bg-transparent flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shrink-0">
           <div>
-            <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Análisis de Operaciones</h1>
-            <p className="text-base text-gray-400 font-medium tracking-tight">Nexus Genesis ERP • Panel de Control Estadístico Global</p>
+            <h1 className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tight mb-2">Reportes</h1>
+            <p className="text-sm lg:text-base text-gray-400 font-medium tracking-tight">Panel de Control Estadístico Global</p>
           </div>
-          <div className="flex items-center gap-4">
-             <button onClick={exportPDF} className="px-6 py-4 bg-white border border-gray-100 rounded-[20px] text-sm font-black text-gray-900 hover:bg-gray-50 shadow-sm transition-all flex items-center gap-3">
-                <FileText className="w-5 h-5 text-rose-500" /> Exportar PDF
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+             <button onClick={exportPDF} className="flex-1 sm:flex-none px-6 py-4 bg-white border border-gray-100 rounded-[20px] text-sm font-black text-gray-900 hover:bg-gray-50 shadow-sm transition-all flex items-center justify-center gap-3">
+                <FileText className="w-5 h-5 text-rose-500" /> <span className="hidden sm:inline">Exportar PDF</span> <span className="sm:hidden">PDF</span>
              </button>
-             <button onClick={exportExcel} className="px-8 py-4 bg-blue-600 rounded-[20px] text-sm font-black text-white hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all flex items-center gap-3">
-                <TableIcon className="w-5 h-5" /> Descargar Excel
+             <button onClick={exportExcel} className="flex-1 sm:flex-none px-8 py-4 bg-blue-600 rounded-[20px] text-sm font-black text-white hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all flex items-center justify-center gap-3">
+                <TableIcon className="w-5 h-5" /> <span className="hidden sm:inline">Excel</span> <span className="sm:hidden">XLSX</span>
              </button>
           </div>
         </div>
@@ -145,10 +145,10 @@ export default function ReportsPage() {
         <main className="flex-1 overflow-y-auto">
 
         {/* Filters Top Bar */}
-        <div className="px-12 pb-10 flex items-center gap-6 sticky top-0 bg-[#F8F9FC]/80 backdrop-blur-md z-30 pt-2">
-           <div className="flex-1 flex gap-6">
+        <div className="px-4 lg:px-12 pb-10 flex flex-col lg:flex-row items-center gap-6 sticky top-0 bg-[#F8F9FC]/80 backdrop-blur-md z-30 pt-2">
+           <div className="w-full flex flex-col sm:flex-row gap-4">
               <div className="flex-1 bg-white rounded-[24px] border border-gray-100 px-6 py-3.5 group focus-within:border-blue-300 transition-all shadow-sm">
-                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Periodo de Análisis</p>
+                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Periodo</p>
                  <div className="flex items-center justify-between">
                     <select className="bg-transparent text-sm font-black text-gray-900 focus:outline-none w-full appearance-none cursor-pointer">
                        <option>Últimos 30 Días</option>
@@ -175,43 +175,43 @@ export default function ReportsPage() {
                     <ChevronDown className="w-4 h-4 text-blue-600" />
                  </div>
               </div>
-              <div className="w-[350px] flex items-center bg-white border border-gray-100 px-6 rounded-[24px] shadow-sm">
+              <div className="w-full lg:w-[350px] flex items-center bg-white border border-gray-100 px-6 py-3.5 rounded-[24px] shadow-sm">
                  <Search className="w-4 h-4 text-gray-400 mr-3" />
-                 <input className="bg-transparent border-none focus:ring-0 text-sm font-bold text-gray-700 w-full" placeholder="Buscar parámetros de auditoría..." />
+                 <input className="bg-transparent border-none focus:ring-0 text-sm font-bold text-gray-700 w-full" placeholder="Buscar parámetros..." />
               </div>
            </div>
         </div>
 
-        <div className="flex-1 px-12 pb-16 space-y-10">
+        <div className="flex-1 px-4 lg:px-12 pb-16 space-y-10">
           
           {(isEmpty || !data.summary) ? (
-             <div className="flex flex-col items-center justify-center py-28 animate-in fade-in slide-in-from-bottom-4 bg-white rounded-[48px] border border-dashed border-gray-200 mx-4">
-                <div className="w-36 h-36 bg-gray-50 rounded-[44px] flex items-center justify-center mb-10 border border-gray-100">
-                   <BarChart3 className="w-16 h-16 text-gray-200" />
+             <div className="flex flex-col items-center justify-center py-20 lg:py-28 animate-in fade-in slide-in-from-bottom-4 bg-white rounded-[48px] border border-dashed border-gray-200 mx-4">
+                <div className="w-24 lg:w-36 h-24 lg:h-36 bg-gray-50 rounded-[44px] flex items-center justify-center mb-10 border border-gray-100">
+                   <BarChart3 className="w-12 lg:w-16 h-12 lg:h-16 text-gray-200" />
                 </div>
-                <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-3">Sin registros para procesar</h2>
-                <p className="text-gray-400 font-medium mb-12 max-w-sm text-center">No se detectaron transacciones en el rango seleccionado. Intente ampliar el periodo de búsqueda.</p>
-                <div className="flex gap-6">
-                   <button onClick={() => setFilters({startDate:'', endDate:'', type:'Ingresos Consolidados'})} className="px-10 py-4 bg-blue-600 rounded-2xl text-white font-black hover:bg-blue-700 transition-all flex items-center gap-3 shadow-xl shadow-blue-100">
+                <h2 className="text-2xl lg:text-3xl font-black text-gray-900 tracking-tight mb-3">Sin registros</h2>
+                <p className="text-sm lg:text-base text-gray-400 font-medium mb-12 max-w-sm text-center">No se detectaron transacciones en el rango seleccionado.</p>
+                <div className="flex flex-col sm:flex-row gap-6 w-full sm:w-auto px-10">
+                   <button onClick={() => setFilters({startDate:'', endDate:'', type:'Ingresos Consolidados'})} className="px-10 py-4 bg-blue-600 rounded-2xl text-white font-black hover:bg-blue-700 transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-100">
                        <Calendar className="w-5 h-5" /> Ajustar Fecha
                    </button>
-                   <button onClick={() => fetchData()} className="px-10 py-4 bg-white border border-gray-100 rounded-2xl text-gray-900 font-black hover:bg-gray-50 transition-all flex items-center gap-3">
-                       <Loader2 className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} /> Refrescar Panel
+                   <button onClick={() => fetchData()} className="px-10 py-4 bg-white border border-gray-100 rounded-2xl text-gray-900 font-black hover:bg-gray-50 transition-all flex items-center justify-center gap-3">
+                       <Loader2 className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} /> Refrescar
                    </button>
                 </div>
              </div>
           ) : (
             <>
               {/* KPIs */}
-              <div className="flex gap-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-10">
                 <KPICard title="Facturación Bruta" value={data.summary?.totalRevenue ?? 0} growth={12.5} icon={ShoppingBag} isCurrency />
                 <KPICard title="Margen de Utilidad" value={data.summary?.totalProfit ?? 0} growth={8.2} icon={TrendingUp} isCurrency />
                 <KPICard title="Ticket Promedio" value={data.summary?.avgTicket ?? 0} growth={-1.4} icon={DollarSign} isCurrency />
               </div>
 
               {/* Charts Row */}
-              <div className="grid grid-cols-12 gap-10">
-                <div className="col-span-7 bg-white p-10 rounded-[48px] border border-gray-100 shadow-sm">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                <div className="col-span-1 lg:col-span-7 bg-white p-6 lg:p-10 rounded-[48px] border border-gray-100 shadow-sm">
                   <div className="flex items-center justify-between mb-8">
                      <div>
                         <h3 className="text-xl font-black text-gray-900 tracking-tight">Evolución de Ingresos</h3>
@@ -291,8 +291,8 @@ export default function ReportsPage() {
               </div>
 
               {/* Details Row */}
-              <div className="grid grid-cols-12 gap-10">
-                 <div className="col-span-5 bg-white p-10 rounded-[48px] border border-gray-100 shadow-sm flex flex-col">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                 <div className="col-span-1 lg:col-span-5 bg-white p-6 lg:p-10 rounded-[48px] border border-gray-100 shadow-sm flex flex-col">
                     <div className="flex items-center justify-between mb-8">
                        <h3 className="text-xl font-black text-gray-900 tracking-tight">Top Productos</h3>
                        <button className="text-[9px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-800 transition-colors">Ver Almacén</button>
@@ -312,13 +312,13 @@ export default function ReportsPage() {
                     </div>
                  </div>
 
-                 <div className="col-span-7 bg-white p-10 rounded-[48px] border border-gray-100 shadow-sm">
+                 <div className="col-span-1 lg:col-span-7 bg-white p-6 lg:p-10 rounded-[48px] border border-gray-100 shadow-sm">
                     <div className="flex items-center justify-between mb-8">
                        <h3 className="text-xl font-black text-gray-900 tracking-tight">Transacciones de Impacto</h3>
                        <button className="p-2 bg-gray-50 rounded-xl text-gray-400 hover:text-gray-900 transition-all"><MoreHorizontal className="w-5 h-5"/></button>
                     </div>
-                    <div className="overflow-hidden">
-                       <table className="w-full text-left">
+                    <div className="overflow-x-auto">
+                       <table className="w-full text-left min-w-[500px]">
                           <thead>
                              <tr className="bg-gray-50/50 text-[9px] font-black text-gray-400 uppercase tracking-[2px] border-b border-gray-50">
                                 <th className="px-5 py-4">ID</th>

@@ -184,29 +184,29 @@ export default function ExpensesPage() {
     <div className="flex h-screen bg-[#F9FAFB] overflow-hidden font-sans text-[#111827]">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col ml-64 overflow-hidden">
+      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden transition-all duration-300">
         <TopBar />
         
-        <main className="flex-1 overflow-y-auto bg-[#F9FAFB] p-8">
+        <main className="flex-1 overflow-y-auto bg-[#F9FAFB] px-4 lg:px-10 py-6 lg:py-8">
           <div className="max-w-7xl mx-auto">
             
             {/* Header Area */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
               <div>
-                <h1 className="text-3xl font-extrabold tracking-tight mb-2">Gastos y Egresos</h1>
-                <p className="text-[#6B7280]">Control detallado de salidas de capital y costos operativos.</p>
+                <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight mb-2">Gastos</h1>
+                <p className="text-sm lg:text-base text-[#6B7280]">Control de egresos y costos operativos.</p>
               </div>
               
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                 <button 
                   onClick={() => setIsCategoryModalOpen(true)}
-                  className="px-6 py-3 bg-white border border-gray-100 text-gray-700 rounded-2xl text-sm font-bold hover:bg-gray-50 transition-all shadow-sm"
+                  className="w-full sm:w-auto px-6 py-3.5 bg-white border border-gray-100 text-gray-700 rounded-2xl text-sm font-bold hover:bg-gray-50 transition-all shadow-sm"
                 >
                   Categorías
                 </button>
                 <button 
                   onClick={() => { resetForm(); setIsModalOpen(true); }}
-                  className="flex items-center gap-2 px-6 py-3 bg-rose-600 text-white rounded-2xl text-sm font-bold hover:bg-rose-700 transition-all shadow-lg shadow-rose-100 active:scale-95"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 bg-rose-600 text-white rounded-2xl text-sm font-bold hover:bg-rose-700 transition-all shadow-lg shadow-rose-100 active:scale-95"
                 >
                   <Plus className="w-5 h-5" />
                   Registrar Egreso
@@ -215,7 +215,7 @@ export default function ExpensesPage() {
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
               <div className="bg-white rounded-[32px] p-8 border border-gray-100 shadow-sm relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
                    <TrendingDown className="w-20 h-20 text-rose-600" />
@@ -254,8 +254,8 @@ export default function ExpensesPage() {
 
             {/* List and Filters */}
             <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
-               <div className="p-8 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  <div className="relative w-full md:w-96">
+               <div className="p-6 lg:p-8 border-b border-gray-50 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                  <div className="relative w-full lg:w-96">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input 
                       type="text" 
@@ -266,13 +266,13 @@ export default function ExpensesPage() {
                     />
                   </div>
                   
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 w-full lg:w-auto">
                     <select 
-                      className="px-4 py-3 bg-gray-50 border-transparent rounded-xl text-xs font-bold text-gray-500 outline-none cursor-pointer hover:bg-gray-100 transition-colors"
+                      className="flex-1 lg:flex-none px-4 py-3 bg-gray-50 border-transparent rounded-xl text-xs font-bold text-gray-500 outline-none cursor-pointer hover:bg-gray-100 transition-colors"
                       value={filters.categoryId}
                       onChange={(e) => setFilters({...filters, categoryId: e.target.value})}
                     >
-                      <option value="">Todas las categorías</option>
+                      <option value="">Categorías</option>
                       {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                     <button className="p-3 bg-gray-50 text-gray-400 rounded-xl hover:bg-gray-100 transition-all">
@@ -282,7 +282,7 @@ export default function ExpensesPage() {
                </div>
 
                <div className="overflow-x-auto">
-                  <table className="w-full text-left">
+                  <table className="w-full text-left min-w-[900px]">
                     <thead>
                       <tr className="bg-gray-50/50">
                         <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Fecha y Ref</th>
@@ -369,6 +369,7 @@ export default function ExpensesPage() {
                       ))}
                     </tbody>
                   </table>
+                </div>
                </div>
             </div>
           </div>

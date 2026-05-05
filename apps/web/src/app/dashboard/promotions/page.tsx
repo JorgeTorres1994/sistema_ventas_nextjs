@@ -78,27 +78,27 @@ export default function PromotionsPage() {
     <div className="flex h-screen bg-[#F9FAFB] overflow-hidden font-sans text-[#111827]">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col ml-64 overflow-hidden">
+      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden transition-all duration-300">
         <TopBar />
         
-        <main className="flex-1 overflow-y-auto bg-[#F9FAFB] p-8">
+        <main className="flex-1 overflow-y-auto bg-[#F9FAFB] px-4 lg:px-10 py-6 lg:py-10">
           <div className="max-w-7xl mx-auto">
             
             {/* Header Area */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
               <div>
-                <h1 className="text-3xl font-extrabold tracking-tight mb-2">Promociones y Fidelización</h1>
-                <p className="text-[#6B7280]">Gestiona tus campañas de marketing, cupones de descuento y programa de puntos.</p>
+                <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight mb-2">Promociones</h1>
+                <p className="text-sm lg:text-base text-[#6B7280]">Marketing y fidelización.</p>
               </div>
               
-              <button className="flex items-center gap-2 px-6 py-4 bg-blue-600 text-white rounded-[24px] text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 active:scale-95">
+              <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 text-white rounded-[24px] text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 active:scale-95">
                 <Plus className="w-5 h-5" />
                 {activeTab === 'promos' ? 'Nueva Promoción' : 'Nuevo Cupón'}
               </button>
             </div>
 
             {/* Loyalty Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
                <div className="bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm relative overflow-hidden group">
                   <div className="absolute right-[-20px] top-[-20px] bg-blue-50 w-32 h-32 rounded-full opacity-50 group-hover:scale-110 transition-transform duration-500"></div>
                   <Trophy className="w-10 h-10 text-blue-600 mb-6 relative z-10" />

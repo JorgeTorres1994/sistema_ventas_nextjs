@@ -201,45 +201,82 @@ export default function PosPage() {
     }
   };
 
+  const [showMobileCart, setShowMobileCart] = useState(false);
+
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden relative">
+      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden relative transition-all duration-300">
         <PosTopBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         
-        <main className="flex-1 flex overflow-hidden">
+        <main className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
           {/* Main Workspace: Product Grid */}
-          <PosProductGrid 
-            products={products} 
-            isLoading={isLoading} 
-            onAddToCart={handleAddToCart}
-            selectedCategoryId={selectedCategoryId}
-            setSelectedCategoryId={setSelectedCategoryId}
-            categories={categories}
-          />
+          <div className="flex-1 h-full overflow-hidden">
+            <PosProductGrid 
+              products={products} 
+              isLoading={isLoading} 
+              onAddToCart={handleAddToCart}
+              selectedCategoryId={selectedCategoryId}
+              setSelectedCategoryId={setSelectedCategoryId}
+              categories={categories}
+            />
+          </div>
           
           {/* Sidebar: Cart Panel */}
-          <PosCartPanel 
-            cart={cart}
-            paymentMethod={paymentMethod}
-            setPaymentMethod={setPaymentMethod}
-            documentType={documentType}
-            setDocumentType={setDocumentType}
-            selectedCustomerId={selectedCustomerId}
-            setSelectedCustomerId={setSelectedCustomerId}
-            couponCode={couponCode}
-            setCouponCode={setCouponCode}
-            pointsToRedeem={pointsToRedeem}
-            setPointsToRedeem={setPointsToRedeem}
-            customerPoints={customerPoints}
-            onClearCart={handleClearCart}
-            onUpdateQuantity={handleUpdateQuantity}
-            onRemoveItem={handleRemoveItem}
-            onCompleteSale={handleCompleteSale}
-            onGenerateQuotation={handleGenerateQuotation}
-            isProcessing={isProcessing}
-          />
+          {/* On mobile, this will be an overlay/sliding panel */}
+          <div 
+            className={`
+              fixed inset-0 z-50 lg:relative lg:inset-auto lg:z-10
+              transition-transform duration-300 transform
+              ${showMobileCart ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
+            `}
+          >
+            {/* Overlay for mobile */}
+            {showMobileCart && (
+              <div 
+                className="absolute inset-0 bg-black/40 backdrop-blur-sm lg:hidden"
+                onClick={() => setShowMobileCart(false)}
+              />
+            )}
+            
+            <PosCartPanel 
+              cart={cart}
+              paymentMethod={paymentMethod}
+              setPaymentMethod={setPaymentMethod}
+              documentType={documentType}
+              setDocumentType={setDocumentType}
+              selectedCustomerId={selectedCustomerId}
+              setSelectedCustomerId={setSelectedCustomerId}
+              couponCode={couponCode}
+              setCouponCode={setCouponCode}
+              pointsToRedeem={pointsToRedeem}
+              setPointsToRedeem={setPointsToRedeem}
+              customerPoints={customerPoints}
+              onClearCart={handleClearCart}
+              onUpdateQuantity={handleUpdateQuantity}
+              onRemoveItem={handleRemoveItem}
+              onCompleteSale={handleCompleteSale}
+              onGenerateQuotation={handleGenerateQuotation}
+              isProcessing={isProcessing}
+              onCloseMobile={() => setShowMobileCart(false)}
+            />
+          </div>
+
+          {/* Floating Cart Button for Mobile */}
+          <button
+            onClick={() => setShowMobileCart(true)}
+            className="lg:hidden fixed bottom-6 right-6 z-40 w-16 h-16 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center animate-bounce active:scale-90 transition-transform"
+          >
+            <div className="relative">
+              <ShoppingCart className="w-6 h-6" />
+              {cart.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-rose-500 text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
+                  {cart.reduce((acc, item) => acc + item.quantity, 0)}
+                </span>
+              )}
+            </div>
+          </button>
         </main>
       </div>
     </div>
