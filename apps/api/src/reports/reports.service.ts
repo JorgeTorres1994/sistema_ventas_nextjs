@@ -154,9 +154,12 @@ export class ReportsService {
     async getDashboardStats() {
         const last30Days = { startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() };
         
-        const summary = await this.getSummary(last30Days);
-        const charts = await this.getCharts(last30Days);
-        const recentOrders = await this.getTransactions({});
+        // Elite optimization: Parallel fetching for maximum responsiveness
+        const [summary, charts, recentOrders] = await Promise.all([
+            this.getSummary(last30Days),
+            this.getCharts(last30Days),
+            this.getTransactions({})
+        ]);
 
         return {
             kpis: {

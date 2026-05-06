@@ -200,23 +200,61 @@ async function main() {
         },
     });
 
+    console.log('Creando permisos y asignando al Administrador...');
+    const modules = [
+        'dashboard', 'pos', 'cash', 'sales', 'expenses', 'credits', 
+        'customers', 'products', 'inventory', 'suppliers', 
+        'purchases', 'promotions', 'reports', 'audit', 'users', 'roles', 'settings'
+    ];
+    const actions = ['read', 'create', 'update', 'delete'];
+
+    for (const module of modules) {
+        for (const action of actions) {
+            const p = await (prisma as any).permission.create({
+                data: {
+                    name: `${module}:${action}`,
+                    module,
+                    action,
+                    description: `Permiso para ${action} en el módulo ${module}`
+                }
+            });
+            await (prisma as any).rolePermission.create({
+                data: {
+                    roleId: adminRole.id,
+                    permissionId: p.id
+                }
+            });
+        }
+    }
+
     console.log('Iniciando el seeding de ropa con categorías...');
     for (const item of products) {
-        let categoryRecord = await prisma.category.findUnique({ where: { name: item.category } });
+        let categoryRecord = await (prisma as any).category.findUnique({ where: { name: item.category } });
         if (!categoryRecord) {
-            categoryRecord = await prisma.category.create({ data: { name: item.category } });
+            categoryRecord = await (prisma as any).category.create({ data: { name: item.category } });
         }
 
-        await prisma.product.create({
+        await (prisma as any).product.create({
             data: {
                 name: item.name,
                 description: item.description,
                 price: item.price,
                 stock: item.stock,
                 imageUrl: item.imageUrl,
-                categoryId: categoryRecord.id
+                categoryId: (categoryRecord as any).id
             },
         });
+    }
+
+    // Create a default Document Series
+    console.log('Creando series de documentos por defecto...');
+    const seriesData = [
+        { documentType: 'BOLETA', prefix: 'B001', startNumber: 1, currentNumber: 0, description: 'Boleta de Venta Electrónica' },
+        { documentType: 'FACTURA', prefix: 'F001', startNumber: 1, currentNumber: 0, description: 'Factura Electrónica' }
+    ];
+
+    for (const s of seriesData) {
+        await (prisma as any).documentSeries.create({ data: s });
     }
 
     console.log('Seeding completado con éxito.');
