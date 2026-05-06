@@ -166,42 +166,42 @@ export default function KardexPage() {
     <div className="flex h-screen bg-[#F9FAFB] overflow-hidden font-sans text-[#111827]">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden transition-all duration-300">
+      <div className="flex-1 flex flex-col ml-64 overflow-hidden">
         <TopBar />
         
-        <main className="flex-1 overflow-y-auto bg-[#F9FAFB] px-4 lg:px-10 py-6 lg:py-8">
+        <main className="flex-1 overflow-y-auto bg-[#F9FAFB] p-8">
           <div className="max-w-7xl mx-auto">
             
             {/* Header Area */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
               <div>
-                <h1 className="text-2xl lg:text-3xl font-extrabold tracking-tight mb-2">Kardex Valorizado</h1>
-                <p className="text-xs lg:text-sm text-[#6B7280]">Seguimiento de existencias y costos promedio.</p>
+                <h1 className="text-3xl font-extrabold tracking-tight mb-2">Kardex de Inventario Valorizado</h1>
+                <p className="text-[#6B7280]">Seguimiento detallado de costos y existencias con método de promedio ponderado.</p>
               </div>
               
-              <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+              <div className="flex items-center gap-3">
                 <button 
                   onClick={handleExportPDF}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-2xl text-sm font-bold hover:bg-gray-50 transition-all shadow-sm active:scale-95"
+                  className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-2xl text-sm font-bold hover:bg-gray-50 transition-all shadow-sm active:scale-95"
                 >
                   <FileText className="w-5 h-5 text-rose-600" />
-                  PDF
+                  Exportar PDF
                 </button>
                 <button 
                   onClick={handleExportExcel}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-2xl text-sm font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 active:scale-95"
+                  className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-2xl text-sm font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 active:scale-95"
                 >
                   <Download className="w-5 h-5" />
-                  Excel
+                  Exportar Excel
                 </button>
               </div>
             </div>
 
             {/* Product Selector & Filters */}
-            <div className="bg-white rounded-[40px] p-6 lg:p-8 border border-gray-100 shadow-sm mb-10">
-               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-                  <div className="sm:col-span-2 space-y-3">
-                     <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Producto</label>
+            <div className="bg-white rounded-[40px] p-8 border border-gray-100 shadow-sm mb-10">
+               <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                  <div className="md:col-span-2 space-y-3">
+                     <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Seleccionar Producto</label>
                      <div className="relative">
                         <Package className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-600" />
                         <select 
@@ -210,14 +210,14 @@ export default function KardexPage() {
                           onChange={(e) => setSelectedProductId(e.target.value)}
                         >
                           {products.map(p => (
-                            <option key={p.id} value={p.id}>{p.name}</option>
+                            <option key={p.id} value={p.id}>{p.name} - Stock: {p.stock}</option>
                           ))}
                         </select>
                      </div>
                   </div>
 
                   <div className="space-y-3">
-                     <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Inicio</label>
+                     <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Fecha Inicio</label>
                      <input 
                        type="date" 
                        className="w-full px-6 py-5 bg-gray-50 border-transparent rounded-[24px] focus:bg-white focus:border-blue-500 transition-all outline-none font-bold text-gray-700"
@@ -227,7 +227,7 @@ export default function KardexPage() {
                   </div>
 
                   <div className="space-y-3">
-                     <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Fin</label>
+                     <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Fecha Fin</label>
                      <input 
                        type="date" 
                        className="w-full px-6 py-5 bg-gray-50 border-transparent rounded-[24px] focus:bg-white focus:border-blue-500 transition-all outline-none font-bold text-gray-700"
@@ -240,22 +240,22 @@ export default function KardexPage() {
 
             {/* Product Summary Mini Cards */}
             {kardexData?.product && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
                 <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Costo Unit. Promedio</p>
-                   <h4 className="text-xl lg:text-2xl font-black text-blue-600 tracking-tight">S/ {Number(kardexData.product.purchasePrice).toFixed(2)}</h4>
+                   <h4 className="text-2xl font-black text-blue-600 tracking-tight">S/ {Number(kardexData.product.purchasePrice).toFixed(2)}</h4>
                 </div>
                 <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Stock Actual</p>
-                   <h4 className="text-xl lg:text-2xl font-black text-gray-900 tracking-tight">{kardexData.product.stock} Unid.</h4>
+                   <h4 className="text-2xl font-black text-gray-900 tracking-tight">{kardexData.product.stock} Unid.</h4>
                 </div>
                 <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
-                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Valor Total</p>
-                   <h4 className="text-xl lg:text-2xl font-black text-emerald-600 tracking-tight">S/ {(kardexData.product.stock * Number(kardexData.product.purchasePrice)).toFixed(2)}</h4>
+                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Valor Total Inventario</p>
+                   <h4 className="text-2xl font-black text-emerald-600 tracking-tight">S/ {(kardexData.product.stock * Number(kardexData.product.purchasePrice)).toFixed(2)}</h4>
                 </div>
                 <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Precio de Venta</p>
-                   <h4 className="text-xl lg:text-2xl font-black text-amber-600 tracking-tight">S/ {Number(kardexData.product.price).toFixed(2)}</h4>
+                   <h4 className="text-2xl font-black text-amber-600 tracking-tight">S/ {Number(kardexData.product.price).toFixed(2)}</h4>
                 </div>
               </div>
             )}
@@ -263,7 +263,7 @@ export default function KardexPage() {
             {/* Valued Kardex Table */}
             <div className="bg-white rounded-[48px] border border-gray-100 shadow-sm overflow-hidden">
                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse min-w-[1200px]">
+                  <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-gray-50/50">
                         <th className="px-8 py-8 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">Fecha y Movimiento</th>
@@ -350,8 +350,7 @@ export default function KardexPage() {
                       ))}
                     </tbody>
                   </table>
-                </div>
-              </div>
+               </div>
             </div>
           </div>
         </main>

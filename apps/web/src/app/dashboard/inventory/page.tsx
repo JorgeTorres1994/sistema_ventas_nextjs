@@ -241,34 +241,34 @@ export default function InventoryPage() {
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
       <Sidebar />
-      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden transition-all duration-300">
+      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
         <TopBar />
 
         {/* Module Header */}
-        <div className="px-4 lg:px-10 py-6 lg:py-8 bg-white border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shrink-0">
+        <div className="px-8 py-6 bg-white border-b border-gray-100 flex items-start justify-between shrink-0">
           <div>
-            <nav className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+            <nav className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">
               <span>Inventario</span><span>/</span>
-              <span className="text-indigo-600">Stock</span>
+              <span className="text-indigo-600">Vista General</span>
             </nav>
-            <h1 className="text-2xl lg:text-3xl font-black text-gray-900 tracking-tight leading-none">Control de Stock</h1>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none">Stock de Inventario</h1>
           </div>
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-[10px] lg:text-sm font-black text-gray-600 hover:bg-gray-50 transition-colors">
-              <Download className="w-4 h-4" /> <span className="hidden sm:inline">Exportar</span>
+          <div className="flex items-center gap-3 mt-1">
+            <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-black text-gray-600 hover:bg-gray-50 transition-colors">
+              <Download className="w-4 h-4" /> Exportar
             </button>
             <button
               onClick={() => router.push('/dashboard/inventory/movements')}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 rounded-xl text-[10px] lg:text-sm font-black text-white hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all">
-              <span>Kardex</span>
+              className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 rounded-xl text-sm font-black text-white hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all">
+              Historial de Movimientos
             </button>
           </div>
         </div>
 
-        <main className="flex-1 p-4 lg:p-10 space-y-8 lg:space-y-10 overflow-y-auto scroll-smooth">
+        <main className="flex-1 p-8 space-y-8 overflow-y-auto scroll-smooth">
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-4 gap-6">
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50 border-l-4 border-l-indigo-500">
               <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Valor Total de Stock</p>
               <p className="text-3xl font-black text-gray-900">
@@ -299,16 +299,16 @@ export default function InventoryPage() {
           <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
 
             {/* Filter Bar */}
-            <div className="px-6 py-4 border-b border-gray-100 flex flex-col lg:flex-row items-center gap-6">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-4 flex-wrap">
               {/* Status Pills */}
-              <div className="flex items-center gap-2 overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 scrollbar-none">
+              <div className="flex items-center gap-2">
                 {[
-                  { label: 'Todo', value: '' },
-                  { label: 'Bajo', value: 'low' },
-                  { label: 'Cero', value: 'out' },
+                  { label: 'Todo el Stock', value: '' },
+                  { label: 'Stock Bajo', value: 'low' },
+                  { label: 'Sin Stock', value: 'out' },
                 ].map(s => (
                   <button key={s.value} onClick={() => { setStockStatus(s.value); setPage(1); }}
-                    className={`flex-none px-4 py-2 rounded-xl text-[10px] lg:text-xs font-black transition-all ${stockStatus === s.value ? 'bg-indigo-600 text-white shadow-sm' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+                    className={`px-4 py-2 rounded-xl text-sm font-black transition-all ${stockStatus === s.value ? 'bg-indigo-600 text-white shadow-sm' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
                     {s.label}
                   </button>
                 ))}
@@ -316,17 +316,17 @@ export default function InventoryPage() {
 
               {/* Category Filter */}
               <select value={categoryId} onChange={e => { setCategoryId(e.target.value); setPage(1); }}
-                className="w-full lg:w-auto px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-[10px] lg:text-xs font-bold text-gray-600 focus:outline-none">
-                <option value="">Categorías</option>
+                className="px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold text-gray-600 focus:outline-none">
+                <option value="">Todas las Categorías</option>
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
 
               {/* Search */}
-              <div className="w-full lg:ml-auto lg:w-auto flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl px-4 py-3">
+              <div className="ml-auto flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2">
                 <Search className="w-4 h-4 text-gray-400" />
-                <input placeholder="Buscar..." value={searchInput}
+                <input placeholder="Buscar productos..." value={searchInput}
                   onChange={e => setSearchInput(e.target.value)}
-                  className="bg-transparent outline-none text-[10px] lg:text-xs font-medium text-gray-700 w-full lg:w-48" />
+                  className="bg-transparent outline-none text-sm font-medium text-gray-700 w-48" />
               </div>
             </div>
 
@@ -342,7 +342,7 @@ export default function InventoryPage() {
 
             {/* Table */}
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px]">
+              <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-100">
                     <th className="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Producto</th>

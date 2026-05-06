@@ -21,7 +21,7 @@ const fmtTime = (iso: string) => new Date(iso).toLocaleTimeString('es-PE', { hou
 // ── Components ─────────────────────────────────────────────────────────────────
 
 const SalesSummary = ({ stats }: any) => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+  <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
     <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm group hover:border-blue-100 transition-all">
        <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-4">
           <TrendingUp className="w-6 h-6" />
@@ -375,26 +375,26 @@ export default function SalesPage() {
     <div className="flex h-screen bg-[#F8F9FC] overflow-hidden font-sans">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden transition-all duration-300">
+      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
         <TopBar />
         
         {/* Module Header */}
-        <div className="px-4 lg:px-10 py-6 lg:py-8 bg-transparent flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shrink-0">
+        <div className="px-10 py-8 bg-transparent flex items-center justify-between shrink-0">
           <div>
-            <h1 className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tight leading-none mb-2">Ventas</h1>
-            <p className="text-sm lg:text-base text-gray-400 font-medium">Auditoría centralizada de transacciones • Nexus Genesis</p>
+            <h1 className="text-4xl font-black text-gray-900 tracking-tight leading-none mb-2">Historial de Ventas</h1>
+            <p className="text-base text-gray-400 font-medium">Auditoría centralizada de transacciones • Nexus Genesis</p>
           </div>
-          <Link href="/dashboard/pos" className="w-full sm:w-auto">
-            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-black text-sm transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-3">
+          <Link href="/dashboard/pos">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-black text-sm transition-all shadow-xl shadow-blue-100 flex items-center gap-3">
               <Plus className="w-5 h-5" /> Nueva Venta
             </button>
           </Link>
         </div>
 
-        <main className="flex-1 overflow-y-auto px-4 lg:px-10 pb-12 space-y-8 scroll-smooth scrollbar-hide">
+        <main className="flex-1 overflow-y-auto px-10 pb-12 space-y-8 scroll-smooth scrollbar-hide">
           {/* Controls Bar */}
-          <div className="bg-white p-6 rounded-[24px] shadow-sm border border-gray-100 flex flex-col lg:flex-row items-center gap-6">
-            <div className="flex-1 w-full relative">
+          <div className="bg-white p-6 rounded-[24px] shadow-sm border border-gray-100 flex flex-wrap items-center gap-6">
+            <div className="flex-1 min-w-[300px] relative">
               <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input 
                 type="text" 
@@ -405,12 +405,12 @@ export default function SalesPage() {
               />
             </div>
 
-            <div className="flex bg-gray-50 p-1.5 rounded-2xl border border-gray-100 overflow-x-auto no-scrollbar max-w-full">
+            <div className="flex bg-gray-50 p-1.5 rounded-2xl border border-gray-100">
               {['Todos', 'Pagado', 'Pendiente', 'Anulado'].map((s) => (
                 <button
                   key={s}
                   onClick={() => setStatus(s === 'Anulado' ? 'CANCELLED' : (s === 'Pagado' ? 'PAID' : (s === 'Pendiente' ? 'PENDING' : 'Todos')))}
-                  className={`px-4 lg:px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                  className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                     (status === 'CANCELLED' && s === 'Anulado') || 
                     (status === 'PAID' && s === 'Pagado') || 
                     (status === 'PENDING' && s === 'Pendiente') || 
@@ -424,7 +424,7 @@ export default function SalesPage() {
               ))}
             </div>
 
-            <button className="p-4 bg-gray-50 hover:bg-gray-100 rounded-2xl transition-colors text-gray-500 border border-gray-100 hidden sm:block">
+            <button className="p-4 bg-gray-50 hover:bg-gray-100 rounded-2xl transition-colors text-gray-500 border border-gray-100">
               <Download className="w-5 h-5" />
             </button>
           </div>
@@ -432,8 +432,7 @@ export default function SalesPage() {
           <SalesSummary stats={stats} />
 
           <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left min-w-[800px]">
+            <table className="w-full text-left">
               <thead>
                 <tr className="bg-gray-50/50 border-b border-gray-100">
                   <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">ID Venta</th>
@@ -482,7 +481,6 @@ export default function SalesPage() {
               </tbody>
             </table>
           </div>
-        </div>
         </main>
       </div>
 

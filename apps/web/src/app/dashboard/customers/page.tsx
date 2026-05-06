@@ -286,20 +286,20 @@ export default function CustomersPage() {
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
       <Sidebar />
-      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden transition-all duration-300">
+      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
         <TopBar />
 
         {/* Module Header */}
-        <div className="px-4 lg:px-8 py-6 bg-white border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shrink-0">
+        <div className="px-8 py-6 bg-white border-b border-gray-100 flex items-start justify-between shrink-0">
           <div>
-            <p className="text-[10px] lg:text-xs font-black text-indigo-600 uppercase tracking-widest mb-1">Gestión</p>
-            <h1 className="text-2xl lg:text-3xl font-black text-gray-900 tracking-tight leading-none">Clientes</h1>
-            <p className="text-xs lg:text-sm text-gray-400 font-medium mt-1">Gestione sus relaciones con los clientes y vea el historial de transacciones.</p>
+            <p className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-1">Gestión</p>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none">Clientes</h1>
+            <p className="text-sm text-gray-400 font-medium mt-1">Gestione sus relaciones con los clientes y vea el historial de transacciones.</p>
           </div>
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-3 mt-1">
             <button
               onClick={() => router.push('/dashboard/customers/new')}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-indigo-600 rounded-xl text-sm font-black text-white hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all"
+              className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 rounded-xl text-sm font-black text-white hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all"
             >
               <UserPlus className="w-4 h-4" /> Agregar Cliente
             </button>

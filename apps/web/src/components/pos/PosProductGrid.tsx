@@ -45,7 +45,7 @@ export default function PosProductGrid({
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#f9f9ff] px-4 lg:px-8 py-4 lg:py-6 overflow-hidden">
+    <div className="flex-1 flex flex-col h-full bg-[#f9f9ff] px-8 py-6 overflow-hidden">
       
       {/* Category Scroller in POS */}
       <div className="relative flex items-center gap-2 mb-8 shrink-0">

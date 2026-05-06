@@ -14,7 +14,6 @@ export const metadata: Metadata = {
 };
 
 import { SettingsProvider } from "@/components/SettingsProvider";
-import { SidebarProvider } from "@/components/SidebarProvider";
 
 export default function RootLayout({
   children,
@@ -31,10 +30,8 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col font-sans">
         <SettingsProvider>
-          <SidebarProvider>
-            {children}
-            <Toaster position="bottom-right" />
-          </SidebarProvider>
+          {children}
+          <Toaster position="bottom-right" />
         </SettingsProvider>
       </body>
     </html>

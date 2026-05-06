@@ -1,12 +1,10 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Bell, User, LogOut, Settings as SettingsIcon, ChevronDown, Menu } from 'lucide-react';
+import { Search, Bell, User, LogOut, Settings as SettingsIcon, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { logout } from '@/lib/api';
-import { useSidebar } from '../SidebarProvider';
 
 const TopBar = () => {
-  const { toggle } = useSidebar();
   const [user, setUser] = useState<any>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -85,15 +83,7 @@ const TopBar = () => {
     <header className="h-[88px] border-b border-gray-100/50 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 w-full sticky top-0 z-30 transition-all duration-300">
       
       {/* Left Section: Search & Status */}
-      <div className="flex items-center gap-4 lg:gap-8 flex-1">
-        {/* Mobile Menu Toggle */}
-        <button 
-          onClick={toggle}
-          className="lg:hidden p-3 bg-gray-50 hover:bg-gray-100 rounded-2xl transition-colors border border-gray-100 shadow-sm active:scale-95"
-        >
-          <Menu className="w-5 h-5 text-gray-600" />
-        </button>
-
+      <div className="flex items-center gap-8 flex-1">
         <div className="relative w-full max-w-md group">
           <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
             <Search className="h-4 w-4 text-gray-400 group-focus-within:text-blue-600 transition-colors" />

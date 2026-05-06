@@ -126,7 +126,7 @@ export default function SettingsPage() {
         return (
             <div className="flex h-screen bg-[#F9FAFB] overflow-hidden font-sans">
                 <Sidebar />
-                <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden transition-all duration-300">
+                <div className="flex-1 flex flex-col ml-64 overflow-hidden">
                     <TopBar />
                     <div className="flex-1 flex items-center justify-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -145,9 +145,9 @@ export default function SettingsPage() {
                 
                 <main className="flex-1 overflow-y-auto bg-[#F9FAFB] p-8">
                     <div className="max-w-7xl mx-auto">
-                        <div className="mb-8 px-4 lg:px-0">
-                            <h1 className="text-2xl lg:text-3xl font-extrabold text-[#111827] mb-2">Configuración</h1>
-                            <p className="text-sm text-[#6B7280]">Gestione la identidad de su negocio y parámetros globales.</p>
+                        <div className="mb-8">
+                            <h1 className="text-3xl font-extrabold text-[#111827] mb-2">Configuración del Sistema</h1>
+                            <p className="text-[#6B7280]">Gestione la identidad de su negocio, métodos de pago y facturación electrónica.</p>
                         </div>
 
                         {/* Tabs Navigation */}
@@ -373,7 +373,7 @@ export default function SettingsPage() {
                         )}
 
                         {/* Footer Actions */}
-                        <div className="fixed bottom-0 left-0 lg:left-64 right-0 p-6 bg-white/80 backdrop-blur-xl border-t border-gray-100 flex flex-col sm:flex-row justify-end gap-4 z-50 transition-all duration-300">
+                        <div className="fixed bottom-0 left-64 right-0 p-6 bg-white/80 backdrop-blur-xl border-t border-gray-100 flex justify-end gap-4 z-50">
                             <button onClick={refreshSettings} className="px-8 py-3 text-gray-400 font-black text-xs uppercase tracking-widest hover:bg-gray-50 rounded-2xl transition-all">Descartar</button>
                             <button onClick={handleSave} disabled={isSaving} className="px-10 py-3 bg-blue-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-blue-100 hover:bg-blue-700 disabled:opacity-50 flex items-center gap-3 transition-all active:scale-95">
                                 {isSaving ? <span className="animate-spin text-lg">⌛</span> : <Save className="w-4 h-4" />}

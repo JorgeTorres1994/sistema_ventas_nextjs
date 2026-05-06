@@ -57,30 +57,30 @@ export default function InvoicingLogPage() {
     <div className="flex h-screen bg-[#F9FAFB] overflow-hidden font-sans text-[#111827]">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden transition-all duration-300">
+      <div className="flex-1 flex flex-col ml-64 overflow-hidden">
         <TopBar />
         
-        <main className="flex-1 overflow-y-auto bg-[#F9FAFB] px-4 lg:px-8 py-6 lg:py-8">
+        <main className="flex-1 overflow-y-auto bg-[#F9FAFB] p-8">
           <div className="max-w-7xl mx-auto">
             
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
               <div>
-                <h1 className="text-2xl lg:text-3xl font-extrabold tracking-tight mb-2">Comprobantes Electrónicos</h1>
-                <p className="text-xs lg:text-sm text-[#6B7280]">Panel de control y monitoreo de facturación.</p>
+                <h1 className="text-3xl font-extrabold tracking-tight mb-2">Comprobantes Electrónicos</h1>
+                <p className="text-[#6B7280]">Panel de control y monitoreo de sincronización con SUNAT/OSE.</p>
               </div>
               
               <div className="flex items-center gap-3">
                  <div className="bg-white px-4 py-2 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-3">
                     <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                    <span className="text-[10px] lg:text-xs font-black text-gray-900 uppercase tracking-widest">OSE: Activo</span>
+                    <span className="text-xs font-black text-gray-900 uppercase tracking-widest">Servicio OSE: Activo</span>
                  </div>
               </div>
             </div>
 
             {/* Filters Bar */}
             <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm mb-8 space-y-6">
-               <div className="flex flex-col lg:flex-row items-center gap-4">
-                  <div className="w-full lg:flex-1 relative">
+               <div className="flex flex-wrap items-center gap-4">
+                  <div className="flex-1 min-w-[300px] relative">
                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                      <input 
                        type="text"
@@ -91,13 +91,13 @@ export default function InvoicingLogPage() {
                      />
                   </div>
 
-                  <div className="flex items-center gap-3 w-full lg:w-auto">
+                  <div className="flex items-center gap-3">
                      <select 
                         value={invoiceStatus}
                         onChange={(e) => setInvoiceStatus(e.target.value)}
-                        className="flex-1 lg:flex-none px-4 py-3 bg-gray-50 border-transparent rounded-2xl text-[10px] lg:text-xs font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-blue-100 transition-all"
+                        className="px-4 py-3 bg-gray-50 border-transparent rounded-2xl text-xs font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-blue-100 transition-all"
                      >
-                        <option value="All">Estados</option>
+                        <option value="All">Todos los Estados</option>
                         <option value="SENT">Aceptados</option>
                         <option value="PENDING">Pendientes</option>
                         <option value="ERROR">Errores</option>
@@ -106,34 +106,34 @@ export default function InvoicingLogPage() {
                      <select 
                         value={documentType}
                         onChange={(e) => setDocumentType(e.target.value)}
-                        className="flex-1 lg:flex-none px-4 py-3 bg-gray-50 border-transparent rounded-2xl text-[10px] lg:text-xs font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-blue-100 transition-all"
+                        className="px-4 py-3 bg-gray-50 border-transparent rounded-2xl text-xs font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-blue-100 transition-all"
                      >
-                        <option value="All">Tipos</option>
+                        <option value="All">Todos los Tipos</option>
                         <option value="FACTURA">Factura</option>
                         <option value="BOLETA">Boleta</option>
                      </select>
                   </div>
                </div>
 
-               <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 border-t border-gray-50">
-                  <div className="flex items-center gap-3 w-full sm:w-auto">
-                     <div className="relative flex-1 sm:flex-none">
+               <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-50">
+                  <div className="flex items-center gap-3">
+                     <div className="relative">
                         <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                         <input 
                            type="date"
                            value={startDate}
                            onChange={(e) => setStartDate(e.target.value)}
-                           className="w-full pl-11 pr-4 py-2 bg-gray-50 border-transparent rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-blue-100 transition-all"
+                           className="pl-11 pr-4 py-2 bg-gray-50 border-transparent rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-blue-100 transition-all"
                         />
                      </div>
                      <span className="text-gray-300 font-bold text-xs uppercase">al</span>
-                     <div className="relative flex-1 sm:flex-none">
+                     <div className="relative">
                         <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                         <input 
                            type="date"
                            value={endDate}
                            onChange={(e) => setEndDate(e.target.value)}
-                           className="w-full pl-11 pr-4 py-2 bg-gray-50 border-transparent rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-blue-100 transition-all"
+                           className="pl-11 pr-4 py-2 bg-gray-50 border-transparent rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-blue-100 transition-all"
                         />
                      </div>
                   </div>
@@ -146,7 +146,7 @@ export default function InvoicingLogPage() {
                         setStartDate('');
                         setEndDate('');
                      }}
-                     className="sm:ml-auto w-full sm:w-auto px-4 py-2 text-[10px] font-black text-gray-400 hover:text-rose-500 uppercase tracking-widest transition-colors"
+                     className="ml-auto px-4 py-2 text-[10px] font-black text-gray-400 hover:text-rose-500 uppercase tracking-widest transition-colors"
                   >
                      Limpiar Filtros
                   </button>
@@ -155,8 +155,7 @@ export default function InvoicingLogPage() {
 
             {/* Invoicing Table */}
             <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-hidden">
-               <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse min-w-[1000px]">
+               <table className="w-full text-left border-collapse">
                   <thead>
                      <tr className="bg-gray-50/50 border-b border-gray-50">
                         <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Documento</th>
@@ -260,7 +259,6 @@ export default function InvoicingLogPage() {
                      )}
                   </tbody>
                </table>
-               </div>
             </div>
 
             {/* Pagination Mock */}

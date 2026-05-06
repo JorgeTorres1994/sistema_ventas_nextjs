@@ -41,11 +41,11 @@ export default function DashboardPage() {
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden transition-all duration-300">
+      <div className="flex-1 flex flex-col ml-64 overflow-hidden">
         <TopBar />
         
-        <main className="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8">
-          <div className="max-w-7xl mx-auto space-y-6">
+        <main className="flex-1 overflow-y-auto bg-gray-50 p-8">
+          <div className="max-w-7xl mx-auto">
             {/* KPI Cards */}
             <StatsCards kpis={data?.kpis} isLoading={isLoading} />
 

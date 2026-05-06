@@ -42,7 +42,6 @@ interface PosCartPanelProps {
   onCompleteSale: () => void;
   onGenerateQuotation: () => void;
   isProcessing: boolean;
-  onCloseMobile?: () => void;
 }
 
 export default function PosCartPanel({
@@ -63,8 +62,7 @@ export default function PosCartPanel({
   onRemoveItem,
   onCompleteSale,
   onGenerateQuotation,
-  isProcessing,
-  onCloseMobile
+  isProcessing
 }: PosCartPanelProps) {
   const { settings, paymentMethods } = useSettings();
   const [customers, setCustomers] = useState<any[]>([]);
@@ -82,26 +80,18 @@ export default function PosCartPanel({
   const total = subtotal + taxAmount;
 
   return (
-    <div className="w-full sm:w-[420px] ml-auto shrink-0 bg-gray-50 flex flex-col h-full border-l border-gray-100 shadow-[-10px_0_30px_rgba(0,0,0,0.02)] z-10 relative">
+    <div className="w-[420px] shrink-0 bg-gray-50 flex flex-col h-full border-l border-gray-100 shadow-[-10px_0_30px_rgba(0,0,0,0.02)] z-10 relative">
       
       {/* Header */}
-      <div className="px-6 lg:px-8 py-6 flex items-center justify-between bg-gray-50 border-white relative z-20">
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={onCloseMobile}
-            className="lg:hidden p-2 hover:bg-gray-100 rounded-xl transition-colors"
-          >
-            <X className="w-5 h-5 text-gray-400" />
-          </button>
-          <h2 className="text-xl font-bold text-gray-900">Carrito</h2>
-        </div>
+      <div className="px-8 py-6 flex items-center justify-between bg-gray-50 border-white relative z-20">
+        <h2 className="text-xl font-bold text-gray-900">Carrito Activo</h2>
         <button 
           onClick={onClearCart}
           disabled={cart.length === 0 || isProcessing}
           className="flex items-center gap-1.5 text-red-500 font-bold text-[10px] uppercase tracking-widest hover:text-red-700 disabled:opacity-50 transition-colors"
         >
           <Trash2 className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Vaciar Carrito</span>
+          Vaciar Carrito
         </button>
       </div>
 
