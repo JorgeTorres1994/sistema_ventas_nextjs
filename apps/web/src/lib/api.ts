@@ -646,6 +646,46 @@ export const getKardex = async (productId: string, params?: { startDate?: string
 };
 
 // ── Promotions & Loyalty ──────────────────────────────────────────
+export const getPromotions = async (all = true) => {
+  const response = await api.get(all ? '/promotions/all' : '/promotions');
+  return response.data;
+};
+
+export const createPromotion = async (data: any) => {
+  const response = await api.post('/promotions', data);
+  return response.data;
+};
+
+export const updatePromotion = async (id: string, data: any) => {
+  const response = await api.patch(`/promotions/${id}`, data);
+  return response.data;
+};
+
+export const togglePromotionStatus = async (id: string) => {
+  const response = await api.patch(`/promotions/${id}/toggle`);
+  return response.data;
+};
+
+export const getCoupons = async () => {
+  const response = await api.get('/promotions/coupons');
+  return response.data;
+};
+
+export const createCoupon = async (data: any) => {
+  const response = await api.post('/promotions/coupons', data);
+  return response.data;
+};
+
+export const updateCoupon = async (id: string, data: any) => {
+  const response = await api.patch(`/promotions/coupons/${id}`, data);
+  return response.data;
+};
+
+export const toggleCouponStatus = async (id: string) => {
+  const response = await api.patch(`/promotions/coupons/${id}/toggle`);
+  return response.data;
+};
+
 export const validateCoupon = async (code: string, amount: number) => {
   const response = await api.get('/promotions/coupons/validate', { params: { code, amount } });
   return response.data;

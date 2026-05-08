@@ -7,14 +7,29 @@ export class PromotionsService {
 
   // --- Promotions Logic ---
   async createPromotion(data: any) {
-    const { productIds, ...promoData } = data;
+    const { productIds, name, description, type, value, startDate, endDate, isActive, minPurchase } = data;
+    
     return (this.prisma as any).promotion.create({
       data: {
-        ...promoData,
+        name,
+        description,
+        type,
+        value: value ? Number(value) : 0,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        isActive: isActive !== undefined ? isActive : true,
+        minPurchase: minPurchase ? Number(minPurchase) : 0,
         products: {
-          create: productIds?.map((id: string) => ({ productId: id }))
+          create: productIds?.map((id: string) => ({ productId: id })) || []
         }
       },
+      include: { products: true }
+    });
+  }
+
+  async getAllPromotions() {
+    return (this.prisma as any).promotion.findMany({
+      orderBy: { createdAt: 'desc' },
       include: { products: true }
     });
   }
@@ -31,14 +46,93 @@ export class PromotionsService {
     });
   }
 
+  async updatePromotion(id: string, data: any) {
+    const { productIds, name, description, type, value, startDate, endDate, isActive, minPurchase } = data;
+    
+    const updateData: any = {};
+    if (name !== undefined) updateData.name = name;
+    if (description !== undefined) updateData.description = description;
+    if (type !== undefined) updateData.type = type;
+    if (value !== undefined) updateData.value = Number(value);
+    if (startDate) updateData.startDate = new Date(startDate);
+    if (endDate) updateData.endDate = new Date(endDate);
+    if (isActive !== undefined) updateData.isActive = isActive;
+    if (minPurchase !== undefined) updateData.minPurchase = Number(minPurchase);
+
+    if (productIds) {
+      await (this.prisma as any).productPromotion.deleteMany({ where: { promotionId: id } });
+      updateData.products = {
+        create: productIds.map((pid: string) => ({ productId: pid }))
+      };
+    }
+
+    return (this.prisma as any).promotion.update({
+      where: { id },
+      data: updateData,
+      include: { products: true }
+    });
+  }
+
+  async togglePromotionStatus(id: string) {
+    const promo = await (this.prisma as any).promotion.findUnique({ where: { id } });
+    if (!promo) throw new NotFoundException('Promoción no encontrada');
+    return (this.prisma as any).promotion.update({
+      where: { id },
+      data: { isActive: !promo.isActive }
+    });
+  }
+
   // --- Coupons Logic ---
   async createCoupon(data: any) {
-    return (this.prisma as any).coupon.create({ data });
+    const { code, description, type, value, minPurchase, startDate, endDate, usageLimit, isActive } = data;
+    
+    return (this.prisma as any).coupon.create({
+      data: {
+        code,
+        description,
+        type,
+        value: value ? Number(value) : 0,
+        minPurchase: minPurchase ? Number(minPurchase) : 0,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        usageLimit: usageLimit ? parseInt(usageLimit) : null,
+        isActive: isActive !== undefined ? isActive : true
+      }
+    });
   }
 
   async getCoupons() {
     return (this.prisma as any).coupon.findMany({
       orderBy: { createdAt: 'desc' }
+    });
+  }
+
+  async updateCoupon(id: string, data: any) {
+    const { code, description, type, value, minPurchase, startDate, endDate, usageLimit, isActive } = data;
+    
+    const updateData: any = {};
+    if (code !== undefined) updateData.code = code;
+    if (description !== undefined) updateData.description = description;
+    if (type !== undefined) updateData.type = type;
+    if (value !== undefined) updateData.value = Number(value);
+    if (minPurchase !== undefined) updateData.minPurchase = Number(minPurchase);
+    if (startDate) updateData.startDate = new Date(startDate);
+    if (endDate) updateData.endDate = new Date(endDate);
+    if (usageLimit !== undefined) updateData.usageLimit = usageLimit ? parseInt(usageLimit) : null;
+    if (isActive !== undefined) updateData.isActive = isActive;
+
+    return (this.prisma as any).coupon.update({
+      where: { id },
+      data: updateData
+    });
+  }
+
+  async toggleCouponStatus(id: string) {
+    const coupon = await (this.prisma as any).coupon.findUnique({ where: { id } });
+    if (!coupon) throw new NotFoundException('Cupón no encontrado');
+    return (this.prisma as any).coupon.update({
+      where: { id },
+      data: { isActive: !coupon.isActive }
     });
   }
 

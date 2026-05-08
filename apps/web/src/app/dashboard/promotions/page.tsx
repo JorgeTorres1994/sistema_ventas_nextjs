@@ -4,28 +4,15 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '@/components/layout/Sidebar';
 import TopBar from '@/components/layout/TopBar';
 import { 
-  Ticket, 
-  Tag, 
-  Gift, 
-  Plus, 
-  Search, 
-  Calendar, 
-  CheckCircle2, 
-  XCircle, 
-  Clock, 
-  ArrowRight,
-  TrendingUp,
-  Percent,
-  Users,
-  ShoppingBag,
-  Zap,
-  MoreVertical,
-  Filter,
-  Star,
-  Trophy,
-  X
+  Ticket, Tag, Gift, Plus, Search, Calendar, 
+  CheckCircle2, XCircle, Clock, ArrowRight,
+  TrendingUp, Percent, Users, ShoppingBag, 
+  Zap, MoreVertical, Filter, Star, Trophy, X, Save, Edit2, Power
 } from 'lucide-react';
-import api from '@/lib/api';
+import { 
+  getPromotions, createPromotion, updatePromotion, togglePromotionStatus,
+  getCoupons, createCoupon, updateCoupon, toggleCouponStatus 
+} from '@/lib/api';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -37,8 +24,24 @@ export default function PromotionsPage() {
   const [loading, setLoading] = useState(true);
   
   // Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [loadingAction, setLoadingAction] = useState(false);
+
+  // Form State
+  const [formData, setFormData] = useState<any>({
+    name: '',
+    description: '',
+    type: 'PERCENTAGE',
+    value: 0,
+    minPurchase: 0,
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    code: '',
+    usageLimit: 100
+  });
 
   useEffect(() => {
     fetchData();
@@ -48,11 +51,11 @@ export default function PromotionsPage() {
     setLoading(true);
     try {
       if (activeTab === 'promos') {
-        const res = await api.get('/promotions');
-        setPromotions(res.data);
+        const data = await getPromotions();
+        setPromotions(data);
       } else {
-        const res = await api.get('/promotions/coupons');
-        setCoupons(res.data);
+        const data = await getCoupons();
+        setCoupons(data);
       }
     } catch (error) {
       toast.error('Error al cargar datos');
@@ -61,9 +64,77 @@ export default function PromotionsPage() {
     }
   };
 
-  const handleViewDetails = (item: any) => {
+  const handleOpenCreate = () => {
+    setIsEditing(false);
+    setSelectedItem(null);
+    setFormData({
+      name: '',
+      description: '',
+      type: 'PERCENTAGE',
+      value: 0,
+      minPurchase: 0,
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      code: '',
+      usageLimit: 100
+    });
+    setIsFormOpen(true);
+  };
+
+  const handleOpenEdit = (item: any) => {
+    setIsEditing(true);
     setSelectedItem(item);
-    setIsModalOpen(true);
+    setFormData({
+      name: item.name || '',
+      description: item.description || '',
+      type: item.type || 'PERCENTAGE',
+      value: Number(item.value),
+      minPurchase: Number(item.minPurchase || 0),
+      startDate: new Date(item.startDate).toISOString().split('T')[0],
+      endDate: new Date(item.endDate).toISOString().split('T')[0],
+      code: item.code || '',
+      usageLimit: item.usageLimit || 100
+    });
+    setIsFormOpen(true);
+    setIsDetailOpen(false);
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoadingAction(true);
+    const toastId = toast.loading(isEditing ? 'Actualizando...' : 'Creando...');
+    
+    try {
+      if (activeTab === 'promos') {
+        if (isEditing) await updatePromotion(selectedItem.id, formData);
+        else await createPromotion(formData);
+      } else {
+        if (isEditing) await updateCoupon(selectedItem.id, formData);
+        else await createCoupon(formData);
+      }
+      
+      toast.success(isEditing ? 'Actualizado correctamente' : 'Creado correctamente', { id: toastId });
+      setIsFormOpen(false);
+      fetchData();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Error al procesar solicitud', { id: toastId });
+    } finally {
+      setLoadingAction(false);
+    }
+  };
+
+  const handleToggleStatus = async (item: any) => {
+    const toastId = toast.loading('Cambiando estado...');
+    try {
+      if (activeTab === 'promos') await togglePromotionStatus(item.id);
+      else await toggleCouponStatus(item.id);
+      
+      toast.success('Estado actualizado', { id: toastId });
+      fetchData();
+      if (isDetailOpen) setIsDetailOpen(false);
+    } catch (error) {
+      toast.error('Error al cambiar estado', { id: toastId });
+    }
   };
 
   const StatusBadge = ({ active }: { active: boolean }) => (
@@ -91,7 +162,10 @@ export default function PromotionsPage() {
                 <p className="text-[#6B7280]">Gestiona tus campañas de marketing, cupones de descuento y programa de puntos.</p>
               </div>
               
-              <button className="flex items-center gap-2 px-6 py-4 bg-blue-600 text-white rounded-[24px] text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 active:scale-95">
+              <button 
+                onClick={handleOpenCreate}
+                className="flex items-center gap-2 px-6 py-4 bg-blue-600 text-white rounded-[24px] text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 active:scale-95"
+              >
                 <Plus className="w-5 h-5" />
                 {activeTab === 'promos' ? 'Nueva Promoción' : 'Nuevo Cupón'}
               </button>
@@ -173,7 +247,7 @@ export default function PromotionsPage() {
                   promotions.map((promo: any) => (
                     <div key={promo.id} className="bg-white rounded-[40px] p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-blue-50/50 transition-all group">
                        <div className="flex justify-between items-start mb-6">
-                          <div className="p-4 bg-blue-50 rounded-2xl group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                          <div className={`p-4 rounded-2xl transition-colors ${promo.isActive ? 'bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white' : 'bg-gray-100 text-gray-400'}`}>
                              <Percent className="w-6 h-6" />
                           </div>
                           <StatusBadge active={promo.isActive} />
@@ -193,12 +267,20 @@ export default function PromotionsPage() {
                           </div>
                        </div>
                        
-                       <button 
-                         onClick={() => handleViewDetails(promo)}
-                         className="w-full py-4 bg-gray-50 text-gray-900 rounded-[20px] text-sm font-black uppercase tracking-widest hover:bg-gray-100 transition-colors"
-                       >
-                          Ver Detalles
-                       </button>
+                       <div className="flex gap-2">
+                          <button 
+                            onClick={() => { setSelectedItem(promo); setIsDetailOpen(true); }}
+                            className="flex-1 py-4 bg-gray-50 text-gray-900 rounded-[20px] text-xs font-black uppercase tracking-widest hover:bg-gray-100 transition-colors"
+                          >
+                             Detalles
+                          </button>
+                          <button 
+                            onClick={() => handleOpenEdit(promo)}
+                            className="p-4 bg-blue-50 text-blue-600 rounded-[20px] hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                          >
+                             <Edit2 className="w-4 h-4" />
+                          </button>
+                       </div>
                     </div>
                   ))
                 )
@@ -213,7 +295,7 @@ export default function PromotionsPage() {
                   coupons.map((coupon: any) => (
                     <div key={coupon.id} className="bg-white rounded-[40px] p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-emerald-50/50 transition-all group">
                        <div className="flex justify-between items-start mb-6">
-                          <div className="p-4 bg-emerald-50 rounded-2xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                          <div className={`p-4 rounded-2xl transition-colors ${coupon.isActive ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white' : 'bg-gray-100 text-gray-400'}`}>
                              <Ticket className="w-6 h-6" />
                           </div>
                           <StatusBadge active={coupon.isActive} />
@@ -230,7 +312,7 @@ export default function PromotionsPage() {
                        <div className="space-y-4 mb-8">
                           <div className="flex items-center gap-3 text-sm font-bold text-gray-700">
                              <Calendar className="w-4 h-4 text-emerald-600" />
-                             Válido hasta: {format(new Date(coupon.endDate), 'dd MMM yyyy', { locale: es })}
+                             Hasta: {format(new Date(coupon.endDate), 'dd/MM/yy')}
                           </div>
                           <div className="flex items-center gap-3 text-sm font-bold text-gray-700">
                              <Users className="w-4 h-4 text-blue-600" />
@@ -238,12 +320,20 @@ export default function PromotionsPage() {
                           </div>
                        </div>
                        
-                       <button 
-                         onClick={() => handleViewDetails(coupon)}
-                         className="w-full py-4 bg-gray-50 text-gray-900 rounded-[20px] text-sm font-black uppercase tracking-widest hover:bg-gray-100 transition-colors"
-                       >
-                          Ver Detalles
-                       </button>
+                       <div className="flex gap-2">
+                          <button 
+                            onClick={() => { setSelectedItem(coupon); setIsDetailOpen(true); }}
+                            className="flex-1 py-4 bg-gray-50 text-gray-900 rounded-[20px] text-xs font-black uppercase tracking-widest hover:bg-gray-100 transition-colors"
+                          >
+                             Detalles
+                          </button>
+                          <button 
+                            onClick={() => handleOpenEdit(coupon)}
+                            className="p-4 bg-emerald-50 text-emerald-600 rounded-[20px] hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+                          >
+                             <Edit2 className="w-4 h-4" />
+                          </button>
+                       </div>
                     </div>
                   ))
                 )
@@ -254,10 +344,146 @@ export default function PromotionsPage() {
         </main>
       </div>
 
+      {/* Form Modal (Create/Edit) */}
+      {isFormOpen && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+           <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setIsFormOpen(false)}></div>
+           <div className="bg-white w-full max-w-2xl rounded-[40px] shadow-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-200">
+              <div className="p-10 border-b border-gray-50 flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-black text-gray-900 mb-1">
+                    {isEditing ? 'Editar ' : 'Nueva '} 
+                    {activeTab === 'promos' ? 'Promoción' : 'Cupón'}
+                  </h2>
+                  <p className="text-gray-400 text-sm">Complete la información para la campaña operativa.</p>
+                </div>
+                <button onClick={() => setIsFormOpen(false)} className="p-3 hover:bg-gray-100 rounded-full transition-colors">
+                  <X className="w-6 h-6 text-gray-400" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSave} className="p-10 space-y-6 max-h-[70vh] overflow-y-auto">
+                {activeTab === 'promos' ? (
+                  <>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nombre de la Campaña</label>
+                      <input 
+                        type="text" required
+                        className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-[20px] focus:bg-white focus:border-blue-500 transition-all outline-none font-bold"
+                        placeholder="ej. Campaña Navideña 2026"
+                        value={formData.name}
+                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Descripción</label>
+                      <textarea 
+                        className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-[20px] focus:bg-white focus:border-blue-500 transition-all outline-none font-bold min-h-[100px]"
+                        placeholder="Detalles de la promoción..."
+                        value={formData.description}
+                        onChange={(e) => setFormData({...formData, description: e.target.value})}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Código del Cupón</label>
+                        <input 
+                          type="text" required
+                          className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-[20px] focus:bg-white focus:border-blue-500 transition-all outline-none font-black text-blue-600 uppercase tracking-widest"
+                          placeholder="ej. NEXUS20"
+                          value={formData.code}
+                          onChange={(e) => setFormData({...formData, code: e.target.value.toUpperCase()})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Límite de Usos</label>
+                        <input 
+                          type="number" required
+                          className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-[20px] focus:bg-white focus:border-blue-500 transition-all outline-none font-bold"
+                          value={formData.usageLimit}
+                          onChange={(e) => setFormData({...formData, usageLimit: parseInt(e.target.value) || 0})}
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Tipo de Descuento</label>
+                    <select 
+                      className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-[20px] focus:bg-white focus:border-blue-500 transition-all outline-none font-bold"
+                      value={formData.type}
+                      onChange={(e) => setFormData({...formData, type: e.target.value})}
+                    >
+                      <option value="PERCENTAGE">Porcentaje (%)</option>
+                      <option value="FIXED">Monto Fijo (S/)</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Valor</label>
+                    <input 
+                      type="number" step="0.01" required
+                      className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-[20px] focus:bg-white focus:border-blue-500 transition-all outline-none font-bold"
+                      value={formData.value}
+                      onChange={(e) => setFormData({...formData, value: parseFloat(e.target.value) || 0})}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Fecha Inicio</label>
+                    <input 
+                      type="date" required
+                      className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-[20px] focus:bg-white focus:border-blue-500 transition-all outline-none font-bold"
+                      value={formData.startDate}
+                      onChange={(e) => setFormData({...formData, startDate: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Fecha Fin</label>
+                    <input 
+                      type="date" required
+                      className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-[20px] focus:bg-white focus:border-blue-500 transition-all outline-none font-bold"
+                      value={formData.endDate}
+                      onChange={(e) => setFormData({...formData, endDate: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Compra Mínima (S/)</label>
+                  <input 
+                    type="number" step="0.01" required
+                    className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-[20px] focus:bg-white focus:border-blue-500 transition-all outline-none font-bold"
+                    value={formData.minPurchase}
+                    onChange={(e) => setFormData({...formData, minPurchase: parseFloat(e.target.value) || 0})}
+                  />
+                </div>
+
+                <div className="pt-6">
+                  <button 
+                    type="submit"
+                    disabled={loadingAction}
+                    className="w-full py-5 bg-blue-600 text-white rounded-[24px] text-sm font-black uppercase tracking-[0.2em] hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
+                  >
+                    {loadingAction ? <Zap className="w-5 h-5 animate-pulse" /> : <Save className="w-5 h-5" />}
+                    {isEditing ? 'Actualizar Registro' : 'Confirmar Registro'}
+                  </button>
+                </div>
+              </form>
+           </div>
+        </div>
+      )}
+
       {/* Detail Modal */}
-      {isModalOpen && selectedItem && (
+      {isDetailOpen && selectedItem && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-           <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
+           <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsDetailOpen(false)}></div>
            <div className="bg-white w-full max-w-lg rounded-[40px] shadow-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-200">
               <div className={`h-32 flex items-center justify-center ${activeTab === 'promos' ? 'bg-blue-600' : 'bg-emerald-600'}`}>
                  {activeTab === 'promos' ? <Zap className="w-16 h-16 text-white/20 absolute right-[-20px] top-[-20px] rotate-12" /> : <Ticket className="w-16 h-16 text-white/20 absolute right-[-20px] top-[-20px] rotate-12" />}
@@ -265,7 +491,7 @@ export default function PromotionsPage() {
                     {activeTab === 'promos' ? <Gift className="w-10 h-10 text-white" /> : <Ticket className="w-10 h-10 text-white" />}
                  </div>
                  <button 
-                   onClick={() => setIsModalOpen(false)}
+                   onClick={() => setIsDetailOpen(false)}
                    className="absolute top-6 right-6 p-2 bg-black/10 hover:bg-black/20 text-white rounded-full transition-colors"
                  >
                     <X className="w-5 h-5" />
@@ -309,23 +535,26 @@ export default function PromotionsPage() {
                           {format(new Date(selectedItem.startDate), 'dd/MM/yy')} - {format(new Date(selectedItem.endDate), 'dd/MM/yy')}
                        </span>
                     </div>
-                    {activeTab === 'coupons' && (
-                       <div className="flex items-center justify-between">
-                          <span className="text-sm font-bold text-gray-400">Usos realizados:</span>
-                          <span className="text-sm font-black text-gray-900">
-                             {selectedItem.usageCount} veces
-                          </span>
-                       </div>
-                    )}
                  </div>
               </div>
               
               <div className="p-8 bg-gray-50 flex gap-4">
-                 <button className="flex-1 py-4 bg-gray-900 text-white rounded-[20px] text-sm font-black uppercase tracking-widest hover:bg-black transition-colors shadow-lg shadow-gray-200">
-                    Editar
+                 <button 
+                   onClick={() => handleOpenEdit(selectedItem)}
+                   className="flex-1 py-4 bg-gray-900 text-white rounded-[20px] text-sm font-black uppercase tracking-widest hover:bg-black transition-colors shadow-lg shadow-gray-200 flex items-center justify-center gap-3"
+                 >
+                    <Edit2 className="w-4 h-4" /> Editar
                  </button>
-                 <button className="px-8 py-4 bg-white text-rose-600 border border-rose-100 rounded-[20px] text-sm font-black uppercase tracking-widest hover:bg-rose-50 transition-colors">
-                    Desactivar
+                 <button 
+                   onClick={() => handleToggleStatus(selectedItem)}
+                   className={`px-8 py-4 border rounded-[20px] text-sm font-black uppercase tracking-widest transition-colors flex items-center gap-2 ${
+                     selectedItem.isActive 
+                     ? 'bg-white text-rose-600 border-rose-100 hover:bg-rose-50' 
+                     : 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700'
+                   }`}
+                 >
+                    <Power className="w-4 h-4" />
+                    {selectedItem.isActive ? 'Desactivar' : 'Activar'}
                  </button>
               </div>
            </div>
