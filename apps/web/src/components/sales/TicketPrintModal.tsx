@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { X, Printer, Download, FileText, RotateCcw } from 'lucide-react';
+import { X, Printer, Download, FileText, RotateCcw, AlertCircle } from 'lucide-react';
 import { getSaleById, cancelSale } from '@/lib/api';
 import { toast } from 'sonner';
 import { useSettings } from '@/components/SettingsProvider';
