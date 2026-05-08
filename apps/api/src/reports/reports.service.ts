@@ -139,15 +139,18 @@ export class ReportsService {
                 items: {
                     take: 1,
                     include: { product: true }
-                }
+                },
+                payments: true
             }
         }).then(sales => sales.map(s => ({
-            id: `#SAL-${s.id.substring(0, 6).toUpperCase()}`,
+            id: s.id,
+            displayId: `#SAL-${s.id.substring(0, 6).toUpperCase()}`,
             date: s.createdAt ? s.createdAt.toISOString() : new Date().toISOString(),
             customer: s.customer?.name || 'Cliente de Mostrador',
             product: s.items[0]?.product?.name || 'Varios Artículos',
             amount: Number(s.total),
-            status: s.status
+            status: s.status,
+            paymentMethod: s.payments[0]?.method || 'EFECTIVO'
         })));
     }
 
