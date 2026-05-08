@@ -9,6 +9,8 @@ const TopBar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [mounted, setMounted] = useState(false);
+  const [version] = useState(() => Date.now());
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
 
@@ -43,12 +45,33 @@ const TopBar = () => {
   };
 
   useEffect(() => {
-    const loadUser = () => {
+    setMounted(true);
+    const loadUser = async () => {
+      // 1. First try to load basic name from local storage for instant feedback
       const userData = localStorage.getItem('user');
       if (userData) {
         setUser(JSON.parse(userData));
-        fetchNotifications();
       }
+
+      // 2. IMMEDIATELY fetch fresh data from API to ensure avatar is correct and not stale
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}/users/me`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (res.ok) {
+          const freshUser = await res.json();
+          setUser(freshUser);
+          localStorage.setItem('user', JSON.stringify(freshUser));
+        }
+      } catch (error) {
+        console.error('Error fetching fresh user data:', error);
+      }
+      
+      fetchNotifications();
     };
 
     loadUser();
@@ -191,15 +214,19 @@ const TopBar = () => {
           </div>
 
           {/* User Profile Area (Enhanced) */}
-          <div className="relative" ref={dropdownRef}>
+          <div className={`relative transition-opacity duration-500 ${mounted && user ? 'opacity-100' : 'opacity-0'}`} ref={dropdownRef}>
             <button 
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="flex items-center gap-3 p-1.5 pr-4 bg-white hover:bg-gray-50 rounded-[22px] transition-all duration-300 border border-gray-100 shadow-sm hover:shadow-md group active:scale-95"
             >
               <div className="relative">
                 <div className="w-10 h-10 rounded-[16px] bg-gradient-to-tr from-blue-600 to-indigo-600 overflow-hidden border-2 border-white shadow-sm flex items-center justify-center transition-transform group-hover:scale-105">
-                  {userAvatar ? (
-                    <img src={userAvatar} alt={user?.name} className="w-full h-full object-cover" />
+                  {mounted && userAvatar ? (
+                    <img 
+                      src={`${userAvatar}${userAvatar.includes('?') ? '&' : '?'}v=${version}`} 
+                      alt={user?.name} 
+                      className="w-full h-full object-cover" 
+                    />
                   ) : (
                     <span className="text-white font-black text-sm uppercase">
                       {user?.name?.charAt(0) || 'U'}
@@ -209,7 +236,7 @@ const TopBar = () => {
                 <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white"></div>
               </div>
               <div className="text-left hidden lg:block">
-                <p className="text-[13px] font-black text-gray-900 leading-none mb-1">
+                <p className={`text-[13px] font-black text-gray-900 leading-none mb-1 ${!mounted ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
                   {user?.name || 'Cargando...'}
                 </p>
                 <div className="flex items-center gap-1.5">
@@ -228,8 +255,12 @@ const TopBar = () => {
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 p-0.5 shadow-lg shadow-blue-200">
                       <div className="w-full h-full rounded-[14px] bg-white overflow-hidden flex items-center justify-center">
-                        {userAvatar ? (
-                          <img src={userAvatar} alt={user?.name} className="w-full h-full object-cover" />
+                        {mounted && userAvatar ? (
+                          <img 
+                            src={`${userAvatar}${userAvatar.includes('?') ? '&' : '?'}v=${version}`} 
+                            alt={user?.name} 
+                            className="w-full h-full object-cover" 
+                          />
                         ) : (
                           <span className="text-blue-600 font-black text-xl uppercase">
                             {user?.name?.charAt(0) || 'U'}

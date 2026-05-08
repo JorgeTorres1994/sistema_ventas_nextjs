@@ -13,6 +13,14 @@ export class RolesService {
                         permission: true
                     }
                 },
+                users: {
+                    take: 4,
+                    select: {
+                        id: true,
+                        name: true,
+                        avatarUrl: true
+                    }
+                },
                 _count: {
                     select: { users: true }
                 }

@@ -35,6 +35,30 @@ const moduleTranslations: Record<string, string> = {
     invoicing: 'Facturación Electrónica'
 };
 
+const SafeAvatar = ({ src, name }: { src?: string; name: string }) => {
+    const [error, setError] = React.useState(false);
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005';
+    
+    const fullSrc = src ? (src.startsWith('http') ? src : `${apiUrl}${src}`) : null;
+
+    if (error || !fullSrc) {
+        return (
+            <div className="w-full h-full bg-blue-50 flex items-center justify-center text-[10px] font-black text-blue-600 uppercase">
+                {name?.charAt(0) || 'U'}
+            </div>
+        );
+    }
+
+    return (
+        <img 
+            src={fullSrc} 
+            alt={name} 
+            className="w-full h-full object-cover" 
+            onError={() => setError(true)}
+        />
+    );
+};
+
 export default function RolesPage() {
     const router = useRouter();
     const [roles, setRoles] = useState<any[]>([]);
@@ -247,19 +271,28 @@ export default function RolesPage() {
                                     </p>
                                     
                                     <div className="pt-6 border-t border-gray-50 flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <div className="flex -space-x-2">
-                                                {Array(Math.min(role._count.users, 3)).fill(0).map((_, i) => (
-                                                    <div key={i} className="w-7 h-7 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-gray-400">
-                                                        U
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex -space-x-2.5">
+                                                {role.users && role.users.length > 0 ? (
+                                                    role.users.map((user: any) => (
+                                                        <div key={user.id} className="w-8 h-8 rounded-full bg-white border-2 border-white flex items-center justify-center overflow-hidden shadow-sm group-hover:scale-110 transition-transform duration-500">
+                                                            <SafeAvatar src={user.avatarUrl} name={user.name} />
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <div className="w-8 h-8 rounded-full bg-gray-50 border-2 border-white flex items-center justify-center text-[10px] font-bold text-gray-300 uppercase italic">
+                                                        0
                                                     </div>
-                                                ))}
+                                                )}
                                             </div>
-                                            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                                                {role._count.users} Miembros
-                                            </span>
+                                            <div className="flex flex-col">
+                                                <span className="text-[10px] font-black text-gray-900 leading-none">
+                                                    {role._count.users} MIEMBROS
+                                                </span>
+                                                <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Asignados</span>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-1.5 text-[10px] font-black text-blue-600 uppercase tracking-widest">
+                                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50/50 rounded-xl text-[9px] font-black text-blue-600 uppercase tracking-widest">
                                             <Lock className="w-3 h-3" />
                                             {role.permissions.length} Permisos
                                         </div>

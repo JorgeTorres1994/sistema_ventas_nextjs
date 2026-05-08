@@ -32,8 +32,11 @@ const Sidebar = () => {
   const { settings } = useSettings();
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [permissions, setPermissions] = React.useState<string[]>([]);
+  const [mounted, setMounted] = React.useState(false);
+  const [version] = React.useState(() => Date.now());
   
   React.useEffect(() => {
+    setMounted(true);
     const loadUser = () => {
       const userStr = localStorage.getItem('user');
       if (userStr) {
@@ -112,15 +115,19 @@ const Sidebar = () => {
   return (
     <aside className="w-64 border-r border-[#E5E7EB] h-screen bg-[#F9FAFB] flex flex-col justify-between fixed left-0 top-0 overflow-y-auto scrollbar-hide">
       <div>
-        <div className="flex items-center gap-3 p-6 mb-2">
-          {settings?.logoUrl ? (
-            <img src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}${settings.logoUrl}`} alt="Logo" className="w-10 h-10 rounded-lg object-cover" />
+        <div className={`flex items-center gap-3 p-6 mb-2 transition-opacity duration-500 ${mounted && settings ? 'opacity-100' : 'opacity-0'}`}>
+          {mounted && settings?.logoUrl ? (
+            <img 
+              src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}${settings.logoUrl}?v=${version}`} 
+              alt="Logo" 
+              className="w-10 h-10 rounded-lg object-cover" 
+            />
           ) : (
             <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm">
-              <img src="/logo.png" alt="Nexus Genesis" className="w-full h-full object-contain p-1" />
+              <Building2 className="w-6 h-6 text-blue-600/20" />
             </div>
           )}
-          <div>
+          <div className={!mounted ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}>
             <h1 className="font-bold text-[#111827] text-md leading-tight truncate w-32" title={settings?.businessName || 'Nexus Genesis'}>
               {settings?.businessName || 'Nexus Genesis'}
             </h1>
