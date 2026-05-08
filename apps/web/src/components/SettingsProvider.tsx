@@ -36,7 +36,6 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
     const refreshSettings = async () => {
         try {
-            // We still try to fetch (since we made GET settings public)
             const [s, p] = await Promise.all([
                 getSettings().catch(() => null),
                 getPaymentMethods().catch(() => [])

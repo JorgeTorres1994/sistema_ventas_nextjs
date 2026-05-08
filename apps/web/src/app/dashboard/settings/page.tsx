@@ -24,6 +24,8 @@ export default function SettingsPage() {
     const [formData, setFormData] = useState<any>(null);
     const [series, setSeries] = useState<any[]>([]);
     const [isSaving, setIsSaving] = useState(false);
+    const [logoFile, setLogoFile] = useState<File | null>(null);
+    const [logoPreview, setLogoPreview] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState('business');
     const [isSeriesModalOpen, setIsSeriesModalOpen] = useState(false);
     const [selectedSeries, setSelectedSeries] = useState<any>(null);
@@ -71,10 +73,26 @@ export default function SettingsPage() {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            await updateSettings(formData);
+            let finalLogoUrl = formData.logoUrl;
+
+            // 1. If there's a new logo file pending, upload it first
+            if (logoFile) {
+                const uploadResult = await uploadSettingsLogo(logoFile);
+                finalLogoUrl = uploadResult.url;
+            }
+
+            // 2. Update all settings at once
+            await updateSettings({
+                ...formData,
+                logoUrl: finalLogoUrl
+            });
+            
             await refreshSettings();
-            toast.success('Configuración actualizada correctamente');
+            setLogoFile(null);
+            setLogoPreview(null);
+            toast.success('Configuración global actualizada correctamente');
         } catch (error) {
+            console.error('Save error:', error);
             toast.error('Error al guardar la configuración');
         } finally {
             setIsSaving(false);
@@ -91,18 +109,18 @@ export default function SettingsPage() {
         }
     };
 
-    const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files?.length) return;
         const file = e.target.files[0];
-        try {
-            const result = await uploadSettingsLogo(file);
-            setFormData((prev: any) => ({ ...prev, logoUrl: result.url }));
-            await updateSettings({ logoUrl: result.url });
-            await refreshSettings();
-            toast.success('Logotipo corporativo actualizado');
-        } catch (error) {
-            toast.error('Error al subir el logotipo');
-        }
+        
+        // Just create a local preview, don't upload yet!
+        setLogoFile(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setLogoPreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+        toast.info('Previsualización de logo cargada. Aplique los cambios para guardar.');
     };
 
     const handleSeriesSave = async (e: React.FormEvent) => {
@@ -178,8 +196,8 @@ export default function SettingsPage() {
                                     <section className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-8">
                                         <div className="flex items-center gap-6">
                                             <div className="w-24 h-24 rounded-3xl bg-gray-50 border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden relative group">
-                                                {formData.logoUrl ? (
-                                                    <img src={`http://localhost:3005${formData.logoUrl}`} alt="Logo" className="w-full h-full object-cover" />
+                                                {logoPreview || formData.logoUrl ? (
+                                                    <img src={logoPreview || `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}${formData.logoUrl}`} alt="Logo" className="w-full h-full object-cover" />
                                                 ) : (
                                                     <Building2 className="w-8 h-8 text-gray-300" />
                                                 )}
@@ -196,8 +214,12 @@ export default function SettingsPage() {
                                                         Subir Logo
                                                         <input type="file" className="hidden" onChange={handleLogoUpload} />
                                                     </label>
-                                                    {formData.logoUrl && (
-                                                        <button onClick={() => setFormData({ ...formData, logoUrl: null })} className="px-4 py-2 text-rose-600 text-xs font-bold hover:bg-rose-50 rounded-xl transition-all">
+                                                    { (logoPreview || formData.logoUrl) && (
+                                                        <button onClick={() => {
+                                                            setFormData({ ...formData, logoUrl: null });
+                                                            setLogoPreview(null);
+                                                            setLogoFile(null);
+                                                        }} className="px-4 py-2 text-rose-600 text-xs font-bold hover:bg-rose-50 rounded-xl transition-all">
                                                             Remover
                                                         </button>
                                                     )}
