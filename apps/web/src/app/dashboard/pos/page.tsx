@@ -5,7 +5,7 @@ import Sidebar from '@/components/layout/Sidebar';
 import PosTopBar from '@/components/pos/PosTopBar';
 import PosProductGrid from '@/components/pos/PosProductGrid';
 import PosCartPanel from '@/components/pos/PosCartPanel';
-import { getProducts, createSale, createQuotation, getActiveCategories } from '@/lib/api';
+import { getProducts, createSale, createQuotation, getActiveCategories, validateCoupon } from '@/lib/api';
 import { toast } from 'sonner';
 import { useSettings } from '@/components/SettingsProvider';
 
@@ -30,6 +30,8 @@ interface CartItem {
 }
 
 export default function PosPage() {
+  const { settings } = useSettings();
+  
   // Products & Global search state
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -41,12 +43,51 @@ export default function PosPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [paymentMethod, setPaymentMethod] = useState('CASH');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [documentType, setDocumentType] = useState('BOLETA');
   
   // Promotions & Customer State
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
   const [couponCode, setCouponCode] = useState('');
-  const [pointsToRedeem, setPointsToRedeem] = useState(0);
-  const [customerPoints, setCustomerPoints] = useState(0);
+  const [appliedDiscount, setAppliedDiscount] = useState(0);
+
+  // Calculate Totals
+  const calculateTotals = useCallback(() => {
+    const subtotal = cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
+    const taxRate = (settings?.taxRate || 18) / 100;
+    const taxAmount = subtotal * taxRate;
+    const totalBeforeDiscount = subtotal + taxAmount;
+    const finalTotal = Math.max(0, totalBeforeDiscount - appliedDiscount);
+    
+    return { subtotal, taxAmount, totalBeforeDiscount, finalTotal };
+  }, [cart, settings, appliedDiscount]);
+
+  const { subtotal, taxAmount, finalTotal } = calculateTotals();
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) {
+      setAppliedDiscount(0);
+      return;
+    }
+    
+    try {
+      const subtotalVal = cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
+      const coupon = await validateCoupon(couponCode, subtotalVal);
+      
+      let discount = 0;
+      if (coupon.type === 'PERCENTAGE') {
+        discount = (subtotalVal * Number(coupon.value)) / 100;
+      } else {
+        discount = Number(coupon.value);
+      }
+      
+      setAppliedDiscount(discount);
+      toast.success(`Cupón "${couponCode}" aplicado: -S/ ${discount.toFixed(2)}`);
+    } catch (error: any) {
+      setAppliedDiscount(0);
+      setCouponCode('');
+      toast.error(error.response?.data?.message || 'Cupón no válido');
+    }
+  };
 
   // Load Categories
   useEffect(() => {
@@ -118,13 +159,25 @@ export default function PosPage() {
 
   const handleClearCart = useCallback(() => {
     setCart([]);
+    setAppliedDiscount(0);
+    setCouponCode('');
   }, []);
 
-  const { settings } = useSettings();
-
-  const [documentType, setDocumentType] = useState('BOLETA');
-
   const handleCompleteSale = async () => {
+    // 1. Mandatory Customer Validation
+    if (!selectedCustomerId) {
+      toast.error('Cliente Requerido', {
+        description: 'Debes seleccionar un cliente para procesar la venta.',
+        icon: '👤'
+      });
+      return;
+    }
+
+    if (cart.length === 0) {
+      toast.error('Carrito vacío', { description: 'Agrega productos para continuar.' });
+      return;
+    }
+
     setIsProcessing(true);
     try {
       const itemsPayload = cart.map(item => ({
@@ -132,22 +185,20 @@ export default function PosPage() {
         quantity: item.quantity
       }));
       
-      const subtotal = cart.reduce((acc, item) => acc + (Number(item.product.price) * item.quantity), 0);
-      const taxRate = (settings?.taxRate || 18) / 100; 
-      const total = subtotal + (subtotal * taxRate);
+      const { finalTotal } = calculateTotals();
 
       const result = await createSale(
         itemsPayload, 
         paymentMethod, 
-        total, 
+        finalTotal, 
         documentType,
         selectedCustomerId,
         couponCode,
-        pointsToRedeem
+        0 // pointsToRedeem deprecated
       );
       
       toast.success('¡Venta completada con éxito!', {
-        description: `Total procesado: S/ ${total.toFixed(2)}`,
+        description: `Total procesado: S/ ${finalTotal.toFixed(2)}`,
         action: {
           label: 'Ver Comprobante',
           onClick: () => {
@@ -209,7 +260,6 @@ export default function PosPage() {
         <PosTopBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         
         <main className="flex-1 flex overflow-hidden">
-          {/* Main Workspace: Product Grid */}
           <PosProductGrid 
             products={products} 
             isLoading={isLoading} 
@@ -219,7 +269,6 @@ export default function PosPage() {
             categories={categories}
           />
           
-          {/* Sidebar: Cart Panel */}
           <PosCartPanel 
             cart={cart}
             paymentMethod={paymentMethod}
@@ -230,9 +279,11 @@ export default function PosPage() {
             setSelectedCustomerId={setSelectedCustomerId}
             couponCode={couponCode}
             setCouponCode={setCouponCode}
-            pointsToRedeem={pointsToRedeem}
-            setPointsToRedeem={setPointsToRedeem}
-            customerPoints={customerPoints}
+            onApplyCoupon={handleApplyCoupon}
+            appliedDiscount={appliedDiscount}
+            subtotal={subtotal}
+            taxAmount={taxAmount}
+            finalTotal={finalTotal}
             onClearCart={handleClearCart}
             onUpdateQuantity={handleUpdateQuantity}
             onRemoveItem={handleRemoveItem}

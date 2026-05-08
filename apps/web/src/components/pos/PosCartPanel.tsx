@@ -33,9 +33,11 @@ interface PosCartPanelProps {
   setSelectedCustomerId: (id: string) => void;
   couponCode: string;
   setCouponCode: (code: string) => void;
-  pointsToRedeem: number;
-  setPointsToRedeem: (points: number) => void;
-  customerPoints: number;
+  onApplyCoupon: () => void;
+  appliedDiscount: number;
+  subtotal: number;
+  taxAmount: number;
+  finalTotal: number;
   onClearCart: () => void;
   onUpdateQuantity: (productId: string, delta: number) => void;
   onRemoveItem: (productId: string) => void;
@@ -54,9 +56,11 @@ export default function PosCartPanel({
   setSelectedCustomerId,
   couponCode,
   setCouponCode,
-  pointsToRedeem,
-  setPointsToRedeem,
-  customerPoints,
+  onApplyCoupon,
+  appliedDiscount,
+  subtotal,
+  taxAmount,
+  finalTotal,
   onClearCart,
   onUpdateQuantity,
   onRemoveItem,
@@ -73,11 +77,7 @@ export default function PosCartPanel({
       .catch(console.error);
   }, []);
 
-  // Calculations
-  const subtotal = cart.reduce((acc: number, item: CartItem) => acc + (Number(item.product.price) * item.quantity), 0);
   const taxPercent = settings?.taxRate || 18;
-  const taxAmount = subtotal * (taxPercent / 100);
-  const total = subtotal + taxAmount;
 
   return (
     <div className="w-[420px] shrink-0 bg-gray-50 flex flex-col h-full border-l border-gray-100 shadow-[-10px_0_30px_rgba(0,0,0,0.02)] z-10 relative">
@@ -175,10 +175,16 @@ export default function PosCartPanel({
             <span>Impuestos ({taxPercent}%)</span>
             <span className="text-gray-900">S/ {taxAmount.toFixed(2)}</span>
           </div>
+          {appliedDiscount > 0 && (
+            <div className="flex justify-between items-center text-[10px] font-black text-emerald-500 uppercase tracking-widest animate-in fade-in slide-in-from-right-2">
+              <span>Descuento Aplicado</span>
+              <span className="font-black">- S/ {appliedDiscount.toFixed(2)}</span>
+            </div>
+          )}
           <div className="flex justify-between items-end pt-2">
             <span className="text-sm font-black text-gray-900 uppercase tracking-[0.2em] leading-none mb-2">Total Neto</span>
             <span className="text-[40px] font-black text-gray-900 leading-none tracking-tighter">
-              S/ {total.toFixed(2)}
+              S/ {finalTotal.toFixed(2)}
             </span>
           </div>
         </div>
@@ -255,32 +261,26 @@ export default function PosCartPanel({
           </div>
         </div>
 
-        {/* Coupons & Loyalty */}
-        <div className="mb-6 grid grid-cols-2 gap-4">
-           <div>
-              <p className="text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase mb-3 flex items-center gap-2">
-                 <Ticket className="w-3 h-3" /> Cupón
-              </p>
-              <input 
-                type="text" 
-                placeholder="Código"
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                className="w-full px-4 py-3 bg-white border border-gray-100 rounded-xl text-xs font-bold placeholder:text-gray-300 focus:border-blue-500 outline-none transition-all shadow-sm"
-              />
-           </div>
-           <div>
-              <p className="text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase mb-3 flex items-center gap-2">
-                 <Star className="w-3 h-3 text-amber-500" /> Puntos ({customerPoints})
-              </p>
-              <input 
-                type="number" 
-                placeholder="Canjear"
-                value={pointsToRedeem || ''}
-                onChange={(e) => setPointsToRedeem(parseInt(e.target.value) || 0)}
-                className="w-full px-4 py-3 bg-white border border-gray-100 rounded-xl text-xs font-bold placeholder:text-gray-300 focus:border-blue-500 outline-none transition-all shadow-sm"
-              />
-           </div>
+        {/* Coupons */}
+        <div className="mb-6">
+          <p className="text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase mb-3 flex items-center gap-2">
+             <Ticket className="w-3 h-3" /> Cupón de Descuento
+          </p>
+          <div className="flex gap-2">
+            <input 
+              type="text" 
+              placeholder="Ingresar código (Ej: PROMO10)"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+              className="flex-1 px-4 py-4 bg-white border border-gray-100 rounded-xl text-sm font-bold placeholder:text-gray-300 focus:border-blue-500 outline-none transition-all shadow-sm"
+            />
+            <button 
+              onClick={onApplyCoupon}
+              className="px-6 py-4 bg-gray-900 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-black transition-all shadow-md active:scale-95"
+            >
+              Aplicar
+            </button>
+          </div>
         </div>
 
         {/* Checkout Button */}
