@@ -45,15 +45,15 @@ export default function PosProductGrid({
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#f9f9ff] px-8 py-6 overflow-hidden">
+    <div className="flex-1 flex flex-col h-full bg-background px-4 lg:px-8 py-6 overflow-hidden">
       
       {/* Category Scroller in POS */}
       <div className="relative flex items-center gap-2 mb-8 shrink-0">
         <button 
           onClick={() => scroll('left')}
-          className="p-2 bg-white border border-gray-100 rounded-full shadow-sm hover:bg-gray-50 transition-all shrink-0 z-10"
+          className="p-2 bg-card border border-outline-variant rounded-full shadow-sm hover:bg-surface-low transition-all shrink-0 z-10"
         >
-          <ChevronLeft className="w-4 h-4 text-gray-600" />
+          <ChevronLeft className="w-4 h-4 text-on-surface-variant" />
         </button>
 
         <div 
@@ -64,8 +64,8 @@ export default function PosProductGrid({
             onClick={() => setSelectedCategoryId('all')}
             className={`px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap border ${
               selectedCategoryId === 'all' 
-                ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-100' 
-                : 'bg-white border-gray-100 text-gray-700 hover:border-indigo-200'
+                ? 'bg-primary border-primary text-on-primary shadow-lg shadow-primary/20' 
+                : 'bg-card border-outline-variant text-on-surface-variant hover:border-primary/50'
             }`}
           >
             Todos
@@ -77,8 +77,8 @@ export default function PosProductGrid({
               onClick={() => setSelectedCategoryId(cat.id)}
               className={`px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap border ${
                 selectedCategoryId === cat.id 
-                  ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-100' 
-                  : 'bg-white border-gray-100 text-gray-700 hover:border-indigo-200'
+                  ? 'bg-primary border-primary text-on-primary shadow-lg shadow-primary/20' 
+                  : 'bg-card border-outline-variant text-on-surface-variant hover:border-primary/50'
               }`}
             >
               {cat.name}
@@ -88,21 +88,21 @@ export default function PosProductGrid({
 
         <button 
           onClick={() => scroll('right')}
-          className="p-2 bg-white border border-gray-100 rounded-full shadow-sm hover:bg-gray-50 transition-all shrink-0 z-10"
+          className="p-2 bg-card border border-outline-variant rounded-full shadow-sm hover:bg-surface-low transition-all shrink-0 z-10"
         >
-          <ChevronRight className="w-4 h-4 text-gray-600" />
+          <ChevronRight className="w-4 h-4 text-on-surface-variant" />
         </button>
       </div>
 
       {/* Product Grid */}
       <div className="flex-1 overflow-y-auto hide-scrollbar pb-24">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20 text-gray-400 gap-4">
-             <div className="w-12 h-12 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin" />
+          <div className="flex flex-col items-center justify-center py-20 text-on-surface-variant gap-4">
+             <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
              <p className="font-black text-[10px] uppercase tracking-widest">Cargando catálogo...</p>
           </div>
         ) : products.length === 0 ? (
-          <div className="text-center text-gray-400 py-20 flex flex-col items-center">
+          <div className="text-center text-on-surface-variant py-20 flex flex-col items-center">
             <PackageSearch className="w-12 h-12 mb-4 opacity-20" />
             <p className="text-xs font-black uppercase tracking-widest">No se encontraron productos</p>
           </div>
@@ -114,56 +114,56 @@ export default function PosProductGrid({
               const isLowStock = product.stock > 0 && product.stock <= 10;
               
               let badgeText = "EN STOCK";
-              let badgeColor = "bg-emerald-50 text-emerald-600 border-emerald-100";
+              let badgeColor = "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
               
               if (isOutOfStock) {
                 badgeText = "SIN STOCK";
-                badgeColor = "bg-rose-50 text-rose-600 border-rose-100";
+                badgeColor = "bg-rose-500/10 text-rose-500 border-rose-500/20";
               } else if (isLowStock) {
                 badgeText = "BAJO STOCK";
-                badgeColor = "bg-amber-50 text-amber-600 border-amber-100";
+                badgeColor = "bg-amber-500/10 text-amber-500 border-amber-500/20";
               }
 
               return (
                 <div 
                   key={product.id}
                   onClick={() => !isOutOfStock && onAddToCart(product)}
-                  className={`bg-white rounded-[32px] p-4 transition-all duration-300 border group relative flex flex-col
+                  className={`bg-card rounded-[24px] lg:rounded-[32px] p-3 lg:p-4 transition-all duration-300 border group relative flex flex-col
                     ${!isOutOfStock 
-                      ? 'cursor-pointer hover:shadow-2xl hover:shadow-indigo-100 hover:-translate-y-2 border-gray-100 hover:border-indigo-100' 
-                      : 'opacity-60 grayscale-[0.8] cursor-not-allowed border-gray-100'
+                      ? 'cursor-pointer hover:shadow-2xl hover:shadow-primary/5 border-outline-variant hover:border-primary/30' 
+                      : 'opacity-60 grayscale-[0.8] cursor-not-allowed border-outline-variant'
                     }
                   `}
                 >
-                  <div className="relative aspect-square w-full rounded-3xl bg-gray-50/50 mb-4 overflow-hidden flex items-center justify-center border border-gray-50">
+                  <div className="relative aspect-square w-full rounded-2xl lg:rounded-3xl bg-surface-low mb-3 lg:mb-4 overflow-hidden flex items-center justify-center border border-outline-variant/30">
                     {product.imageUrl ? (
                       <img src={product.imageUrl} alt={product.name} className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110" />
                     ) : (
-                      <LayoutGrid className="w-8 h-8 text-gray-200" />
+                      <LayoutGrid className="w-6 lg:w-8 h-6 lg:h-8 text-outline-variant" />
                     )}
                     
-                    <div className={`absolute top-2 left-2 lg:top-3 lg:left-auto lg:right-3 px-1.5 py-0.5 lg:px-2.5 lg:py-1 rounded-full text-[7px] lg:text-[8px] font-black tracking-tighter lg:tracking-widest border ${badgeColor}`}>
+                    <div className={`absolute top-2 left-2 lg:top-3 lg:left-auto lg:right-3 px-1.5 py-0.5 lg:px-2.5 lg:py-1 rounded-full text-[6px] lg:text-[8px] font-black tracking-tighter lg:tracking-widest border ${badgeColor}`}>
                       {badgeText}
                     </div>
                   </div>
 
-                  <div className="px-1 flex flex-col flex-1">
-                    <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-1 truncate">
+                  <div className="px-0.5 lg:px-1 flex flex-col flex-1">
+                    <p className="text-[8px] lg:text-[10px] font-black text-primary uppercase tracking-widest mb-0.5 lg:mb-1 truncate">
                       {product.category?.name || 'General'}
                     </p>
-                    <h3 className="font-black text-gray-900 text-sm mb-4 leading-tight line-clamp-2 min-h-[2.5rem]">
+                    <h3 className="font-black text-foreground text-[11px] lg:text-sm mb-2 lg:mb-4 leading-tight line-clamp-2 min-h-[2rem] lg:min-h-[2.5rem]">
                       {product.name}
                     </h3>
                     
                     <div className="mt-auto flex items-center justify-between">
                       <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Precio</span>
-                        <span className="font-black text-gray-900 text-lg tracking-tight">
+                        <span className="text-[8px] lg:text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Precio</span>
+                        <span className="font-black text-foreground text-sm lg:text-lg tracking-tight">
                           S/ {priceNumber.toFixed(2)}
                         </span>
                       </div>
-                      <div className="w-10 h-10 bg-gray-50 group-hover:bg-indigo-600 group-hover:text-white rounded-2xl flex items-center justify-center transition-all shadow-sm">
-                         <Plus className="w-5 h-5" />
+                      <div className="w-8 h-8 lg:w-10 lg:h-10 bg-surface-low group-hover:bg-primary group-hover:text-on-primary rounded-xl lg:rounded-2xl flex items-center justify-center transition-all shadow-sm">
+                         <Plus className="w-4 lg:w-5 h-4 lg:h-5" />
                       </div>
                     </div>
                   </div>
