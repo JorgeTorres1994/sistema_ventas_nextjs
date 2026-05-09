@@ -49,75 +49,86 @@ function CategoryDrawer({
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex justify-end" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+    <div className="fixed inset-0 z-[100] flex justify-end" onClick={onClose}>
+      {/* Dimmed Overlay - NO BLUR to avoid issues */}
+      <div className="absolute inset-0 bg-black/70 animate-in fade-in duration-300" />
+      
       <div 
-        className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-200"
+        className="relative w-full sm:max-w-md bg-card h-full shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] flex flex-col animate-in slide-in-from-right duration-500 border-l border-outline-variant/30 z-[110]"
         onClick={e => e.stopPropagation()}
       >
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-lg font-black text-gray-900">
-            {category ? 'Editar Categoría' : 'Nueva Categoría'}
-          </h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-            <X className="w-5 h-5 text-gray-400" />
+        <div className="px-6 py-6 sm:px-10 sm:py-9 border-b border-outline-variant/20 flex items-center justify-between bg-card sticky top-0 z-20">
+          <div>
+            <h2 className="text-2xl font-black text-foreground tracking-tight">
+              {category ? 'Editar Categoría' : 'Nueva Categoría'}
+            </h2>
+            <div className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
+               <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+               Módulo de Inventario
+            </div>
+          </div>
+          <button onClick={onClose} className="w-10 h-10 flex items-center justify-center hover:bg-surface-low rounded-xl transition-all active:scale-90 text-on-surface-variant/40 hover:text-foreground">
+            <X className="w-6 h-6" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="flex-1 p-6 sm:p-10 space-y-10 overflow-y-auto scrollbar-hide bg-card">
           {error && (
-            <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-600 text-sm font-bold animate-in fade-in zoom-in duration-200">
+            <div className="p-5 bg-rose-500/10 border border-rose-500/20 rounded-3xl flex items-center gap-4 text-rose-500 text-sm font-black animate-in fade-in zoom-in duration-300">
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
               {error}
             </div>
           )}
 
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
-              Nombre de la Categoría
+          <div className="space-y-4">
+            <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] ml-1">
+              Nombre de la Categoría <span className="text-rose-500">*</span>
             </label>
             <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Tag className="h-4 w-4 text-gray-400 group-focus-within:text-indigo-600 transition-colors" />
+              <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+                <Tag className="h-5 w-5 text-on-surface-variant/30 group-focus-within:text-primary transition-colors" />
               </div>
               <input
                 type="text"
                 required
                 value={name}
                 onChange={e => setName(e.target.value)}
-                className="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all"
+                className="block w-full pl-16 pr-6 py-5 bg-surface-low border border-transparent rounded-[24px] text-sm font-black text-foreground placeholder:text-on-surface-variant/20 focus:bg-card focus:border-primary/30 transition-all outline-none shadow-inner"
                 placeholder="Ej. Electrónica, Ropa, Hogar..."
               />
             </div>
           </div>
 
-          <div className="p-6 bg-indigo-50 rounded-3xl border border-indigo-100/50">
-            <div className="flex gap-4">
-              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
-                <Info className="w-5 h-5 text-indigo-600" />
+          <div className="p-8 bg-surface-low/30 rounded-[40px] border border-outline-variant/30 relative overflow-hidden group">
+            <div className="absolute -right-6 -top-6 opacity-5 group-hover:scale-110 transition-transform">
+               <Info className="w-28 h-28 text-on-surface-variant" />
+            </div>
+            <div className="flex gap-6 relative z-10">
+              <div className="w-14 h-14 bg-card rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border border-outline-variant/30">
+                <Info className="w-7 h-7 text-primary" />
               </div>
-              <div>
-                <h4 className="text-sm font-black text-indigo-900 mb-1">Dato importante</h4>
-                <p className="text-xs text-indigo-600/80 font-medium leading-relaxed">
-                  Las categorías inactivas no aparecerán al crear nuevos productos, pero se mantendrán en los reportes históricos.
+              <div className="flex-1">
+                <h4 className="text-sm font-black text-foreground mb-1.5 uppercase tracking-tight">Dato importante</h4>
+                <p className="text-xs text-on-surface-variant font-bold leading-relaxed opacity-70">
+                  Las categorías inactivas no aparecerán al crear nuevos productos, pero se mantendrán en los reportes históricos para integridad de datos.
                 </p>
               </div>
             </div>
           </div>
         </form>
 
-        <div className="p-6 border-t border-gray-100 bg-gray-50/50">
+        <div className="p-6 sm:p-10 border-t border-outline-variant/20 bg-card shrink-0">
           <button
             onClick={handleSubmit}
             disabled={loading || !name.trim()}
-            className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full py-5 bg-primary text-on-primary rounded-[22px] font-black text-[12px] uppercase tracking-[0.15em] hover:opacity-90 shadow-2xl shadow-primary/30 transition-all flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.98]"
           >
             {loading ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <div className="w-6 h-6 border-3 border-on-primary/30 border-t-on-primary rounded-full animate-spin" />
             ) : (
-              <CheckCircle className="w-5 h-5" />
+              <CheckCircle className="w-6 h-6" />
             )}
-            {category ? 'Guardar Cambios' : 'Crear Categoría'}
+            {category ? 'ACTUALIZAR DATOS' : 'REGISTRAR CATEGORÍA'}
           </button>
         </div>
       </div>
@@ -145,27 +156,34 @@ function ConfirmModal({
 }) {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose} />
-      <div className="relative bg-white w-full max-w-sm rounded-[32px] p-8 shadow-2xl animate-in zoom-in duration-200">
-        <div className={`w-16 h-16 rounded-2xl mb-6 flex items-center justify-center ${
-          type === 'danger' ? 'bg-rose-50 text-rose-500' : 'bg-amber-50 text-amber-500'
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 sm:p-4">
+      {/* Heavy solid overlay */}
+      <div className="absolute inset-0 bg-black/80 animate-in fade-in duration-300" onClick={onClose} />
+      
+      <div className="relative bg-card w-full max-w-sm rounded-[48px] p-8 sm:p-12 shadow-[0_0_80px_-15px_rgba(0,0,0,0.6)] animate-in zoom-in-95 duration-300 border border-outline-variant/20 z-[210]">
+        <div className={`w-20 h-20 rounded-[32px] mb-8 flex items-center justify-center shadow-inner ${
+          type === 'danger' ? 'bg-rose-500/10 text-rose-500' : 'bg-amber-500/10 text-amber-500'
         }`}>
-          <AlertCircle className="w-8 h-8" />
+          <AlertCircle className="w-10 h-10" />
         </div>
-        <h3 className="text-xl font-black text-gray-900 mb-2">{title}</h3>
-        <p className="text-sm text-gray-500 font-medium leading-relaxed mb-8">{message}</p>
-        <div className="flex gap-3">
-          <button onClick={onClose} className="flex-1 py-3.5 px-4 bg-gray-50 text-gray-500 rounded-2xl font-black text-xs hover:bg-gray-100 transition-all">
+        
+        <h3 className="text-2xl sm:text-3xl font-black text-foreground mb-4 tracking-tight leading-tight">{title}</h3>
+        <p className="text-sm text-on-surface-variant font-bold leading-relaxed mb-10 opacity-80">{message}</p>
+        
+        <div className="flex flex-col sm:flex-row gap-4">
+          <button 
+            onClick={onClose} 
+            className="flex-1 py-4.5 px-6 bg-surface-low text-on-surface-variant rounded-2xl font-black text-[10px] hover:bg-card transition-all border border-outline-variant/30 uppercase tracking-[0.2em] active:scale-95 shadow-sm"
+          >
             CANCELAR
           </button>
           <button 
             onClick={() => { onConfirm(); onClose(); }}
-            className={`flex-1 py-3.5 px-4 rounded-2xl font-black text-xs text-white shadow-lg transition-all active:scale-95 ${
-              type === 'danger' ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-100' : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-100'
+            className={`flex-1 py-4.5 px-6 rounded-2xl font-black text-[10px] text-white shadow-2xl transition-all active:scale-95 uppercase tracking-[0.2em] ${
+              type === 'danger' ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/30' : 'bg-primary hover:opacity-90 shadow-primary/30'
             }`}
           >
-            {confirmText.toUpperCase()}
+            {confirmText}
           </button>
         </div>
       </div>
@@ -246,204 +264,208 @@ export default function CategoriesPage() {
   const inactiveCount = categories.filter(c => !c.isActive).length;
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
+    <div className="flex h-screen bg-background overflow-hidden font-sans text-foreground transition-colors">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
+      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden">
         <TopBar />
 
-        {/* Header */}
-        <div className="px-8 py-6 bg-white border-b border-gray-100 flex items-start justify-between shrink-0">
-          <div>
-            <p className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-1">Logística</p>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none">Categorías</h1>
-            <p className="text-sm text-gray-400 font-medium mt-1">Gestione el estado y organización de sus productos.</p>
-          </div>
-          <button
-            onClick={() => { setSelectedCategory(null); setIsDrawerOpen(true); }}
-            className="flex items-center gap-2 px-5 py-3 bg-indigo-600 rounded-2xl text-sm font-black text-white hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-95"
-          >
-            <Plus className="w-5 h-5" /> Nueva Categoría
-          </button>
-        </div>
-
-        <main className="flex-1 overflow-y-auto p-8 space-y-6">
-          {/* Search Bar & Filters */}
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <div className="flex-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-2 w-full">
-              <div className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl px-4 py-2">
-                <Search className="w-4 h-4 text-gray-400" />
-                <input
-                  placeholder="Buscar categoría..."
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  className="bg-transparent text-sm font-bold text-gray-700 outline-none flex-1"
-                />
+        <main className="flex-1 overflow-y-auto bg-background p-4 lg:p-8 scrollbar-hide">
+          <div className="max-w-7xl mx-auto pb-20">
+            
+            {/* Header Area */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+              <div>
+                <nav className="flex items-center gap-2 text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-2">
+                  <span>Logística</span><span>/</span>
+                  <span className="text-on-surface-variant">Clasificación comercial</span>
+                </nav>
+                <h1 className="text-4xl font-black tracking-tighter mb-2">Categorías</h1>
+                <p className="text-sm font-medium text-on-surface-variant max-w-xl">Organización estructural del catálogo de productos y servicios.</p>
               </div>
-            </div>
-
-            <div className="flex items-center gap-3 w-full md:w-auto">
-              <select
-                value={filterType}
-                onChange={e => setFilterType(e.target.value)}
-                className="bg-white border border-gray-100 rounded-2xl px-4 py-3.5 text-xs font-black text-gray-600 outline-none shadow-sm focus:ring-2 focus:ring-indigo-100 transition-all cursor-pointer"
+              
+              <button
+                onClick={() => { setSelectedCategory(null); setIsDrawerOpen(true); }}
+                className="flex items-center justify-center gap-3 px-8 py-4 bg-primary text-on-primary rounded-[22px] text-[11px] font-black uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-primary/20 active:scale-95 w-full md:w-auto"
               >
-                <option value="ALL">TODOS LOS ESTADOS</option>
-                <option value="ACTIVE">SOLO ACTIVAS</option>
-                <option value="INACTIVE">SOLO INACTIVAS</option>
-              </select>
-
-              <select
-                value={sortBy}
-                onChange={e => setSortBy(e.target.value)}
-                className="bg-white border border-gray-100 rounded-2xl px-4 py-3.5 text-xs font-black text-gray-600 outline-none shadow-sm focus:ring-2 focus:ring-indigo-100 transition-all cursor-pointer"
-              >
-                <option value="NAME_ASC">ORDEN: A - Z</option>
-                <option value="NAME_DESC">ORDEN: Z - A</option>
-                <option value="PROD_DESC">MÁS PRODUCTOS</option>
-                <option value="PROD_ASC">MENOS PRODUCTOS</option>
-              </select>
+                <Plus className="w-5 h-5" /> Nueva Categoría
+              </button>
             </div>
-          </div>
 
-          {/* Stats Bar */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-              <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">
-                <Tag className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total</p>
-                <h3 className="text-2xl font-black text-gray-900">{categories.length}</h3>
-              </div>
-            </div>
-            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-              <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center">
-                <Eye className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Activas</p>
-                <h3 className="text-2xl font-black text-emerald-600">{activeCount}</h3>
-              </div>
-            </div>
-            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-              <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center">
-                <EyeOff className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Inactivas</p>
-                <h3 className="text-2xl font-black text-rose-600">{inactiveCount}</h3>
-              </div>
-            </div>
-            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-              <div className="w-12 h-12 bg-gray-50 text-gray-400 rounded-2xl flex items-center justify-center">
-                <Package className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Items Totales</p>
-                <h3 className="text-2xl font-black text-gray-900">
-                  {categories.reduce((acc, c) => acc + (c._count?.products || 0), 0)}
-                </h3>
-              </div>
-            </div>
-          </div>
-
-          {/* Grid of Categories */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {loading ? (
-              Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="h-40 bg-white rounded-3xl animate-pulse border border-gray-100" />
-              ))
-            ) : paginated.length === 0 ? (
-              <div className="col-span-full py-20 text-center">
-                <Tag className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                <p className="font-black text-gray-400">No se encontraron categorías</p>
-              </div>
-            ) : (
-              paginated.map(cat => (
-                <div 
-                  key={cat.id} 
-                  className={`bg-white p-6 rounded-3xl shadow-sm border transition-all group relative overflow-hidden ${
-                    cat.isActive ? 'border-gray-100 hover:shadow-xl hover:shadow-indigo-50/50 hover:border-indigo-100' : 'border-rose-100 opacity-70 bg-rose-50/20'
-                  }`}
-                >
-                  {/* Action Buttons */}
-                  <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 z-10">
-                    <button 
-                      onClick={() => { setSelectedCategory(cat); setIsDrawerOpen(true); }}
-                      className="p-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button 
-                      onClick={(e) => { 
-                        e.stopPropagation(); 
-                        setConfirmModal({ isOpen: true, catId: cat.id, isActive: cat.isActive });
-                      }}
-                      className={`p-2 rounded-xl transition-all shadow-sm active:scale-90 ${
-                        cat.isActive 
-                        ? 'bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white' 
-                        : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white'
-                      }`}
-                      title={cat.isActive ? 'Desactivar' : 'Activar'}
-                    >
-                      {cat.isActive ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors mb-4 ${
-                    cat.isActive ? 'bg-gray-50 text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-600' : 'bg-rose-100 text-rose-400'
-                  }`}>
-                    <Tag className="w-6 h-6" />
-                  </div>
-
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className={`text-lg font-black uppercase truncate pr-16 ${
-                      cat.isActive ? 'text-gray-900 group-hover:text-indigo-600' : 'text-gray-400'
-                    }`}>
-                      {cat.name}
-                    </h3>
-                    {!cat.isActive && (
-                      <span className="px-2 py-0.5 bg-rose-100 text-rose-600 text-[8px] font-black uppercase rounded-full">Inactiva</span>
-                    )}
-                  </div>
-                  
-                  <div className={`flex items-center justify-between mt-6 pt-4 border-t ${cat.isActive ? 'border-gray-50' : 'border-rose-100/50'}`}>
-                    <div className="flex items-center gap-1.5">
-                      <Package className={`w-3.5 h-3.5 ${cat.isActive ? 'text-indigo-500' : 'text-gray-300'}`} />
-                      <span className={`text-xs font-black ${cat.isActive ? 'text-indigo-900' : 'text-gray-400'}`}>{cat._count?.products || 0}</span>
-                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Productos</span>
-                    </div>
-                    <ChevronRight className={`w-4 h-4 ${cat.isActive ? 'text-gray-200 group-hover:text-indigo-300' : 'text-rose-200'}`} />
-                  </div>
+            {/* Premium Stats Bar */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-12">
+              <div className="bg-card p-6 lg:p-8 rounded-[32px] shadow-sm border border-outline-variant/30 flex flex-col lg:flex-row items-center lg:items-start gap-4 transition-all hover:border-primary/20 group">
+                <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Tag className="w-6 h-6" />
                 </div>
-              ))
+                <div className="text-center lg:text-left">
+                  <p className="text-[9px] font-black text-on-surface-variant/40 uppercase tracking-widest mb-1">Total</p>
+                  <h3 className="text-2xl font-black text-foreground tracking-tighter">{categories.length}</h3>
+                </div>
+              </div>
+              <div className="bg-card p-6 lg:p-8 rounded-[32px] shadow-sm border border-outline-variant/30 flex flex-col lg:flex-row items-center lg:items-start gap-4 transition-all hover:border-emerald-500/20 group">
+                <div className="w-12 h-12 bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <CheckCircle className="w-6 h-6" />
+                </div>
+                <div className="text-center lg:text-left">
+                  <p className="text-[9px] font-black text-on-surface-variant/40 uppercase tracking-widest mb-1">Activas</p>
+                  <h3 className="text-2xl font-black text-emerald-500 tracking-tighter">{activeCount}</h3>
+                </div>
+              </div>
+              <div className="bg-card p-6 lg:p-8 rounded-[32px] shadow-sm border border-outline-variant/30 flex flex-col lg:flex-row items-center lg:items-start gap-4 transition-all hover:border-rose-500/20 group">
+                <div className="w-12 h-12 bg-rose-500/10 text-rose-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <EyeOff className="w-6 h-6" />
+                </div>
+                <div className="text-center lg:text-left">
+                  <p className="text-[9px] font-black text-on-surface-variant/40 uppercase tracking-widest mb-1">Pausadas</p>
+                  <h3 className="text-2xl font-black text-rose-500 tracking-tighter">{inactiveCount}</h3>
+                </div>
+              </div>
+              <div className="bg-card p-6 lg:p-8 rounded-[32px] shadow-sm border border-outline-variant/30 flex flex-col lg:flex-row items-center lg:items-start gap-4 transition-all hover:border-on-surface-variant/20 group">
+                <div className="w-12 h-12 bg-surface-low text-on-surface-variant rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform border border-outline-variant/50">
+                  <Package className="w-6 h-6" />
+                </div>
+                <div className="text-center lg:text-left">
+                  <p className="text-[9px] font-black text-on-surface-variant/40 uppercase tracking-widest mb-1">Artículos</p>
+                  <h3 className="text-2xl font-black text-foreground tracking-tighter">
+                    {categories.reduce((acc, c) => acc + (c._count?.products || 0), 0)}
+                  </h3>
+                </div>
+              </div>
+            </div>
+
+            {/* Search Bar & Filters */}
+            <div className="flex flex-col lg:flex-row items-center gap-4 mb-8">
+              <div className="flex-1 relative group w-full">
+                  <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant/30 group-focus-within:text-primary transition-colors" />
+                  <input 
+                    type="text" 
+                    placeholder="Filtrar categorías por nombre..." 
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full pl-16 pr-6 py-4 bg-card border border-outline-variant rounded-[24px] text-sm font-black focus:border-primary/40 transition-all outline-none text-foreground shadow-sm placeholder:text-on-surface-variant/20"
+                  />
+              </div>
+
+              <div className="flex items-center gap-3 w-full lg:w-auto">
+                <select
+                  value={filterType}
+                  onChange={e => setFilterType(e.target.value)}
+                  className="flex-1 lg:flex-none bg-card border border-outline-variant rounded-[20px] px-6 py-4 text-[10px] font-black text-on-surface-variant outline-none shadow-sm transition-all cursor-pointer uppercase tracking-widest hover:border-primary/40"
+                >
+                  <option value="ALL">Estados</option>
+                  <option value="ACTIVE">Activas</option>
+                  <option value="INACTIVE">Pausadas</option>
+                </select>
+
+                <select
+                  value={sortBy}
+                  onChange={e => setSortBy(e.target.value)}
+                  className="flex-1 lg:flex-none bg-card border border-outline-variant rounded-[20px] px-6 py-4 text-[10px] font-black text-on-surface-variant outline-none shadow-sm transition-all cursor-pointer uppercase tracking-widest hover:border-primary/40"
+                >
+                  <option value="NAME_ASC">Nombre (A-Z)</option>
+                  <option value="PROD_DESC">Volumen Stock</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Grid of Categories */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {loading ? (
+                Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="h-[240px] bg-card rounded-[40px] animate-pulse border border-outline-variant/30 shadow-sm" />
+                ))
+              ) : paginated.length === 0 ? (
+                <div className="col-span-full py-32 text-center bg-card rounded-[40px] border border-outline-variant/30 shadow-inner">
+                  <Tag className="w-20 h-20 text-on-surface-variant/10 mx-auto mb-6" />
+                  <p className="font-black text-on-surface-variant uppercase tracking-[0.2em] text-xs">Sin registros que mostrar</p>
+                </div>
+              ) : (
+                paginated.map(cat => (
+                  <div 
+                    key={cat.id} 
+                    className={`bg-card p-8 rounded-[40px] border transition-all group relative overflow-hidden flex flex-col justify-between min-h-[260px] shadow-sm ${
+                      cat.isActive ? 'border-outline-variant/50 hover:shadow-2xl hover:shadow-primary/5 hover:border-primary/20' : 'border-rose-500/10 opacity-70 grayscale-[0.5] bg-rose-500/5'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-6">
+                      <div className={`w-16 h-16 rounded-[24px] flex items-center justify-center transition-all border ${
+                        cat.isActive ? 'bg-surface-low text-on-surface-variant border-outline-variant group-hover:bg-primary/5 group-hover:text-primary group-hover:border-primary/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                      }`}>
+                        <Tag className="w-8 h-8" />
+                      </div>
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => { setSelectedCategory(cat); setIsDrawerOpen(true); }}
+                          className="w-10 h-10 bg-card border border-outline-variant/50 text-on-surface-variant rounded-xl flex items-center justify-center hover:bg-primary hover:text-on-primary hover:border-primary transition-all active:scale-90 shadow-sm"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            setConfirmModal({ isOpen: true, catId: cat.id, isActive: cat.isActive });
+                          }}
+                          className={`w-10 h-10 border rounded-xl flex items-center justify-center transition-all active:scale-90 bg-card shadow-sm ${
+                            cat.isActive 
+                            ? 'border-outline-variant text-rose-500 hover:bg-rose-500 hover:text-white hover:border-rose-500' 
+                            : 'border-emerald-500/40 text-emerald-500 hover:bg-emerald-500 hover:text-white hover:border-emerald-500'
+                          }`}
+                        >
+                          {cat.isActive ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className={`text-2xl font-black uppercase tracking-tight line-clamp-1 transition-colors mb-1 ${
+                        cat.isActive ? 'text-foreground group-hover:text-primary' : 'text-on-surface-variant'
+                      }`}>
+                        {cat.name}
+                      </h3>
+                      <p className="text-[10px] font-black text-on-surface-variant/40 uppercase tracking-widest">ID: {cat.id.substring(0, 8).toUpperCase()}</p>
+                    </div>
+                    
+                    <div className={`mt-8 pt-6 border-t flex items-center justify-between transition-colors ${cat.isActive ? 'border-outline-variant/30 group-hover:border-primary/10' : 'border-rose-500/20'}`}>
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-[14px] flex items-center justify-center ${cat.isActive ? 'bg-primary/5 text-primary' : 'bg-surface-low text-on-surface-variant'}`}>
+                          <Package className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <span className={`text-lg font-black block leading-none ${cat.isActive ? 'text-foreground' : 'text-on-surface-variant'}`}>{cat._count?.products || 0}</span>
+                          <span className="text-[9px] font-black text-on-surface-variant/40 uppercase tracking-widest">Productos</span>
+                        </div>
+                      </div>
+                      <ChevronRight className={`w-5 h-5 transition-transform group-hover:translate-x-1 ${cat.isActive ? 'text-on-surface-variant/20 group-hover:text-primary/30' : 'text-rose-500/10'}`} />
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Pagination */}
+            {!loading && totalPages > 1 && (
+              <div className="flex items-center justify-between bg-card px-8 py-6 rounded-[32px] border border-outline-variant/30 shadow-sm mt-12">
+                <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">
+                  Página <span className="text-primary">{currentPage}</span> de <span className="text-foreground">{totalPages}</span>
+                </p>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1}
+                    className="w-12 h-12 rounded-2xl border border-outline-variant/50 flex items-center justify-center hover:bg-card text-on-surface-variant disabled:opacity-30 transition-all active:scale-90"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <div className="w-12 h-12 flex items-center justify-center bg-primary text-on-primary rounded-2xl text-xs font-black shadow-xl shadow-primary/20">
+                     {currentPage}
+                  </div>
+                  <button onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages}
+                    className="w-12 h-12 rounded-2xl border border-outline-variant/50 flex items-center justify-center hover:bg-card text-on-surface-variant disabled:opacity-30 transition-all active:scale-90"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
             )}
           </div>
-
-          {/* Pagination */}
-          {!loading && totalPages > 1 && (
-            <div className="flex items-center justify-between bg-white px-8 py-5 rounded-3xl border border-gray-100 shadow-sm mt-6 mb-10">
-              <p className="text-xs font-black text-gray-400 uppercase tracking-widest">
-                Página <span className="text-gray-900">{currentPage}</span> de <span className="text-gray-900">{totalPages}</span>
-              </p>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  disabled={currentPage === 1}
-                  className="p-2 rounded-xl border border-gray-100 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                >
-                  <ChevronLeft className="w-5 h-5 text-gray-600" />
-                </button>
-                <button
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                  disabled={currentPage === totalPages}
-                  className="p-2 rounded-xl border border-gray-100 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                >
-                  <ChevronRight className="w-5 h-5 text-gray-600" />
-                </button>
-              </div>
-            </div>
-          )}
         </main>
       </div>
 
@@ -469,3 +491,4 @@ export default function CategoriesPage() {
     </div>
   );
 }
+

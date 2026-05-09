@@ -38,19 +38,19 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
+    <div className="flex h-screen bg-background overflow-hidden font-sans transition-colors">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col ml-64 overflow-hidden">
+      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden">
         <TopBar />
         
-        <main className="flex-1 overflow-y-auto bg-gray-50 p-8">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 overflow-y-auto bg-background p-4 lg:p-8 scrollbar-hide">
+          <div className="max-w-7xl mx-auto pb-12">
             {/* KPI Cards */}
             <StatsCards kpis={data?.kpis} isLoading={isLoading} />
 
             {/* Charts Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
               <div className="lg:col-span-2 flex flex-col h-full">
                 <SalesChart data={data?.salesOverTime || []} isLoading={isLoading} />
               </div>
@@ -67,3 +67,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+

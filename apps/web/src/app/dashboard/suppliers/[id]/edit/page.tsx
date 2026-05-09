@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
+import TopBar from '@/components/layout/TopBar';
 import {
   ArrowLeft, Building2, Hash, Mail, Phone, MapPin,
   Save, CheckCircle, AlertCircle, Loader2
@@ -25,10 +26,10 @@ interface FormErrors {
 
 function validate(data: FormData): FormErrors {
   const errors: FormErrors = {};
-  if (!data.name.trim()) errors.name = 'Company Name is required';
-  if (!data.dniRuc.trim()) errors.dniRuc = 'DNI/RUC is required';
+  if (!data.name.trim()) errors.name = 'El nombre de la empresa es obligatorio';
+  if (!data.dniRuc.trim()) errors.dniRuc = 'El DNI/RUC es obligatorio';
   if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-    errors.email = 'Invalid email format';
+    errors.email = 'Formato de correo electrónico inválido';
   }
   return errors;
 }
@@ -81,7 +82,7 @@ export default function EditSupplierPage() {
       setSuccess(true);
       setTimeout(() => router.push('/dashboard/suppliers'), 1200);
     } catch (err: any) {
-      const msg = err.response?.data?.message ?? 'An error occurred. Please try again.';
+      const msg = err.response?.data?.message ?? 'Ocurrió un error. Por favor, intente de nuevo.';
       setServerError(Array.isArray(msg) ? msg.join(', ') : msg);
     } finally {
       setLoading(false);
@@ -89,117 +90,121 @@ export default function EditSupplierPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
+    <div className="flex h-screen bg-background overflow-hidden font-sans text-foreground">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-y-auto">
+      <div className="flex-1 flex flex-col lg:ml-64 w-full overflow-hidden">
+        <TopBar />
 
-        <header className="px-8 py-6 bg-white border-b border-gray-100 flex items-center gap-4 sticky top-0 z-20">
+        <header className="px-4 lg:px-10 py-6 border-b border-outline-variant/30 flex items-center gap-6 sticky top-0 z-20 bg-background/80 backdrop-blur-xl">
           <button
             onClick={() => router.push('/dashboard/suppliers')}
-            className="w-9 h-9 rounded-xl border border-gray-100 hover:bg-gray-50 flex items-center justify-center transition-colors">
-            <ArrowLeft className="w-4 h-4 text-gray-500" />
+            className="w-12 h-12 rounded-2xl border border-outline-variant/30 hover:bg-surface-low flex items-center justify-center transition-all active:scale-90 shadow-sm"
+          >
+            <ArrowLeft className="w-5 h-5 text-on-surface-variant" />
           </button>
           <div>
-            <nav className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
-              <span>Suppliers</span><span>/</span>
-              <span className="text-blue-600">Edit Supplier</span>
+            <nav className="flex items-center gap-2 text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] mb-1">
+              <span>Proveedores</span><span>/</span>
+              <span className="text-primary">Editar Registro</span>
             </nav>
-            <h1 className="text-2xl font-black text-gray-900 leading-tight">Edit Supplier</h1>
+            <h1 className="text-2xl lg:text-3xl font-black text-foreground tracking-tighter">Editar Proveedor</h1>
           </div>
         </header>
 
-        <main className="flex-1 p-8">
+        <main className="flex-1 overflow-y-auto p-4 lg:p-10 pb-32">
           {fetchLoading ? (
             <div className="flex items-center justify-center h-64">
-              <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+              <Loader2 className="w-10 h-10 text-primary animate-spin" />
             </div>
           ) : (
-            <div className="max-w-2xl mx-auto">
-              <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden">
+            <div className="max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="bg-card rounded-[40px] shadow-sm border border-outline-variant/30 overflow-hidden">
 
-                <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-blue-50/50 to-white">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                      <Building2 className="w-6 h-6 text-blue-600" />
+                <div className="px-8 py-10 border-b border-outline-variant/30 bg-gradient-to-br from-primary/[0.03] to-transparent">
+                  <div className="flex items-center gap-6">
+                    <div className="w-16 h-16 bg-primary/10 rounded-[24px] flex items-center justify-center border border-primary/20">
+                      <Building2 className="w-8 h-8 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-black text-gray-900">Update vendor details</h2>
-                      <p className="text-sm text-gray-500 font-medium">Modify the details below and save your changes</p>
+                      <h2 className="text-xl font-black text-foreground tracking-tight">Actualizar datos del proveedor</h2>
+                      <p className="text-sm text-on-surface-variant font-medium opacity-60">Modifique los detalles a continuación y guarde los cambios</p>
                     </div>
                   </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                <form onSubmit={handleSubmit} className="p-6 lg:p-10 space-y-8">
                   
-                  <div>
-                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Company Name <span className="text-rose-500">*</span></label>
-                    <div className="relative">
-                      <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300" />
-                      <input type="text" placeholder="e.g. Lumina Tech Solutions" value={form.name} onChange={set('name')}
-                        className={`w-full pl-12 pr-4 py-3.5 bg-gray-50/80 rounded-xl font-bold text-gray-900 focus:outline-none focus:ring-2 transition-all border border-transparent ${errors.name ? 'ring-2 ring-rose-200 bg-rose-50' : 'focus:ring-blue-100 focus:border-blue-300 focus:bg-white'}`} />
-                    </div>
-                    {errors.name && <p className="mt-2 text-xs font-bold text-rose-500 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.name}</p>}
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Tax ID / RUC <span className="text-rose-500">*</span></label>
-                    <div className="relative">
-                      <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300" />
-                      <input type="text" placeholder="e.g. 20543219876" value={form.dniRuc} onChange={set('dniRuc')}
-                        className={`w-full pl-12 pr-4 py-3.5 bg-gray-50/80 rounded-xl font-bold text-gray-900 font-mono focus:outline-none focus:ring-2 transition-all border border-transparent ${errors.dniRuc ? 'ring-2 ring-rose-200 bg-rose-50' : 'focus:ring-blue-100 focus:border-blue-300 focus:bg-white'}`} />
-                    </div>
-                    {errors.dniRuc && <p className="mt-2 text-xs font-bold text-rose-500 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.dniRuc}</p>}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Email Address</label>
-                      <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300" />
-                        <input type="email" placeholder="contact@company.com" value={form.email} onChange={set('email')}
-                          className={`w-full pl-12 pr-4 py-3.5 bg-gray-50/80 rounded-xl font-bold text-gray-900 focus:outline-none focus:ring-2 transition-all border border-transparent ${errors.email ? 'ring-2 ring-rose-200 bg-rose-50' : 'focus:ring-blue-100 focus:border-blue-300 focus:bg-white'}`} />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] ml-1">Nombre de la Empresa <span className="text-rose-500">*</span></label>
+                      <div className="relative group">
+                        <Building2 className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-primary transition-transform group-focus-within:scale-110" />
+                        <input type="text" placeholder="Ej. Aether Optics S.A.C." value={form.name} onChange={set('name')}
+                          className={`w-full h-[64px] pl-16 pr-6 bg-surface-low border-2 border-outline-variant/20 rounded-[24px] font-bold text-foreground focus:outline-none focus:bg-card transition-all ${errors.name ? 'border-rose-500/50 bg-rose-500/5' : 'focus:border-primary focus:shadow-xl focus:shadow-primary/5'}`} />
                       </div>
-                      {errors.email && <p className="mt-2 text-xs font-bold text-rose-500 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.email}</p>}
+                      {errors.name && <p className="mt-2 text-[10px] font-black text-rose-500 flex items-center gap-2 uppercase tracking-widest ml-1"><AlertCircle className="w-3.5 h-3.5" />{errors.name}</p>}
                     </div>
-                    <div>
-                      <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Phone</label>
-                      <div className="relative">
-                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300" />
-                        <input type="text" placeholder="+1 (555) 000-0000" value={form.phone} onChange={set('phone')}
-                          className="w-full pl-12 pr-4 py-3.5 bg-gray-50/80 rounded-xl font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 focus:bg-white transition-all border border-transparent" />
+
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] ml-1">DNI / RUC <span className="text-rose-500">*</span></label>
+                      <div className="relative group">
+                        <Hash className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-primary transition-transform group-focus-within:scale-110" />
+                        <input type="text" placeholder="Ej. 20938477544" value={form.dniRuc} onChange={set('dniRuc')}
+                          className={`w-full h-[64px] pl-16 pr-6 bg-surface-low border-2 border-outline-variant/20 rounded-[24px] font-black text-foreground font-mono focus:outline-none focus:bg-card transition-all ${errors.dniRuc ? 'border-rose-500/50 bg-rose-500/5' : 'focus:border-primary focus:shadow-xl focus:shadow-primary/5'}`} />
+                      </div>
+                      {errors.dniRuc && <p className="mt-2 text-[10px] font-black text-rose-500 flex items-center gap-2 uppercase tracking-widest ml-1"><AlertCircle className="w-3.5 h-3.5" />{errors.dniRuc}</p>}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] ml-1">Correo Electrónico</label>
+                      <div className="relative group">
+                        <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-primary transition-transform group-focus-within:scale-110" />
+                        <input type="email" placeholder="ejemplo@proveedor.com" value={form.email} onChange={set('email')}
+                          className={`w-full h-[64px] pl-16 pr-6 bg-surface-low border-2 border-outline-variant/20 rounded-[24px] font-bold text-foreground focus:outline-none focus:bg-card transition-all ${errors.email ? 'border-rose-500/50 bg-rose-500/5' : 'focus:border-primary focus:shadow-xl focus:shadow-primary/5'}`} />
+                      </div>
+                      {errors.email && <p className="mt-2 text-[10px] font-black text-rose-500 flex items-center gap-2 uppercase tracking-widest ml-1"><AlertCircle className="w-3.5 h-3.5" />{errors.email}</p>}
+                    </div>
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] ml-1">Teléfono</label>
+                      <div className="relative group">
+                        <Phone className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-primary transition-transform group-focus-within:scale-110" />
+                        <input type="text" placeholder="+51 987 654 321" value={form.phone} onChange={set('phone')}
+                          className="w-full h-[64px] pl-16 pr-6 bg-surface-low border-2 border-outline-variant/20 rounded-[24px] font-bold text-foreground focus:outline-none focus:border-primary focus:bg-card focus:shadow-xl focus:shadow-primary/5 transition-all" />
                       </div>
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Corporate Address</label>
-                    <div className="relative">
-                      <MapPin className="absolute left-4 top-4 w-5 h-5 text-gray-300" />
-                      <textarea rows={3} placeholder="Street, building, city..." value={form.address} onChange={set('address')}
-                        className="w-full pl-12 pr-4 py-3.5 bg-gray-50/80 rounded-xl font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 focus:bg-white transition-all border border-transparent resize-none leading-relaxed" />
+                  <div className="space-y-3">
+                    <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] ml-1">Dirección Corporativa</label>
+                    <div className="relative group">
+                      <MapPin className="absolute left-6 top-6 w-5 h-5 text-primary transition-transform group-focus-within:scale-110" />
+                      <textarea rows={3} placeholder="Calle, edificio, ciudad..." value={form.address} onChange={set('address')}
+                        className="w-full pl-16 pr-6 py-6 bg-surface-low border-2 border-outline-variant/20 rounded-[32px] font-medium text-foreground focus:outline-none focus:border-primary focus:bg-card focus:shadow-xl focus:shadow-primary/5 transition-all resize-none leading-relaxed" />
                     </div>
                   </div>
 
                   {serverError && (
-                    <div className="flex items-center gap-3 p-4 bg-rose-50 text-rose-700 rounded-xl border border-rose-100 font-bold text-sm">
-                      <AlertCircle className="w-5 h-5 flex-shrink-0" /> {serverError}
+                    <div className="flex items-center gap-4 p-6 bg-rose-500/10 text-rose-500 rounded-[24px] border border-rose-500/20 font-black text-xs uppercase tracking-widest">
+                      <AlertCircle className="w-6 h-6 flex-shrink-0" /> {serverError}
                     </div>
                   )}
                   {success && (
-                    <div className="flex items-center gap-3 p-4 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100 font-bold text-sm">
-                      <CheckCircle className="w-5 h-5 flex-shrink-0" /> Supplier updated successfully!
+                    <div className="flex items-center gap-4 p-6 bg-emerald-500/10 text-emerald-500 rounded-[24px] border border-emerald-500/20 font-black text-xs uppercase tracking-widest">
+                      <CheckCircle className="w-6 h-6 flex-shrink-0" /> ¡Proveedor actualizado correctamente!
                     </div>
                   )}
 
-                  <div className="flex items-center gap-4 pt-4 border-t border-gray-100">
+                  <div className="flex flex-col sm:flex-row items-center gap-4 pt-8 border-t border-outline-variant/30">
                     <button type="button" onClick={() => router.push('/dashboard/suppliers')}
-                      className="flex-1 py-3.5 bg-white border border-gray-200 rounded-xl font-black text-sm text-gray-600 hover:bg-gray-50 transition-colors">
-                      Cancel
+                      className="w-full sm:flex-1 h-[64px] bg-card border-2 border-outline-variant/30 rounded-[24px] font-black text-xs text-on-surface-variant uppercase tracking-widest hover:bg-surface-low transition-all active:scale-95 shadow-sm">
+                      Cancelar
                     </button>
                     <button type="submit" disabled={loading || success}
-                      className="flex-1 py-3.5 bg-blue-600 rounded-xl font-black text-sm text-white flex items-center justify-center gap-2 hover:bg-blue-700 shadow-lg shadow-blue-200/50 transition-all disabled:opacity-50 disabled:shadow-none">
-                      {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                      Save Details
+                      className="w-full sm:flex-1 h-[64px] bg-primary rounded-[24px] font-black text-xs text-on-primary flex items-center justify-center gap-3 hover:opacity-90 shadow-2xl shadow-primary/30 transition-all active:scale-95 disabled:opacity-50 disabled:shadow-none">
+                      {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Save className="w-6 h-6" />}
+                      Guardar Cambios
                     </button>
                   </div>
                 </form>

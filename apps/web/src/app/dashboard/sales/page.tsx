@@ -22,40 +22,37 @@ const fmtTime = (iso: string) => new Date(iso).toLocaleTimeString('es-PE', { hou
 // ── Components ─────────────────────────────────────────────────────────────────
 
 const SalesSummary = ({ stats }: any) => (
-  <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-    <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm group hover:border-blue-100 transition-all">
-       <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-4">
-          <TrendingUp className="w-6 h-6" />
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:p-8">
+    <div className="bg-card p-6 lg:p-8 rounded-[24px] lg:rounded-[32px] border border-outline-variant shadow-sm group hover:border-primary/30 transition-all">
+       <div className="w-10 h-10 lg:w-12 lg:h-12 bg-primary/10 rounded-xl lg:rounded-2xl flex items-center justify-center text-primary mb-4">
+          <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6" />
        </div>
-       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Ingresos Totales</p>
-       <h4 className="text-2xl font-black text-gray-900 leading-none">S/ {stats.totalRevenue.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</h4>
+       <p className="text-[9px] lg:text-[10px] font-black text-on-surface-variant uppercase tracking-widest mb-1">Ingresos Totales</p>
+       <h4 className="text-xl lg:text-2xl font-black text-foreground leading-none">{fmtCurrency(stats.totalRevenue)}</h4>
     </div>
-    <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm group hover:border-blue-100 transition-all">
-       <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-4">
-          <ShoppingBag className="w-6 h-6" />
+    <div className="bg-card p-6 lg:p-8 rounded-[24px] lg:rounded-[32px] border border-outline-variant shadow-sm group hover:border-primary/30 transition-all">
+       <div className="w-10 h-10 lg:w-12 lg:h-12 bg-emerald-500/10 rounded-xl lg:rounded-2xl flex items-center justify-center text-emerald-500 mb-4">
+          <ShoppingBag className="w-5 h-5 lg:w-6 lg:h-6" />
        </div>
-       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Transacciones</p>
-       <h4 className="text-2xl font-black text-gray-900 leading-none">{stats.transactionCount}</h4>
+       <p className="text-[9px] lg:text-[10px] font-black text-on-surface-variant uppercase tracking-widest mb-1">Transacciones</p>
+       <h4 className="text-xl lg:text-2xl font-black text-foreground leading-none">{stats.transactionCount}</h4>
     </div>
-    <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm group hover:border-blue-100 transition-all">
-       <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-4">
-          <DollarSign className="w-6 h-6" />
+    <div className="bg-card p-6 lg:p-8 rounded-[24px] lg:rounded-[32px] border border-outline-variant shadow-sm group hover:border-primary/30 transition-all">
+       <div className="w-10 h-10 lg:w-12 lg:h-12 bg-amber-500/10 rounded-xl lg:rounded-2xl flex items-center justify-center text-amber-500 mb-4">
+          <DollarSign className="w-5 h-5 lg:w-6 lg:h-6" />
        </div>
-       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Ticket Promedio</p>
-       <h4 className="text-2xl font-black text-gray-900 leading-none">S/ {stats.avgSale.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</h4>
+       <p className="text-[9px] lg:text-[10px] font-black text-on-surface-variant uppercase tracking-widest mb-1">Ticket Promedio</p>
+       <h4 className="text-xl lg:text-2xl font-black text-foreground leading-none">{fmtCurrency(stats.avgSale)}</h4>
     </div>
-    <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm group hover:border-blue-100 transition-all">
-       <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 mb-4">
-          <AlertCircle className="w-6 h-6" />
+    <div className="bg-card p-6 lg:p-8 rounded-[24px] lg:rounded-[32px] border border-outline-variant shadow-sm group hover:border-primary/30 transition-all">
+       <div className="w-10 h-10 lg:w-12 lg:h-12 bg-rose-500/10 rounded-xl lg:rounded-2xl flex items-center justify-center text-rose-500 mb-4">
+          <AlertCircle className="w-5 h-5 lg:w-6 lg:h-6" />
        </div>
-       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Anulaciones</p>
-       <h4 className="text-2xl font-black text-gray-900 leading-none">{stats.returns}</h4>
+       <p className="text-[9px] lg:text-[10px] font-black text-on-surface-variant uppercase tracking-widest mb-1">Anulaciones</p>
+       <h4 className="text-xl lg:text-2xl font-black text-foreground leading-none">{stats.returns}</h4>
     </div>
   </div>
 );
-
-// Mocks for structure - in real life these would be imported from components
-// The SaleDetailDrawer has been moved to its own shared component file.
 
 export default function SalesPage() {
   const [sales, setSales] = useState<any[]>([]);
@@ -141,125 +138,180 @@ export default function SalesPage() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'PAID': return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest">Pagado</span>;
-      case 'PENDING': return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-50 text-amber-600 border border-amber-100 uppercase tracking-widest">Pendiente</span>;
-      case 'PARTIAL': return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-blue-50 text-blue-600 border border-blue-100 uppercase tracking-widest">Parcial</span>;
-      case 'CANCELLED': return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-rose-50 text-rose-600 border border-rose-100 uppercase tracking-widest">Anulado</span>;
+      case 'PAID': return <span className="px-2.5 py-1 rounded-full text-[9px] lg:text-[10px] font-black bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 uppercase tracking-widest">Pagado</span>;
+      case 'PENDING': return <span className="px-2.5 py-1 rounded-full text-[9px] lg:text-[10px] font-black bg-amber-500/10 text-amber-500 border border-amber-500/20 uppercase tracking-widest">Pendiente</span>;
+      case 'PARTIAL': return <span className="px-2.5 py-1 rounded-full text-[9px] lg:text-[10px] font-black bg-primary/10 text-primary border border-primary/20 uppercase tracking-widest">Parcial</span>;
+      case 'CANCELLED': return <span className="px-2.5 py-1 rounded-full text-[9px] lg:text-[10px] font-black bg-rose-500/10 text-rose-500 border border-rose-500/20 uppercase tracking-widest">Anulado</span>;
       default: return null;
     }
   };
 
   return (
-    <div className="flex h-screen bg-[#F8F9FC] overflow-hidden font-sans">
+    <div className="flex h-screen bg-background overflow-hidden font-sans transition-colors">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
+      <div className="flex-1 flex flex-col lg:ml-64 w-full overflow-hidden">
         <TopBar />
         
-        {/* Module Header */}
-        <div className="px-10 py-8 bg-transparent flex items-center justify-between shrink-0">
-          <div>
-            <h1 className="text-4xl font-black text-gray-900 tracking-tight leading-none mb-2">Historial de Ventas</h1>
-            <p className="text-base text-gray-400 font-medium">Auditoría centralizada de transacciones • Nexus Genesis</p>
-          </div>
-          <Link href="/dashboard/pos">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-black text-sm transition-all shadow-xl shadow-blue-100 flex items-center gap-3">
-              <Plus className="w-5 h-5" /> Nueva Venta
-            </button>
-          </Link>
-        </div>
-
-        <main className="flex-1 overflow-y-auto px-10 pb-12 space-y-8 scroll-smooth scrollbar-hide">
-          {/* Controls Bar */}
-          <div className="bg-white p-6 rounded-[24px] shadow-sm border border-gray-100 flex flex-wrap items-center gap-6">
-            <div className="flex-1 min-w-[300px] relative">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input 
-                type="text" 
-                placeholder="Buscar por cliente, ID o DNI..." 
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all outline-none text-sm font-bold text-gray-700"
-              />
+        <div className="flex-1 overflow-y-auto overflow-x-hidden">
+          {/* Module Header */}
+          <div className="px-4 lg:px-10 py-6 lg:py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shrink-0">
+            <div>
+              <h1 className="text-2xl lg:text-4xl font-black text-foreground tracking-tight leading-none mb-2">Historial de Ventas</h1>
+              <p className="text-xs lg:text-base text-on-surface-variant font-medium">Auditoría centralizada de transacciones • Nexus Genesis</p>
             </div>
-
-            <div className="flex bg-gray-50 p-1.5 rounded-2xl border border-gray-100">
-              {['Todos', 'Pagado', 'Pendiente', 'Anulado'].map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setStatus(s === 'Anulado' ? 'CANCELLED' : (s === 'Pagado' ? 'PAID' : (s === 'Pendiente' ? 'PENDING' : 'Todos')))}
-                  className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                    (status === 'CANCELLED' && s === 'Anulado') || 
-                    (status === 'PAID' && s === 'Pagado') || 
-                    (status === 'PENDING' && s === 'Pendiente') || 
-                    (status === 'Todos' && s === 'Todos')
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' 
-                      : 'text-gray-400 hover:text-gray-600'
-                  }`}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-
-            <button className="p-4 bg-gray-50 hover:bg-gray-100 rounded-2xl transition-colors text-gray-500 border border-gray-100">
-              <Download className="w-5 h-5" />
-            </button>
+            <Link href="/dashboard/pos" className="w-full sm:w-auto">
+              <button className="w-full sm:w-auto bg-primary hover:opacity-90 text-on-primary px-6 lg:px-8 py-3.5 lg:py-4 rounded-xl lg:rounded-2xl font-black text-xs lg:text-sm transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-3 active:scale-95">
+                <Plus className="w-5 h-5" /> Nueva Venta
+              </button>
+            </Link>
           </div>
 
-          <SalesSummary stats={stats} />
+          <main className="px-4 lg:px-10 pb-20 space-y-6 lg:space-y-10">
+            {/* Controls Bar */}
+            <div className="bg-card p-4 lg:p-6 rounded-[24px] lg:rounded-[32px] shadow-sm border border-outline-variant flex flex-col lg:flex-row items-stretch lg:items-center gap-4 lg:gap-6">
+              <div className="flex-1 relative">
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-on-surface-variant w-5 h-5" />
+                <input 
+                  type="text" 
+                  placeholder="Buscar venta o cliente..." 
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-14 pr-6 py-3.5 lg:py-4 bg-surface-low border border-outline-variant rounded-xl lg:rounded-2xl focus:bg-card focus:ring-2 focus:ring-primary/20 transition-all outline-none text-sm font-bold text-foreground placeholder:text-on-surface-variant/50"
+                />
+              </div>
 
-          <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-gray-50/50 border-b border-gray-100">
-                  <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">ID Venta</th>
-                  <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Cliente</th>
-                  <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-center">Estado</th>
-                  <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-right">Monto Neto</th>
-                  <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-center">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {loading ? (
-                  <tr><td colSpan={5} className="py-24 text-center text-gray-300 font-black uppercase tracking-widest animate-pulse text-xs">Auditando registros...</td></tr>
-                ) : sales.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="py-24 text-center">
-                      <p className="text-sm font-black text-gray-400 uppercase tracking-widest">No se encontraron transacciones</p>
-                    </td>
-                  </tr>
-                ) : sales.map((sale) => (
-                  <tr key={sale.id} className="hover:bg-blue-50/20 transition-all cursor-default">
-                    <td className="px-10 py-6 font-black text-blue-600 text-sm">
-                      {sale.documentSeries && sale.documentNumber 
-                        ? `${sale.documentSeries}-${sale.documentNumber.toString().padStart(8, '0')}` 
-                        : `#SAL-${sale.id.substring(0,6).toUpperCase()}`}
-                    </td>
-                    <td className="px-8 py-6">
-                      <div className="flex items-center gap-4">
-                        <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 font-black text-[10px] border border-gray-200">{sale.customer?.name?.[0] || 'G'}</div>
-                        <span className="text-sm font-black text-gray-900 leading-none">{sale.customer?.name || 'Cliente de Mostrador'}</span>
-                      </div>
-                    </td>
-                    <td className="px-8 py-6 text-center">{getStatusBadge(sale.status)}</td>
-                    <td className="px-8 py-6 text-right">
-                      <span className="text-sm font-black text-gray-900 tracking-tight">S/ {Number(sale.total).toLocaleString('es-PE', { minimumFractionDigits: 2 })}</span>
-                    </td>
-                    <td className="px-10 py-6">
-                      <div className="flex items-center justify-center gap-3">
-                        <button onClick={() => setSelectedSaleId(sale.id)} className="p-3 bg-gray-100 hover:bg-blue-600 rounded-xl text-gray-400 hover:text-white transition-all"><Eye className="w-4 h-4" /></button>
-                        {sale.status !== 'CANCELLED' && (
-                          <button onClick={() => handleCancelSale(sale.id)} className="p-3 bg-gray-100 hover:bg-rose-600 rounded-xl text-gray-400 hover:text-white transition-all"><RotateCcw className="w-4 h-4" /></button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+              <div className="flex flex-wrap bg-surface-low p-1.5 rounded-xl lg:rounded-2xl border border-outline-variant gap-1">
+                {['Todos', 'Pagado', 'Pendiente', 'Anulado'].map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setStatus(s === 'Anulado' ? 'CANCELLED' : (s === 'Pagado' ? 'PAID' : (s === 'Pendiente' ? 'PENDING' : 'Todos')))}
+                    className={`flex-1 min-w-[70px] px-3 lg:px-6 py-2 lg:py-2.5 rounded-lg lg:rounded-xl text-[9px] lg:text-[10px] font-black uppercase tracking-widest transition-all ${
+                      (status === 'CANCELLED' && s === 'Anulado') || 
+                      (status === 'PAID' && s === 'Pagado') || 
+                      (status === 'PENDING' && s === 'Pendiente') || 
+                      (status === 'Todos' && s === 'Todos')
+                        ? 'bg-primary text-on-primary shadow-lg shadow-primary/20' 
+                        : 'text-on-surface-variant hover:text-foreground'
+                    }`}
+                  >
+                    {s}
+                  </button>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </main>
+              </div>
+
+              <button className="hidden lg:block p-4 bg-surface-low hover:bg-primary/10 rounded-2xl transition-colors text-on-surface-variant hover:text-primary border border-outline-variant active:scale-95">
+                <Download className="w-5 h-5" />
+              </button>
+            </div>
+
+            <SalesSummary stats={stats} />
+
+            <section className="bg-card rounded-[24px] lg:rounded-[40px] shadow-sm border border-outline-variant overflow-hidden flex flex-col">
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="bg-surface-low border-b border-outline-variant">
+                      <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant">ID Venta</th>
+                      <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant">Cliente</th>
+                      <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant text-center">Estado</th>
+                      <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant text-right">Monto Neto</th>
+                      <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant text-center">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-outline-variant">
+                    {loading ? (
+                      <tr><td colSpan={5} className="py-24 text-center text-on-surface-variant font-black uppercase tracking-widest animate-pulse text-xs">Auditando registros...</td></tr>
+                    ) : sales.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="py-24 text-center">
+                          <p className="text-sm font-black text-on-surface-variant uppercase tracking-widest">No se encontraron transacciones</p>
+                        </td>
+                      </tr>
+                    ) : sales.map((sale) => (
+                      <tr key={sale.id} className="hover:bg-primary/5 transition-all cursor-default group">
+                        <td className="px-10 py-6 font-black text-primary text-sm">
+                          {sale.documentSeries && sale.documentNumber 
+                            ? `${sale.documentSeries}-${sale.documentNumber.toString().padStart(8, '0')}` 
+                            : `#SAL-${sale.id.substring(0,6).toUpperCase()}`}
+                        </td>
+                        <td className="px-8 py-6">
+                          <div className="flex items-center gap-4">
+                            <div className="w-9 h-9 rounded-xl bg-surface-low flex items-center justify-center text-on-surface-variant font-black text-[10px] border border-outline-variant group-hover:bg-card">{sale.customer?.name?.[0] || 'G'}</div>
+                            <span className="text-sm font-black text-foreground leading-none">{sale.customer?.name || 'Cliente de Mostrador'}</span>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6 text-center">{getStatusBadge(sale.status)}</td>
+                        <td className="px-8 py-6 text-right">
+                          <span className="text-sm font-black text-foreground tracking-tight">{fmtCurrency(sale.total)}</span>
+                        </td>
+                        <td className="px-10 py-6">
+                          <div className="flex items-center justify-center gap-3">
+                            <button onClick={() => setSelectedSaleId(sale.id)} className="p-3 bg-surface-low group-hover:bg-card hover:!bg-primary rounded-xl text-on-surface-variant hover:text-white transition-all active:scale-95"><Eye className="w-4 h-4" /></button>
+                            {sale.status !== 'CANCELLED' && (
+                              <button onClick={() => handleCancelSale(sale.id)} className="p-3 bg-surface-low group-hover:bg-card hover:!bg-rose-600 rounded-xl text-on-surface-variant hover:text-white transition-all active:scale-95"><RotateCcw className="w-4 h-4" /></button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="md:hidden divide-y divide-outline-variant">
+                {loading ? (
+                  <div className="py-20 text-center text-on-surface-variant font-black uppercase text-[10px] animate-pulse">Cargando...</div>
+                ) : sales.length === 0 ? (
+                  <div className="py-20 text-center">
+                    <ShoppingBag className="w-10 h-10 text-on-surface-variant/10 mx-auto mb-4" />
+                    <p className="text-xs font-black text-on-surface-variant/30 uppercase tracking-widest">Sin ventas</p>
+                  </div>
+                ) : sales.map((sale) => (
+                  <div key={sale.id} className="p-5 space-y-4 hover:bg-primary/5 transition-all">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-xs font-black text-primary">
+                          {sale.documentSeries && sale.documentNumber 
+                            ? `${sale.documentSeries}-${sale.documentNumber.toString().padStart(8, '0')}` 
+                            : `#SAL-${sale.id.substring(0,6).toUpperCase()}`}
+                        </p>
+                        <p className="text-[10px] text-on-surface-variant font-bold mt-1 uppercase">{fmtDate(sale.createdAt)}</p>
+                      </div>
+                      {getStatusBadge(sale.status)}
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-surface-low flex items-center justify-center text-on-surface-variant font-black text-[9px] border border-outline-variant">{sale.customer?.name?.[0] || 'G'}</div>
+                        <p className="text-xs font-black text-foreground truncate max-w-[150px]">{sale.customer?.name || 'Cliente de Mostrador'}</p>
+                      </div>
+                      <p className="text-sm font-black text-foreground tracking-tight">{fmtCurrency(sale.total)}</p>
+                    </div>
+
+                    <div className="flex gap-2 pt-2">
+                      <button 
+                        onClick={() => setSelectedSaleId(sale.id)} 
+                        className="flex-1 py-3 bg-surface-low hover:bg-primary text-on-surface-variant hover:text-on-primary rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                      >
+                        <Eye className="w-4 h-4" /> Detalle
+                      </button>
+                      {sale.status !== 'CANCELLED' && (
+                        <button 
+                          onClick={() => handleCancelSale(sale.id)} 
+                          className="flex-1 py-3 bg-surface-low hover:bg-rose-600 text-on-surface-variant hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                        >
+                          <RotateCcw className="w-4 h-4" /> Anular
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </main>
+        </div>
       </div>
 
       {mounted && (

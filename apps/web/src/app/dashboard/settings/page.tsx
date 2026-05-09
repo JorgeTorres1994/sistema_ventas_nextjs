@@ -12,14 +12,17 @@ import {
     updateDocumentSeries,
     createDocumentSeries
 } from '@/lib/api';
+import { useTheme } from '@/context/ThemeContext';
 import { 
     Building2, Info, CreditCard, Briefcase, Globe,
     Calendar, CheckCircle2, Upload, Save, FileText,
-    Hash, Settings as SettingsIcon, Plus, Edit2, Play
+    Hash, Settings as SettingsIcon, Plus, Edit2, Play,
+    Palette, Moon, Sun, Monitor
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function SettingsPage() {
+    const { theme, setTheme } = useTheme();
     const { settings, paymentMethods, refreshSettings, loading: initialLoading } = useSettings();
     const [formData, setFormData] = useState<any>(null);
     const [series, setSeries] = useState<any[]>([]);
@@ -142,12 +145,12 @@ export default function SettingsPage() {
 
     if (initialLoading || !formData) {
         return (
-            <div className="flex h-screen bg-[#F9FAFB] overflow-hidden font-sans">
+            <div className="flex h-screen bg-background overflow-hidden font-sans">
                 <Sidebar />
-                <div className="flex-1 flex flex-col ml-64 overflow-hidden">
+                <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden">
                     <TopBar />
                     <div className="flex-1 flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                     </div>
                 </div>
             </div>
@@ -155,63 +158,109 @@ export default function SettingsPage() {
     }
 
     return (
-        <div className="flex h-screen bg-[#F9FAFB] overflow-hidden font-sans">
+        <div className="flex h-screen bg-background overflow-hidden font-sans transition-colors">
             <Sidebar />
             
-            <div className="flex-1 flex flex-col ml-64 overflow-hidden">
+            <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden">
                 <TopBar />
                 
-                <main className="flex-1 overflow-y-auto bg-[#F9FAFB] p-8">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="mb-8">
-                            <h1 className="text-3xl font-extrabold text-[#111827] mb-2">Configuración del Sistema</h1>
-                            <p className="text-[#6B7280]">Gestione la identidad de su negocio, métodos de pago y facturación electrónica.</p>
+                <main className="flex-1 overflow-y-auto bg-background p-4 lg:p-8 scrollbar-hide">
+                    <div className="max-w-7xl mx-auto pb-48">
+                        <div className="mb-8 sm:mb-12">
+                            <nav className="flex items-center gap-2 text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-3">
+                                <span>Sistema</span><span>/</span>
+                                <span className="text-on-surface-variant">Preferencias</span>
+                            </nav>
+                            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tighter leading-none mb-3">Configuración Global</h1>
+                            <p className="text-xs sm:text-sm lg:text-base text-on-surface-variant font-medium opacity-60 tracking-tight">Personalice el núcleo operativo y la identidad visual del ecosistema Nexus.</p>
                         </div>
 
                         {/* Tabs Navigation */}
-                        <div className="flex gap-1 mb-8 bg-white p-1 rounded-2xl border border-gray-100 shadow-sm w-fit">
+                        <div className="flex overflow-x-auto gap-2 mb-8 sm:mb-10 bg-card p-2 rounded-[24px] sm:rounded-[28px] border border-outline-variant shadow-sm w-full snap-x snap-mandatory scrollbar-hide">
                             {[
-                                { id: 'business', label: 'Negocio', icon: Building2 },
-                                { id: 'billing', label: 'Facturación', icon: FileText },
-                                { id: 'payments', label: 'Pagos e Impuestos', icon: CreditCard }
+                                { id: 'business', label: 'Estructura Corporativa', icon: Building2 },
+                                { id: 'appearance', label: 'Ecosistema Visual', icon: Palette },
+                                { id: 'billing', label: 'Ciclo de Facturación', icon: FileText },
+                                { id: 'payments', label: 'Finanzas e Impuestos', icon: CreditCard }
                             ].map((tab) => (
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                                    className={`flex items-center justify-center shrink-0 snap-start gap-2 sm:gap-3 px-5 py-3 sm:px-8 sm:py-4 rounded-[18px] sm:rounded-[22px] text-[10px] sm:text-[11px] font-black uppercase tracking-widest transition-all whitespace-nowrap active:scale-95 ${
                                         activeTab === tab.id 
-                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-100' 
-                                        : 'text-gray-500 hover:bg-gray-50'
+                                        ? 'bg-primary text-on-primary shadow-xl shadow-primary/20' 
+                                        : 'text-on-surface-variant/60 hover:bg-surface-low hover:text-foreground'
                                     }`}
                                 >
-                                    <tab.icon className="w-4 h-4" />
+                                    <tab.icon className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
                                     {tab.label}
                                 </button>
                             ))}
                         </div>
 
+
+                        {activeTab === 'appearance' && (
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 lg:p-4">
+                                {[
+                                    { id: 'light', name: 'Claro Neutro', icon: Sun, color: 'bg-blue-500', desc: 'Clásica' },
+                                    { id: 'dark', name: 'Noche Profunda', icon: Moon, color: 'bg-slate-900', desc: 'Elegante' },
+                                    { id: 'purple', name: 'Real Elite', icon: Palette, color: 'bg-purple-600', desc: 'Distinción' },
+                                    { id: 'emerald', name: 'Bosque Fresco', icon: Palette, color: 'bg-emerald-600', desc: 'Vibrante' },
+                                    { id: 'rose', name: 'Pasión Intensa', icon: Palette, color: 'bg-rose-600', desc: 'Audaz' },
+                                    { id: 'sunset', name: 'Atardecer', icon: Palette, color: 'bg-orange-600', desc: 'Cálido' },
+                                    { id: 'ocean', name: 'Océano Profundo', icon: Palette, color: 'bg-cyan-600', desc: 'Sereno' },
+                                    { id: 'forest', name: 'Bosque Místico', icon: Palette, color: 'bg-emerald-800', desc: 'Estable' }
+                                ].map((t) => (
+                                    <button
+                                        key={t.id}
+                                        onClick={() => setTheme(t.id as any)}
+                                        className={`group relative p-4 sm:p-6 rounded-[24px] sm:rounded-[32px] border-2 transition-all text-left active:scale-95 flex flex-col justify-between ${
+                                            theme === t.id 
+                                            ? 'border-primary bg-primary/5' 
+                                            : 'border-outline-variant/30 bg-card hover:border-primary/30 shadow-sm'
+                                        }`}
+                                    >
+                                        <div className="flex items-start justify-between mb-4 w-full">
+                                            <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-[16px] sm:rounded-[22px] flex items-center justify-center ${t.color} text-white shadow-xl group-hover:scale-110 transition-transform ring-2 sm:ring-4 ring-background shrink-0`}>
+                                                <t.icon className="w-5 h-5 sm:w-7 sm:h-7" />
+                                            </div>
+                                            {theme === t.id && (
+                                                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary rounded-full flex items-center justify-center animate-in zoom-in shadow-lg shrink-0">
+                                                    <CheckCircle2 className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-on-primary" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <h3 className="text-sm sm:text-base font-black text-foreground mb-0.5 tracking-tight leading-tight">{t.name}</h3>
+                                            <p className="text-[9px] sm:text-[10px] text-on-surface-variant font-bold uppercase tracking-widest opacity-50">{t.desc}</p>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
                         {activeTab === 'business' && (
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                <div className="lg:col-span-2 space-y-8">
-                                    <section className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-8">
-                                        <div className="flex items-center gap-6">
-                                            <div className="w-24 h-24 rounded-3xl bg-gray-50 border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden relative group">
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 lg:p-4">
+                                <div className="lg:col-span-2 space-y-6 sm:space-y-8">
+                                    <section className="bg-card rounded-[32px] sm:rounded-[48px] shadow-sm border border-outline-variant p-6 sm:p-8 lg:p-12 space-y-8 sm:space-y-12">
+                                        <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 sm:gap-10">
+                                            <div className="w-24 h-24 sm:w-32 sm:h-32 shrink-0 rounded-[24px] sm:rounded-[36px] bg-surface-low border-2 border-dashed border-outline-variant flex items-center justify-center overflow-hidden relative group transition-all hover:border-primary/50">
                                                 {logoPreview || formData.logoUrl ? (
                                                     <img src={logoPreview || `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}${formData.logoUrl}`} alt="Logo" className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <Building2 className="w-8 h-8 text-gray-300" />
+                                                    <Building2 className="w-8 h-8 sm:w-10 sm:h-10 text-on-surface-variant/20" />
                                                 )}
-                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                    <Upload className="text-white w-6 h-6" />
+                                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                                                    <Upload className="text-white w-6 h-6 sm:w-8 sm:h-8 transform -translate-y-2 group-hover:translate-y-0 transition-transform" />
                                                 </div>
                                                 <input type="file" onChange={handleLogoUpload} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
                                             </div>
-                                            <div>
-                                                <h3 className="font-bold text-gray-900 mb-1">Identidad Visual</h3>
-                                                <p className="text-xs text-gray-400 mb-4">Recomendado: Cuadrado, min 400x400px.</p>
-                                                <div className="flex gap-2">
-                                                    <label className="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-bold cursor-pointer hover:bg-blue-100 transition-all">
-                                                        Subir Logo
+                                            <div className="flex-1">
+                                                <h3 className="text-xl sm:text-2xl font-black text-foreground mb-2 tracking-tighter">Identidad Visual</h3>
+                                                <p className="text-[10px] sm:text-xs text-on-surface-variant font-medium opacity-60 mb-5 sm:mb-6">El logo aparecerá en reportes, comprobantes y facturas electrónicas. Recomendado: Formato cuadrado (400x400px).</p>
+                                                <div className="flex flex-wrap justify-center sm:justify-start gap-3">
+                                                    <label className="px-5 py-3 sm:px-6 sm:py-3 bg-primary/10 text-primary rounded-[16px] sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                                                        Cargar Nuevo Activo
                                                         <input type="file" className="hidden" onChange={handleLogoUpload} />
                                                     </label>
                                                     { (logoPreview || formData.logoUrl) && (
@@ -219,7 +268,7 @@ export default function SettingsPage() {
                                                             setFormData({ ...formData, logoUrl: null });
                                                             setLogoPreview(null);
                                                             setLogoFile(null);
-                                                        }} className="px-4 py-2 text-rose-600 text-xs font-bold hover:bg-rose-50 rounded-xl transition-all">
+                                                        }} className="px-5 py-3 sm:px-6 sm:py-3 text-rose-500 text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:bg-rose-500/10 rounded-[16px] sm:rounded-2xl transition-all active:scale-95">
                                                             Remover
                                                         </button>
                                                     )}
@@ -227,37 +276,40 @@ export default function SettingsPage() {
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="space-y-2">
-                                                <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Razón Social / Nombre</label>
-                                                <input type="text" name="businessName" value={formData.businessName} onChange={handleInputChange} className="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 rounded-2xl outline-none font-bold text-gray-700 transition-all shadow-sm" />
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-8">
+                                            <div className="space-y-2 sm:space-y-3">
+                                                <label className="block text-[9px] sm:text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] ml-2">Denominación / Razón Social</label>
+                                                <input type="text" name="businessName" value={formData.businessName} onChange={handleInputChange} className="w-full px-5 sm:px-8 py-3.5 sm:py-4 bg-surface-low border border-transparent focus:bg-card focus:border-primary/30 rounded-[16px] sm:rounded-[24px] outline-none font-black text-foreground transition-all shadow-inner text-sm" />
                                             </div>
-                                            <div className="space-y-2">
-                                                <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Teléfono Central</label>
-                                                <input type="text" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 rounded-2xl outline-none font-bold text-gray-700 transition-all shadow-sm" />
+                                            <div className="space-y-2 sm:space-y-3">
+                                                <label className="block text-[9px] sm:text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] ml-2">Central Telefónica</label>
+                                                <input type="text" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full px-5 sm:px-8 py-3.5 sm:py-4 bg-surface-low border border-transparent focus:bg-card focus:border-primary/30 rounded-[16px] sm:rounded-[24px] outline-none font-black text-foreground transition-all shadow-inner text-sm" />
                                             </div>
-                                            <div className="md:col-span-2 space-y-2">
-                                                <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Dirección Fiscal / Local</label>
-                                                <input type="text" name="address" value={formData.address} onChange={handleInputChange} className="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 rounded-2xl outline-none font-bold text-gray-700 transition-all shadow-sm" />
+                                            <div className="md:col-span-2 space-y-2 sm:space-y-3">
+                                                <label className="block text-[9px] sm:text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] ml-2">Sede Fiscal / Dirección Principal</label>
+                                                <input type="text" name="address" value={formData.address} onChange={handleInputChange} className="w-full px-5 sm:px-8 py-3.5 sm:py-4 bg-surface-low border border-transparent focus:bg-card focus:border-primary/30 rounded-[16px] sm:rounded-[24px] outline-none font-black text-foreground transition-all shadow-inner text-sm" />
                                             </div>
                                         </div>
                                     </section>
                                 </div>
-                                <div className="space-y-8">
-                                    <section className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-6">
-                                        <h2 className="text-lg font-black text-gray-900">Regionalización</h2>
-                                        <div className="space-y-4">
-                                            <div className="space-y-2">
-                                                <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest">Moneda Principal</label>
-                                                <select name="currency" value={formData.currency} onChange={handleInputChange} className="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 rounded-2xl outline-none font-bold text-gray-700 transition-all shadow-sm">
-                                                    <option value="PEN">Soles (S/)</option>
-                                                    <option value="USD">Dólares ($)</option>
+                                <div className="space-y-6 sm:space-y-8">
+                                    <section className="bg-card rounded-[32px] sm:rounded-[48px] shadow-sm border border-outline-variant p-6 sm:p-8 lg:p-12 space-y-6 sm:space-y-8">
+                                        <div className="flex items-center justify-between mb-2 sm:mb-4">
+                                            <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tighter">Localización</h2>
+                                            <Globe className="w-6 h-6 sm:w-7 sm:h-7 text-primary/40" />
+                                        </div>
+                                        <div className="space-y-4 sm:space-y-6">
+                                            <div className="space-y-2 sm:space-y-3">
+                                                <label className="block text-[9px] sm:text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] ml-2">Divisa de Transacción</label>
+                                                <select name="currency" value={formData.currency} onChange={handleInputChange} className="w-full px-5 sm:px-8 py-3.5 sm:py-4 bg-surface-low border border-transparent focus:bg-card focus:border-primary/30 rounded-[16px] sm:rounded-[24px] outline-none font-black text-foreground transition-all shadow-inner text-sm appearance-none cursor-pointer">
+                                                    <option value="PEN">Soles Peruanos (S/)</option>
+                                                    <option value="USD">Dólares Americanos ($)</option>
                                                 </select>
                                             </div>
-                                            <div className="space-y-2">
-                                                <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest">Zona Horaria</label>
-                                                <select name="timezone" className="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 rounded-2xl outline-none font-bold text-gray-700 transition-all shadow-sm">
-                                                    <option value="America/Lima">(GMT-05:00) Lima, Bogotá</option>
+                                            <div className="space-y-2 sm:space-y-3">
+                                                <label className="block text-[9px] sm:text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] ml-2">Husos Horarios</label>
+                                                <select name="timezone" className="w-full px-5 sm:px-8 py-3.5 sm:py-4 bg-surface-low border border-transparent focus:bg-card focus:border-primary/30 rounded-[16px] sm:rounded-[24px] outline-none font-black text-foreground transition-all shadow-inner text-sm appearance-none cursor-pointer">
+                                                    <option value="America/Lima">(GMT-05:00) Lima, Bogotá, Quito</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -267,12 +319,12 @@ export default function SettingsPage() {
                         )}
 
                         {activeTab === 'billing' && (
-                            <div className="space-y-8">
-                                <section className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
-                                    <div className="p-8 border-b border-gray-50 flex items-center justify-between">
+                            <div className="space-y-6 sm:space-y-8 lg:p-4">
+                                <section className="bg-card rounded-[32px] sm:rounded-[48px] shadow-sm border border-outline-variant overflow-hidden">
+                                    <div className="p-6 sm:p-8 lg:p-12 border-b border-outline-variant/30 flex flex-col sm:flex-row sm:items-center justify-between bg-surface-low/30 gap-4 sm:gap-0">
                                         <div>
-                                            <h2 className="text-xl font-black text-gray-900">Series y Correlativos</h2>
-                                            <p className="text-sm text-gray-400">Administre la numeración automática para sus comprobantes de pago.</p>
+                                            <h2 className="text-2xl sm:text-3xl font-black text-foreground tracking-tighter mb-1.5 sm:mb-2">Series y Correlativos</h2>
+                                            <p className="text-[9px] sm:text-[11px] font-black text-on-surface-variant uppercase tracking-[0.3em] opacity-40">Gestión de numeración para el cumplimiento fiscal</p>
                                         </div>
                                         <button 
                                             onClick={() => {
@@ -280,47 +332,102 @@ export default function SettingsPage() {
                                                 setSeriesFormData({ documentType: 'FACTURA', prefix: '', startNumber: 1, description: '' });
                                                 setIsSeriesModalOpen(true);
                                             }}
-                                            className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-gray-800 transition-all active:scale-95"
+                                            className="flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3.5 sm:py-4 bg-foreground text-background rounded-[18px] sm:rounded-[22px] text-[10px] sm:text-[11px] font-black uppercase tracking-widest hover:opacity-90 transition-all active:scale-95 w-full sm:w-auto shrink-0 shadow-xl shadow-foreground/10"
                                         >
-                                            <Plus className="w-4 h-4" />
-                                            Nueva Serie
+                                            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                                            Añadir Serie
                                         </button>
                                     </div>
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full text-left">
+
+                                    {/* Mobile Cards View */}
+                                    <div className="grid grid-cols-1 md:hidden gap-4 p-4 bg-surface-low/10">
+                                        {series.map((s) => (
+                                            <div key={s.id} className="bg-card rounded-[24px] p-5 border border-outline-variant/50 shadow-sm relative overflow-hidden">
+                                                <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-[100px] -z-10 pointer-events-none"></div>
+                                                <div className="flex items-start justify-between mb-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 rounded-[14px] bg-primary/10 flex items-center justify-center border border-primary/20">
+                                                            <FileText className="w-5 h-5 text-primary" />
+                                                        </div>
+                                                        <span className="font-black text-foreground text-base tracking-tight capitalize leading-tight w-24">{s.documentType.toLowerCase().replace('_', ' ')}</span>
+                                                    </div>
+                                                    <button 
+                                                        onClick={() => {
+                                                            setSelectedSeries(s);
+                                                            setSeriesFormData({ 
+                                                                documentType: s.documentType, 
+                                                                prefix: s.prefix, 
+                                                                startNumber: s.startNumber, 
+                                                                description: s.description || '' 
+                                                            });
+                                                            setIsSeriesModalOpen(true);
+                                                        }}
+                                                        className="p-2.5 bg-surface-low text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-[14px] transition-all active:scale-90 border border-outline-variant/30"
+                                                    >
+                                                        <Edit2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-3 p-3 bg-surface-low/30 rounded-[16px] border border-outline-variant/30">
+                                                    <div>
+                                                        <span className="text-[9px] font-black text-on-surface-variant/40 uppercase tracking-widest block mb-1">Prefijo</span>
+                                                        <span className="px-3 py-1 inline-block bg-card rounded-lg font-black text-primary text-sm border border-outline-variant/30 tracking-widest shadow-sm">{s.prefix}</span>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-[9px] font-black text-on-surface-variant/40 uppercase tracking-widest block mb-1">Correlativo</span>
+                                                        <span className="text-xl font-black text-foreground tracking-tighter leading-none">{s.currentNumber.toString().padStart(8, '0')}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2 pt-3 mt-1 px-1">
+                                                    <div className={`w-2 h-2 rounded-full ${s.isActive ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-on-surface-variant/20'}`}></div>
+                                                    <span className={`text-[9px] font-black uppercase tracking-[0.2em] ${s.isActive ? 'text-emerald-500' : 'text-on-surface-variant/40'}`}>
+                                                        {s.isActive ? 'En Operación' : 'Inactivo'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Desktop Table View */}
+                                    <div className="hidden md:block overflow-x-auto scrollbar-hide">
+                                        <table className="w-full text-left border-collapse">
                                             <thead>
-                                                <tr className="bg-gray-50/50">
-                                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Tipo Documento</th>
-                                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Serie / Prefijo</th>
-                                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">N° Actual</th>
-                                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Estado</th>
-                                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">Acciones</th>
+                                                <tr className="bg-surface-low/20">
+                                                    <th className="px-12 py-7 text-[10px] font-black text-on-surface-variant uppercase tracking-[0.4em]">Documento</th>
+                                                    <th className="px-12 py-7 text-[10px] font-black text-on-surface-variant uppercase tracking-[0.4em]">Prefijo</th>
+                                                    <th className="px-12 py-7 text-[10px] font-black text-on-surface-variant uppercase tracking-[0.4em]">Numeración</th>
+                                                    <th className="px-12 py-7 text-[10px] font-black text-on-surface-variant uppercase tracking-[0.4em]">Estado</th>
+                                                    <th className="px-12 py-7 text-[10px] font-black text-on-surface-variant uppercase tracking-[0.4em] text-right">Acciones</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody className="divide-y divide-outline-variant/20">
                                                 {series.map((s) => (
-                                                    <tr key={s.id} className="border-b border-gray-50 hover:bg-gray-50/30 transition-colors">
-                                                        <td className="px-8 py-5">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                                                                    <FileText className="w-4 h-4 text-blue-600" />
+                                                    <tr key={s.id} className="hover:bg-primary/5 transition-all group">
+                                                        <td className="px-12 py-8">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                                                                    <FileText className="w-6 h-6 text-primary" />
                                                                 </div>
-                                                                <span className="font-bold text-gray-900 capitalize">{s.documentType.replace('_', ' ')}</span>
+                                                                <span className="font-black text-foreground text-lg tracking-tight capitalize">{s.documentType.toLowerCase().replace('_', ' ')}</span>
                                                             </div>
                                                         </td>
-                                                        <td className="px-8 py-5 font-mono font-black text-blue-600 text-lg">{s.prefix}</td>
-                                                        <td className="px-8 py-5">
-                                                            <div className="flex items-baseline gap-1">
-                                                                <span className="text-xl font-black text-gray-900">{s.currentNumber.toString().padStart(8, '0')}</span>
-                                                                <span className="text-[10px] font-bold text-gray-400 uppercase">Procesados</span>
+                                                        <td className="px-12 py-8">
+                                                            <span className="px-4 py-2 bg-surface-low rounded-xl font-black text-primary text-xl border border-outline-variant/30 tracking-widest">{s.prefix}</span>
+                                                        </td>
+                                                        <td className="px-12 py-8">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-3xl font-black text-foreground tracking-tighter leading-none mb-1">{s.currentNumber.toString().padStart(8, '0')}</span>
+                                                                <span className="text-[9px] font-black text-on-surface-variant/40 uppercase tracking-widest">Contador Dinámico</span>
                                                             </div>
                                                         </td>
-                                                        <td className="px-8 py-5">
-                                                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${s.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400'}`}>
-                                                                {s.isActive ? 'Activo' : 'Pausado'}
-                                                            </span>
+                                                        <td className="px-12 py-8">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className={`w-2.5 h-2.5 rounded-full ${s.isActive ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.5)]' : 'bg-on-surface-variant/20'}`}></div>
+                                                                <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${s.isActive ? 'text-emerald-500' : 'text-on-surface-variant/40'}`}>
+                                                                    {s.isActive ? 'Operativo' : 'Inactivo'}
+                                                                </span>
+                                                            </div>
                                                         </td>
-                                                        <td className="px-8 py-5 text-right">
+                                                        <td className="px-12 py-8 text-right">
                                                             <button 
                                                                 onClick={() => {
                                                                     setSelectedSeries(s);
@@ -332,9 +439,9 @@ export default function SettingsPage() {
                                                                     });
                                                                     setIsSeriesModalOpen(true);
                                                                 }}
-                                                                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                                                                className="p-4 bg-surface-low text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-[20px] transition-all active:scale-90"
                                                             >
-                                                                <Edit2 className="w-4 h-4" />
+                                                                <Edit2 className="w-5 h-5" />
                                                             </button>
                                                         </td>
                                                     </tr>
@@ -347,45 +454,57 @@ export default function SettingsPage() {
                         )}
 
                         {activeTab === 'payments' && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <section className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 lg:p-4">
+                                <section className="bg-card rounded-[32px] sm:rounded-[48px] shadow-sm border border-outline-variant p-6 sm:p-8 lg:p-12 space-y-8 sm:space-y-10">
                                     <div className="flex items-center justify-between">
-                                        <h2 className="text-lg font-black text-gray-900">Impuestos y Tasas</h2>
-                                        <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
-                                            <Hash className="w-4 h-4 text-orange-600" />
+                                        <div>
+                                            <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tighter mb-1">Fiscalidad</h2>
+                                            <p className="text-[9px] sm:text-[10px] font-black text-on-surface-variant/40 uppercase tracking-widest">Tasas de impuestos nacionales</p>
+                                        </div>
+                                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[20px] sm:rounded-[22px] bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
+                                            <Hash className="w-6 h-6 sm:w-7 sm:h-7 text-amber-500" />
                                         </div>
                                     </div>
-                                    <div className="p-6 bg-gray-50 rounded-2xl flex items-center justify-between">
+                                    <div className="p-6 sm:p-8 bg-surface-low rounded-[24px] sm:rounded-[32px] flex items-center justify-between border border-outline-variant/30">
                                         <div>
-                                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">IGV / Impuesto General</p>
-                                            <p className="text-[10px] text-gray-400">Aplicado automáticamente al total</p>
+                                            <p className="text-[10px] sm:text-[11px] font-black text-foreground uppercase tracking-[0.2em] mb-2">Tasa IGV / IVA</p>
+                                            <p className="text-[9px] sm:text-[10px] font-medium text-on-surface-variant opacity-60">Cálculo automático en órdenes</p>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <input type="number" name="taxRate" value={formData.taxRate} onChange={handleInputChange} className="w-20 px-3 py-2 bg-white border border-gray-100 rounded-xl font-black text-right outline-none focus:ring-2 focus:ring-blue-500" />
-                                            <span className="font-black text-gray-400">%</span>
+                                        <div className="flex items-center gap-2 sm:gap-3">
+                                            <input type="number" name="taxRate" value={formData.taxRate} onChange={handleInputChange} className="w-24 sm:w-28 px-4 sm:px-5 py-3 sm:py-4 bg-card border border-primary/20 rounded-2xl font-black text-xl sm:text-2xl text-center text-primary outline-none focus:ring-4 focus:ring-primary/5 shadow-inner" />
+                                            <span className="text-xl sm:text-2xl font-black text-on-surface-variant/20">%</span>
                                         </div>
                                     </div>
                                 </section>
 
-                                <section className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-6">
-                                    <h2 className="text-lg font-black text-gray-900">Pasarelas Activas</h2>
-                                    <div className="space-y-3">
+                                <section className="bg-card rounded-[32px] sm:rounded-[48px] shadow-sm border border-outline-variant p-6 sm:p-8 lg:p-12 space-y-8 sm:space-y-10">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tighter mb-1">Pasarelas de Pago</h2>
+                                            <p className="text-[9px] sm:text-[10px] font-black text-on-surface-variant/40 uppercase tracking-widest">Canales de recaudación habilitados</p>
+                                        </div>
+                                        <CreditCard className="w-6 h-6 sm:w-8 sm:h-8 text-primary/40" />
+                                    </div>
+                                    <div className="space-y-4">
                                         {paymentMethods.map((method) => (
-                                            <div key={method.id} className="p-4 rounded-2xl flex items-center justify-between hover:bg-gray-50 transition-all border border-transparent hover:border-gray-100">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center">
-                                                        {method.name === 'Efectivo' ? <Briefcase className="w-5 h-5 text-gray-400" /> : <CreditCard className="w-5 h-5 text-gray-400" />}
+                                            <div key={method.id} className="p-5 sm:p-6 rounded-[24px] sm:rounded-[28px] flex items-center justify-between bg-surface-low/30 hover:bg-surface-low transition-all border border-transparent hover:border-outline-variant/30 group">
+                                                <div className="flex items-center gap-4 sm:gap-6">
+                                                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[18px] sm:rounded-[22px] bg-card flex items-center justify-center border border-outline-variant/30 group-hover:scale-110 transition-transform">
+                                                        {method.name === 'Efectivo' ? <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-on-surface-variant/40" /> : <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-on-surface-variant/40" />}
                                                     </div>
                                                     <div>
-                                                        <h4 className="text-sm font-bold text-gray-900">{method.name}</h4>
-                                                        <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">{method.isActive ? 'Habilitado' : 'Desactivado'}</p>
+                                                        <h4 className="text-base sm:text-lg font-black text-foreground tracking-tight">{method.name}</h4>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${method.isActive ? 'bg-emerald-500' : 'bg-on-surface-variant/20'}`}></div>
+                                                            <p className={`text-[9px] sm:text-[10px] font-black uppercase tracking-widest ${method.isActive ? 'text-emerald-500' : 'text-on-surface-variant/40'}`}>{method.isActive ? 'Operativo' : 'Desconectado'}</p>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <button 
                                                     onClick={() => handleTogglePayment(method.id)}
-                                                    className={`w-12 h-6 rounded-full relative transition-all duration-300 ${method.isActive ? 'bg-blue-600 shadow-md shadow-blue-100' : 'bg-gray-200'}`}
+                                                    className={`w-12 h-6 sm:w-14 sm:h-7 rounded-full relative transition-all duration-500 active:scale-90 ${method.isActive ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-on-surface-variant/20'}`}
                                                 >
-                                                    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-all duration-300 ${method.isActive ? 'left-7' : 'left-1'}`}></div>
+                                                    <div className={`absolute top-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-white shadow-lg transition-all duration-500 ${method.isActive ? 'left-7 sm:left-8' : 'left-1'}`}></div>
                                                 </button>
                                             </div>
                                         ))}
@@ -395,11 +514,17 @@ export default function SettingsPage() {
                         )}
 
                         {/* Footer Actions */}
-                        <div className="fixed bottom-0 left-64 right-0 p-6 bg-white/80 backdrop-blur-xl border-t border-gray-100 flex justify-end gap-4 z-50">
-                            <button onClick={refreshSettings} className="px-8 py-3 text-gray-400 font-black text-xs uppercase tracking-widest hover:bg-gray-50 rounded-2xl transition-all">Descartar</button>
-                            <button onClick={handleSave} disabled={isSaving} className="px-10 py-3 bg-blue-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-blue-100 hover:bg-blue-700 disabled:opacity-50 flex items-center gap-3 transition-all active:scale-95">
-                                {isSaving ? <span className="animate-spin text-lg">⌛</span> : <Save className="w-4 h-4" />}
-                                Aplicar Cambios Globales
+                        <div className="fixed bottom-0 left-0 lg:left-64 right-0 p-4 sm:p-6 lg:p-8 bg-card/80 backdrop-blur-2xl border-t border-outline-variant/30 flex flex-col sm:flex-row justify-end items-center gap-3 sm:gap-6 z-50">
+                            <div className="mr-auto hidden md:block">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                                    <span className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em]">Configuraciones Sincronizadas</span>
+                                </div>
+                            </div>
+                            <button onClick={refreshSettings} className="w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-4 bg-surface-low sm:bg-transparent text-on-surface-variant sm:text-on-surface-variant/40 font-black text-[10px] sm:text-[11px] uppercase tracking-widest hover:text-foreground transition-all active:scale-95 rounded-[16px] sm:rounded-none shrink-0">Descartar Cambios</button>
+                            <button onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto px-6 sm:px-12 py-4 sm:py-4 bg-primary text-on-primary font-black text-[10px] sm:text-[11px] uppercase tracking-widest rounded-[16px] sm:rounded-[22px] shadow-xl sm:shadow-2xl shadow-primary/30 hover:opacity-90 disabled:opacity-50 flex justify-center items-center gap-3 sm:gap-4 transition-all active:scale-95 shrink-0">
+                                {isSaving ? <span className="animate-spin text-lg shrink-0">⌛</span> : <Save className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />}
+                                Propagar Configuración
                             </button>
                         </div>
                     </div>
@@ -408,52 +533,55 @@ export default function SettingsPage() {
 
             {/* Series Modal */}
             {isSeriesModalOpen && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in">
-                    <div className="bg-white rounded-[40px] shadow-2xl w-full max-w-lg overflow-hidden border border-white/20 animate-in zoom-in-95">
-                        <div className="px-10 pt-10 pb-6 border-b border-gray-50">
-                            <h3 className="text-2xl font-black">{selectedSeries ? 'Configurar Serie' : 'Nueva Serie'}</h3>
-                            <p className="text-sm text-gray-400">Defina el formato de numeración para sus comprobantes.</p>
+                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-background/40 backdrop-blur-md p-3 sm:p-4 animate-in fade-in duration-300">
+                    <div className="bg-card rounded-[32px] sm:rounded-[48px] shadow-[0_40px_100px_rgba(0,0,0,0.4)] w-full max-w-xl overflow-hidden flex flex-col border border-outline-variant animate-in zoom-in-95 duration-300">
+                        <div className="px-6 sm:px-12 pt-8 sm:pt-12 pb-6 sm:pb-8 border-b border-outline-variant/30 bg-surface-low/30 shrink-0">
+                            <h3 className="text-2xl sm:text-3xl font-black tracking-tighter mb-1.5 sm:mb-2">{selectedSeries ? 'Sincronizar Serie' : 'Apertura de Serie'}</h3>
+                            <p className="text-[9px] sm:text-[11px] font-black text-on-surface-variant uppercase tracking-[0.3em] opacity-40">Defina el protocolo de numeración automática</p>
                         </div>
-                        <form onSubmit={handleSeriesSave} className="p-10 space-y-6">
-                            <div className="space-y-2">
-                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Tipo de Comprobante</label>
-                                <select 
-                                    className="w-full px-6 py-4 bg-gray-50 border-transparent rounded-2xl outline-none font-bold text-gray-700 shadow-sm focus:bg-white focus:border-blue-500 transition-all appearance-none"
-                                    value={seriesFormData.documentType}
-                                    onChange={(e) => setSeriesFormData({...seriesFormData, documentType: e.target.value})}
-                                >
-                                    <option value="FACTURA">Factura Electrónica</option>
-                                    <option value="BOLETA">Boleta de Venta</option>
-                                    <option value="NOTA_CREDITO">Nota de Crédito</option>
-                                    <option value="TICKET">Ticket POS</option>
-                                </select>
+                        <form onSubmit={handleSeriesSave} className="flex-1 overflow-y-auto max-h-[75vh] p-6 sm:p-12 space-y-6 sm:space-y-8 scrollbar-hide">
+                            <div className="space-y-2.5 sm:space-y-3">
+                                <label className="block text-[9px] sm:text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] ml-2">Protocolo Documental</label>
+                                <div className="relative">
+                                    <select 
+                                        className="w-full px-5 sm:px-8 py-4 sm:py-5 bg-surface-low border border-transparent rounded-[16px] sm:rounded-[24px] outline-none font-black text-foreground shadow-inner focus:bg-card focus:border-primary/50 transition-all appearance-none cursor-pointer text-sm"
+                                        value={seriesFormData.documentType}
+                                        onChange={(e) => setSeriesFormData({...seriesFormData, documentType: e.target.value})}
+                                    >
+                                        <option value="FACTURA">Factura Electrónica (SUNAT)</option>
+                                        <option value="BOLETA">Boleta de Venta Simplificada</option>
+                                        <option value="NOTA_CREDITO">Nota de Crédito Electrónica</option>
+                                        <option value="TICKET">Ticket de Venta Directa</option>
+                                    </select>
+                                    <FileText className="absolute right-6 sm:right-8 top-1/2 -translate-y-1/2 text-on-surface-variant/20 w-4 h-4 sm:w-5 sm:h-5 pointer-events-none" />
+                                </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Prefijo / Serie</label>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                                <div className="space-y-2.5 sm:space-y-3">
+                                    <label className="block text-[9px] sm:text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] ml-2">Identificador (Serie)</label>
                                     <input 
                                         type="text" 
-                                        className="w-full px-6 py-4 bg-gray-50 border-transparent rounded-2xl outline-none font-black text-blue-600 text-lg shadow-sm focus:bg-white focus:border-blue-500 transition-all placeholder:text-gray-300"
+                                        className="w-full px-5 sm:px-8 py-4 sm:py-5 bg-surface-low border border-transparent rounded-[16px] sm:rounded-[24px] outline-none font-black text-primary text-xl sm:text-2xl shadow-inner focus:bg-card focus:border-primary/50 transition-all placeholder:text-on-surface-variant/20 text-center uppercase"
                                         placeholder="ej. F001"
                                         required
                                         value={seriesFormData.prefix}
                                         onChange={(e) => setSeriesFormData({...seriesFormData, prefix: e.target.value.toUpperCase()})}
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">N° de Inicio</label>
+                                <div className="space-y-2.5 sm:space-y-3">
+                                    <label className="block text-[9px] sm:text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] ml-2">Contador Inicial</label>
                                     <input 
                                         type="number" 
-                                        className="w-full px-6 py-4 bg-gray-50 border-transparent rounded-2xl outline-none font-black text-gray-700 text-lg shadow-sm focus:bg-white focus:border-blue-500 transition-all"
+                                        className="w-full px-5 sm:px-8 py-4 sm:py-5 bg-surface-low border border-transparent rounded-[16px] sm:rounded-[24px] outline-none font-black text-foreground text-xl sm:text-2xl shadow-inner focus:bg-card focus:border-primary/50 transition-all text-center"
                                         required
                                         value={seriesFormData.startNumber}
                                         onChange={(e) => setSeriesFormData({...seriesFormData, startNumber: parseInt(e.target.value)})}
                                     />
                                 </div>
                             </div>
-                            <div className="flex gap-4 pt-6">
-                                <button type="button" onClick={() => setIsSeriesModalOpen(false)} className="flex-1 py-4 text-gray-400 font-black text-xs uppercase tracking-widest hover:bg-gray-50 rounded-2xl transition-all">Cerrar</button>
-                                <button type="submit" className="flex-[2] py-4 bg-blue-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all">Guardar Configuración</button>
+                            <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 pt-6 sm:pt-10">
+                                <button type="button" onClick={() => setIsSeriesModalOpen(false)} className="w-full sm:flex-1 py-4 sm:py-5 bg-surface-low sm:bg-transparent text-on-surface-variant sm:text-on-surface-variant/40 font-black text-[10px] sm:text-[11px] uppercase tracking-widest hover:text-foreground hover:bg-outline-variant/10 sm:hover:bg-transparent transition-all active:scale-95 rounded-[16px] sm:rounded-none">Cerrar</button>
+                                <button type="submit" className="w-full sm:flex-[2] py-4 sm:py-5 bg-primary text-on-primary font-black text-[10px] sm:text-[11px] uppercase tracking-widest rounded-[16px] sm:rounded-[24px] shadow-xl sm:shadow-2xl shadow-primary/30 hover:opacity-90 transition-all active:scale-95">Sincronizar Protocolo</button>
                             </div>
                         </form>
                     </div>
@@ -462,3 +590,4 @@ export default function SettingsPage() {
         </div>
     );
 }
+

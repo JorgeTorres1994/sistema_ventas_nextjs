@@ -7,7 +7,7 @@ import TopBar from '@/components/layout/TopBar';
 import {
   Search, Plus, ChevronLeft, ChevronRight, X, Calendar, 
   ShoppingCart, Filter, Package, Eye, FileText, CheckCircle2,
-  Clock, AlertCircle, Building2, TrendingDown
+  Clock, AlertCircle, Building2, TrendingDown, Mail, Phone, MapPin
 } from 'lucide-react';
 import { getPurchases, getPurchaseById } from '@/lib/api';
 
@@ -22,14 +22,14 @@ const fmtCurrency = (n: number) => {
 // ── Status Badge ───────────────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: string }) {
   const styles: any = {
-    COMPLETED: "bg-emerald-50 text-emerald-600 border-emerald-100",
-    PENDING: "bg-amber-50 text-amber-600 border-amber-100",
-    CANCELLED: "bg-rose-50 text-rose-600 border-rose-100",
+    COMPLETED: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+    PENDING: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+    CANCELLED: "bg-rose-500/10 text-rose-500 border-rose-500/20",
   };
   const labels: any = { COMPLETED: "RECIBIDO", PENDING: "PENDIENTE", CANCELLED: "CANCELADO" };
   
   return (
-    <span className={`px-2.5 py-1 rounded-full text-[10px] font-black border ${styles[status] || 'bg-gray-100'}`}>
+    <span className={`px-3 py-1.5 rounded-full text-[9px] font-black border uppercase tracking-[0.15em] ${styles[status] || 'bg-surface-low text-on-surface-variant border-outline-variant'}`}>
       {labels[status] || status}
     </span>
   );
@@ -49,106 +49,135 @@ function PurchaseDetailDrawer({ id, onClose }: { id: string; onClose: () => void
   }, [id]);
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" />
+    <div className="fixed inset-0 z-50 flex justify-end animate-in fade-in duration-300" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity" />
       <div 
-        className="relative w-full max-w-xl bg-white h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-300"
+        className="relative w-full max-w-2xl bg-card h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-500 border-l border-outline-variant/30"
         onClick={e => e.stopPropagation()}
       >
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center">
-              <ShoppingCart className="w-5 h-5 text-indigo-600" />
+        <div className="px-6 lg:px-10 py-6 lg:py-8 border-b border-outline-variant/30 flex items-center justify-between bg-card/80 backdrop-blur-xl sticky top-0 z-10">
+          <div className="flex items-center gap-6">
+            <div className="w-14 h-14 bg-primary/10 rounded-[24px] flex items-center justify-center border border-primary/20">
+              <ShoppingCart className="w-7 h-7 text-primary" />
             </div>
             <div>
-              <h2 className="text-lg font-black text-gray-900 leading-tight">Orden de Compra</h2>
-              <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">#{id.slice(0,8).toUpperCase()}</p>
+              <h2 className="text-xl lg:text-2xl font-black text-foreground leading-none tracking-tight">Orden de Compra</h2>
+              <p className="text-[10px] text-on-surface-variant font-black uppercase tracking-[0.3em] mt-2 opacity-60">REF: #{id.slice(0,8).toUpperCase()}</p>
             </div>
           </div>
-          <button onClick={onClose} className="w-9 h-9 rounded-xl hover:bg-gray-100 flex items-center justify-center transition-colors">
-            <X className="w-5 h-5 text-gray-400" />
+          <button onClick={onClose} className="w-12 h-12 rounded-2xl hover:bg-surface-low flex items-center justify-center transition-all active:scale-90 text-on-surface-variant border border-outline-variant/30">
+            <X className="w-6 h-6" />
           </button>
         </div>
 
         {loading ? (
           <div className="flex-1 flex items-center justify-center">
-            <div className="w-8 h-8 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+            <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
           </div>
         ) : purchase ? (
-          <div className="flex-1 overflow-y-auto p-6 space-y-8">
-            {/* Summary Grid */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Estado</p>
+          <div className="flex-1 overflow-y-auto p-6 lg:p-10 space-y-10 pb-32">
+            {/* Status & Date */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="p-6 lg:p-8 bg-surface-low rounded-[32px] border border-outline-variant/30 group hover:shadow-lg transition-all">
+                <p className="text-[9px] font-black text-on-surface-variant uppercase tracking-[0.2em] mb-4 opacity-40">Estado de Operación</p>
                 <StatusBadge status={purchase.status} />
               </div>
-              <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Fecha de Orden</p>
-                <p className="text-sm font-black text-gray-900">{fmtDate(purchase.createdAt)}</p>
+              <div className="p-6 lg:p-8 bg-surface-low rounded-[32px] border border-outline-variant/30 group hover:shadow-lg transition-all">
+                <p className="text-[9px] font-black text-on-surface-variant uppercase tracking-[0.2em] mb-4 opacity-40">Fecha de Registro</p>
+                <p className="text-sm font-black text-foreground uppercase tracking-widest">{fmtDate(purchase.createdAt)}</p>
               </div>
             </div>
 
-            {/* Supplier Info */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-indigo-600" /> Información del Proveedor
+            {/* Supplier Section */}
+            <div className="space-y-6">
+              <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.3em] flex items-center gap-4 ml-1">
+                <Building2 className="w-4 h-4 text-primary" /> Socio Comercial
               </h3>
-              <div className="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm">
-                <div className="flex items-center gap-4 mb-4 pb-4 border-b border-gray-50">
-                  <div className="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center text-lg font-black">
+              <div className="p-6 lg:p-8 bg-card border border-outline-variant/30 rounded-[40px] shadow-sm group hover:shadow-2xl hover:border-primary/20 transition-all">
+                <div className="flex items-center gap-6 mb-8 pb-8 border-b border-outline-variant/10">
+                  <div className="w-16 h-16 bg-primary text-on-primary rounded-[24px] flex items-center justify-center text-2xl font-black shadow-xl shadow-primary/20">
                     {purchase.supplier?.name?.[0] || 'S'}
                   </div>
                   <div>
-                    <p className="text-base font-black text-gray-900">{purchase.supplier?.name}</p>
-                    <p className="text-xs text-gray-400 font-mono">DNI / RUC: {purchase.supplier?.dniRuc}</p>
+                    <p className="text-xl font-black text-foreground tracking-tight">{purchase.supplier?.name}</p>
+                    <p className="text-[10px] text-on-surface-variant font-black uppercase tracking-widest opacity-60">RUC/DNI: {purchase.supplier?.dniRuc}</p>
                   </div>
                 </div>
-                <div className="space-y-2 text-sm font-medium text-gray-600">
-                  {purchase.supplier?.email && <p>Correo: {purchase.supplier.email}</p>}
-                  {purchase.supplier?.phone && <p>Teléfono: {purchase.supplier.phone}</p>}
-                  {purchase.supplier?.address && <p>Dirección: {purchase.supplier.address}</p>}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                   {[
+                    { label: 'Correo Electrónico', value: purchase.supplier?.email, icon: Mail },
+                    { label: 'Teléfono de Contacto', value: purchase.supplier?.phone, icon: Phone },
+                   ].filter(item => item.value).map((item, idx) => (
+                    <div key={idx} className="space-y-2">
+                      <p className="text-[9px] font-black text-on-surface-variant uppercase tracking-widest opacity-40 flex items-center gap-2">
+                        <item.icon className="w-3.5 h-3.5" /> {item.label}
+                      </p>
+                      <p className="text-sm font-bold text-foreground break-all">{item.value}</p>
+                    </div>
+                   ))}
+                   {purchase.supplier?.address && (
+                    <div className="sm:col-span-2 space-y-2">
+                      <p className="text-[9px] font-black text-on-surface-variant uppercase tracking-widest opacity-40 flex items-center gap-2">
+                        <MapPin className="w-3.5 h-3.5" /> Dirección Fiscal
+                      </p>
+                      <p className="text-sm font-medium text-foreground leading-relaxed">{purchase.supplier.address}</p>
+                    </div>
+                   )}
                 </div>
               </div>
             </div>
 
-            {/* Items Table */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                <Package className="w-4 h-4 text-indigo-600" /> Detalles de los Artículos
+            {/* Items Breakdown */}
+            <div className="space-y-6">
+              <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.3em] flex items-center gap-4 ml-1">
+                <Package className="w-4 h-4 text-primary" /> Detalle de Artículos
               </h3>
-              <div className="overflow-hidden rounded-2xl border border-gray-100">
-                <table className="w-full text-left">
-                    <thead className="bg-gray-50">
-                        <tr className="border-b border-gray-100">
-                            <th className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Producto</th>
-                            <th className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Cant.</th>
-                            <th className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Costo</th>
-                            <th className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-50">
-                        {purchase.items?.map((item: any) => (
-                            <tr key={item.id} className="text-sm">
-                                <td className="px-4 py-4">
-                                    <p className="font-black text-gray-900">{item.product?.name}</p>
-                                </td>
-                                <td className="px-4 py-4 text-center font-bold text-gray-600">{item.quantity}</td>
-                                <td className="px-4 py-4 text-right font-medium text-gray-500">{fmtCurrency(Number(item.costPrice))}</td>
-                                <td className="px-4 py-4 text-right font-black text-gray-900">{fmtCurrency(item.quantity * Number(item.costPrice))}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                    <tfoot className="bg-gray-50/50">
-                        <tr>
-                            <td colSpan={3} className="px-4 py-4 text-right text-xs font-black text-gray-400 uppercase tracking-widest">Total General</td>
-                            <td className="px-4 py-4 text-right text-lg font-black text-indigo-600">{fmtCurrency(Number(purchase.total))}</td>
-                        </tr>
-                    </tfoot>
-                </table>
+              <div className="overflow-hidden rounded-[40px] border border-outline-variant/30 bg-card shadow-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                      <thead className="bg-surface-low/50">
+                          <tr className="border-b border-outline-variant/10">
+                              <th className="px-8 py-6 text-[9px] font-black text-on-surface-variant uppercase tracking-widest">Descripción</th>
+                              <th className="px-4 py-6 text-[9px] font-black text-on-surface-variant uppercase tracking-widest text-center">Cant.</th>
+                              <th className="px-8 py-6 text-[9px] font-black text-on-surface-variant uppercase tracking-widest text-right">Unitario</th>
+                              <th className="px-8 py-6 text-[9px] font-black text-on-surface-variant uppercase tracking-widest text-right">Total</th>
+                          </tr>
+                      </thead>
+                      <tbody className="divide-y divide-outline-variant/10">
+                          {purchase.items?.map((item: any) => (
+                              <tr key={item.id} className="hover:bg-primary/[0.02] transition-colors">
+                                  <td className="px-8 py-6">
+                                      <p className="font-black text-sm text-foreground tracking-tight">{item.product?.name}</p>
+                                      <p className="text-[9px] text-on-surface-variant font-black uppercase tracking-widest opacity-40 mt-1">ID: {item.product?.id.slice(0,8).toUpperCase()}</p>
+                                  </td>
+                                  <td className="px-4 py-6 text-center font-black text-foreground text-sm">{item.quantity}</td>
+                                  <td className="px-8 py-6 text-right font-bold text-on-surface-variant text-xs">{fmtCurrency(Number(item.costPrice))}</td>
+                                  <td className="px-8 py-6 text-right font-black text-foreground text-sm tracking-tight">{fmtCurrency(item.quantity * Number(item.costPrice))}</td>
+                              </tr>
+                          ))}
+                      </tbody>
+                      <tfoot className="bg-surface-low/30">
+                          <tr>
+                              <td colSpan={3} className="px-8 py-10 text-right text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] opacity-60">Monto Total Invertido</td>
+                              <td className="px-8 py-10 text-right text-2xl font-black text-primary tracking-tighter">{fmtCurrency(Number(purchase.total))}</td>
+                          </tr>
+                      </tfoot>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
         ) : null}
+        
+        {/* Detail Footer */}
+        <div className="absolute bottom-0 left-0 right-0 p-8 bg-card/80 backdrop-blur-xl border-t border-outline-variant/30 flex items-center gap-4">
+           <button className="flex-1 h-[60px] bg-primary text-on-primary rounded-[24px] font-black text-[11px] uppercase tracking-widest hover:opacity-90 shadow-2xl shadow-primary/30 transition-all flex items-center justify-center gap-3 active:scale-95">
+              <FileText className="w-5 h-5" /> Generar Comprobante
+           </button>
+           <button onClick={onClose} className="px-8 h-[60px] bg-surface-low text-on-surface-variant rounded-[24px] font-black text-[11px] uppercase tracking-widest border border-outline-variant/30 hover:bg-card transition-all">
+              Cerrar
+           </button>
+        </div>
       </div>
     </div>
   );
@@ -196,166 +225,236 @@ export default function PurchasesPage() {
   }, [searchInput]);
 
   return (
-    <div className="flex h-screen bg-[#F8F9FC] overflow-hidden font-sans">
+    <div className="flex h-screen bg-background overflow-hidden font-sans text-foreground transition-colors">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
+      <div className="flex-1 flex flex-col lg:ml-64 w-full overflow-hidden">
         <TopBar />
         
-        {/* Module Header */}
-        <div className="px-10 py-8 bg-white/50 backdrop-blur-md shrink-0 flex items-start justify-between">
-          <div>
-            <h1 className="text-4xl font-black text-gray-900 tracking-tight leading-none mb-2">Órdenes de Compra</h1>
-            <p className="text-base text-gray-400 font-medium">Gestione y rastree el ciclo de vida de abastecimiento global.</p>
-          </div>
-          <button 
-            onClick={() => router.push('/dashboard/purchases/new')}
-            className="flex items-center gap-2 px-6 py-3.5 bg-indigo-600 text-white rounded-xl font-black text-sm hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition-all"
-          >
-            <Plus className="w-5 h-5" /> Nueva Compra
-          </button>
-        </div>
-
-        <main className="flex-1 overflow-y-auto px-10 pb-12 space-y-8">
-          
-          {/* Metrics */}
-          <div className="grid grid-cols-4 gap-6">
-            {[
-              { label: 'Total Órdenes', value: total, icon: ShoppingCart, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-l-indigo-600' },
-              { label: 'Pendientes', value: purchases.filter(p => p.status === 'PENDING').length, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-l-amber-600' },
-              { label: 'Recibidas', value: purchases.filter(p => p.status === 'COMPLETED').length, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-l-emerald-600' },
-              { label: 'Canceladas', value: purchases.filter(p => p.status === 'CANCELLED').length, icon: AlertCircle, color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-l-rose-600' },
-            ].map((m, i) => (
-              <div key={i} className={`bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 ${m.border} flex items-center justify-between`}>
-                <div>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{m.label}</p>
-                  <p className="text-3xl font-black text-gray-900">{m.value.toLocaleString('es-PE')}</p>
-                </div>
-                <div className={`${m.bg} ${m.color} w-12 h-12 rounded-2xl flex items-center justify-center`}>
-                  <m.icon className="w-6 h-6" />
-                </div>
+        <main className="flex-1 overflow-y-auto bg-background p-4 lg:p-10 pb-32">
+          <div className="max-w-7xl mx-auto space-y-8 lg:space-y-12">
+            
+            {/* Optimized Header Area */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+              <div>
+                <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-2">Ciclo de Abastecimiento</p>
+                <h1 className="text-3xl lg:text-5xl font-black text-foreground tracking-tighter leading-none">Compras</h1>
+                <p className="text-sm text-on-surface-variant font-medium mt-2 max-w-lg">Gestión integral de adquisiciones, control de costos y stock entrante.</p>
               </div>
-            ))}
-          </div>
-
-          {/* Table Area */}
-          <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
-            {/* Filter Bar */}
-            <div className="p-6 border-b border-gray-100 flex items-center gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300" />
-                <input 
-                  placeholder="Buscar por ID o nombre de proveedor..."
-                  value={searchInput}
-                  onChange={e => setSearchInput(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-all"
-                />
+              
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => router.push('/dashboard/purchases/new')}
+                  className="w-full lg:w-auto flex items-center justify-center gap-4 px-10 py-5 bg-primary text-on-primary rounded-[24px] text-[11px] font-black uppercase tracking-widest hover:opacity-90 shadow-2xl shadow-primary/30 transition-all active:scale-95"
+                >
+                  <Plus className="w-5 h-5" />
+                  <span>Nueva Compra</span>
+                </button>
               </div>
-              <select 
-                value={statusFilter}
-                onChange={e => setStatusFilter(e.target.value)}
-                className="px-5 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-black text-gray-600 focus:outline-none cursor-pointer"
-              >
-                <option value="">Todos los Estados</option>
-                <option value="COMPLETED">Recibido</option>
-                <option value="PENDING">Pendiente</option>
-                <option value="CANCELLED">Cancelado</option>
-              </select>
             </div>
 
-            <table className="w-full border-collapse">
-                <thead>
-                    <tr className="bg-gray-50/50 text-[11px] font-black text-gray-400 uppercase tracking-widest text-left">
-                        <th className="px-8 py-5">ID de Orden</th>
-                        <th className="px-6 py-5">Proveedor</th>
-                        <th className="px-6 py-5">Monto Total</th>
-                        <th className="px-6 py-5">Fecha</th>
-                        <th className="px-6 py-5 text-center">Estado</th>
-                        <th className="px-8 py-5 text-right w-16">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                    {loading ? (
-                        Array.from({ length: 5 }).map((_, i) => (
-                            <tr key={i}>
-                                {Array.from({ length: 6 }).map((_, j) => (
-                                    <td key={j} className="px-8 py-5"><div className="h-4 bg-gray-100 rounded animate-pulse w-3/4" /></td>
-                                ))}
-                            </tr>
-                        ))
-                    ) : purchases.length === 0 ? (
-                        <tr>
-                            <td colSpan={6} className="py-20 text-center">
-                                <FileText className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                                <p className="font-black text-gray-600">No se encontraron registros de compra</p>
-                            </td>
+            {/* Metrics Grid - Premium ERP Styling */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
+              {[
+                { label: 'Total Órdenes', value: total, icon: ShoppingCart, color: 'text-primary', bg: 'bg-primary/10' },
+                { label: 'Pendientes', value: purchases.filter(p => p.status === 'PENDING').length, icon: Clock, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+                { label: 'Recibidas', value: purchases.filter(p => p.status === 'COMPLETED').length, icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+                { label: 'Canceladas', value: purchases.filter(p => p.status === 'CANCELLED').length, icon: AlertCircle, color: 'text-rose-500', bg: 'bg-rose-500/10' },
+              ].map((m, i) => (
+                <div key={i} className="bg-card p-6 lg:p-8 rounded-[32px] border border-outline-variant/30 shadow-sm group hover:shadow-xl transition-all">
+                   <div className="flex items-center justify-between mb-6">
+                      <div className={`${m.bg} ${m.color} w-12 h-12 rounded-2xl flex items-center justify-center border border-current/10`}>
+                        <m.icon className="w-6 h-6" />
+                      </div>
+                      <span className="text-[10px] font-black text-on-surface-variant/20 tracking-tighter">0{i+1}</span>
+                   </div>
+                   <p className="text-[9px] font-black text-on-surface-variant uppercase tracking-[0.2em] mb-2 opacity-60">{m.label}</p>
+                   <p className="text-2xl lg:text-4xl font-black text-foreground tracking-tighter leading-none">{m.value.toLocaleString('es-PE')}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Standardized Filter Bar (52px) */}
+            <div className="bg-card rounded-[32px] border border-outline-variant/30 shadow-sm p-3">
+               <div className="flex flex-col lg:flex-row items-center gap-3">
+                  <div className="flex items-center gap-4 bg-surface-low border border-outline-variant/20 rounded-[24px] px-6 h-[52px] flex-1 shadow-inner focus-within:bg-card focus-within:border-primary/40 transition-all w-full">
+                    <Search className="w-5 h-5 text-on-surface-variant/40 flex-shrink-0" />
+                    <input 
+                      placeholder="Buscar por ID de orden o proveedor..."
+                      value={searchInput}
+                      onChange={e => setSearchInput(e.target.value)}
+                      className="bg-transparent text-sm font-bold text-foreground outline-none flex-1 placeholder:text-on-surface-variant/30"
+                    />
+                    {searchInput && (
+                      <button onClick={() => setSearchInput('')} className="text-on-surface-variant/40 hover:text-primary transition-colors">
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3 w-full lg:w-auto">
+                    <div className="relative flex-1 lg:flex-none">
+                      <select 
+                        value={statusFilter}
+                        onChange={e => setStatusFilter(e.target.value)}
+                        className="w-full lg:w-[200px] h-[52px] pl-6 pr-12 bg-surface-low border border-outline-variant/20 rounded-[24px] text-[10px] font-black text-on-surface-variant uppercase tracking-widest focus:outline-none focus:border-primary/40 shadow-inner cursor-pointer appearance-none"
+                      >
+                        <option value="">Todos los Estados</option>
+                        <option value="COMPLETED">Recibido</option>
+                        <option value="PENDING">Pendiente</option>
+                        <option value="CANCELLED">Cancelado</option>
+                      </select>
+                      <ChevronRight className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40 pointer-events-none rotate-90" />
+                    </div>
+                  </div>
+               </div>
+            </div>
+
+            {/* Content Area - Card Grid (Mobile) / Table (Desktop) */}
+            <div className="bg-card rounded-[48px] border border-outline-variant/30 shadow-sm overflow-hidden min-h-[400px]">
+               
+               {/* MOBILE VIEW (lg:hidden) */}
+               <div className="lg:hidden divide-y divide-outline-variant/10">
+                  {loading ? (
+                    Array(4).fill(0).map((_, i) => (
+                      <div key={i} className="p-6 space-y-4 animate-pulse">
+                        <div className="flex justify-between"><div className="h-4 bg-surface-low rounded w-24" /><div className="h-4 bg-surface-low rounded w-20" /></div>
+                        <div className="h-8 bg-surface-low rounded w-3/4" />
+                      </div>
+                    ))
+                  ) : purchases.length === 0 ? (
+                    <div className="p-16 text-center">
+                      <ShoppingCart className="w-16 h-16 text-on-surface-variant/10 mx-auto mb-4" />
+                      <p className="text-[10px] font-black text-on-surface-variant/40 uppercase tracking-widest">Sin órdenes registradas</p>
+                    </div>
+                  ) : purchases.map(purchase => (
+                    <div 
+                      key={purchase.id} 
+                      className="p-6 space-y-6 hover:bg-primary/[0.02] active:bg-primary/[0.05] transition-colors cursor-pointer"
+                      onClick={() => setSelectedId(purchase.id)}
+                    >
+                      <div className="flex justify-between items-start">
+                         <span className="text-[10px] font-black text-primary uppercase tracking-wider bg-primary/5 px-3 py-1.5 rounded-lg border border-primary/10">
+                            #PO-{purchase.id.slice(0, 4).toUpperCase()}
+                         </span>
+                         <StatusBadge status={purchase.status} />
+                      </div>
+
+                      <div>
+                         <p className="text-[8px] font-black text-on-surface-variant/40 uppercase tracking-widest mb-1">Proveedor</p>
+                         <p className="text-base font-black text-foreground tracking-tight">{purchase.supplier?.name}</p>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                         <div className="bg-surface-low p-4 rounded-2xl border border-outline-variant/30">
+                            <p className="text-[8px] font-black text-on-surface-variant/40 uppercase tracking-widest mb-1">Total Inversión</p>
+                            <p className="text-sm font-black text-foreground tracking-tight">{fmtCurrency(Number(purchase.total))}</p>
+                         </div>
+                         <div className="bg-surface-low p-4 rounded-2xl border border-outline-variant/30 text-right">
+                            <p className="text-[8px] font-black text-on-surface-variant/40 uppercase tracking-widest mb-1">Fecha</p>
+                            <p className="text-xs font-black text-foreground uppercase">{fmtDate(purchase.createdAt)}</p>
+                         </div>
+                      </div>
+                    </div>
+                  ))}
+               </div>
+
+               {/* DESKTOP VIEW (lg:block) */}
+               <div className="hidden lg:block overflow-x-auto scrollbar-hide">
+                  <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-surface-low/30 text-[10px] font-black text-on-surface-variant tracking-[0.3em] uppercase">
+                          <th className="px-10 py-8 border-b border-outline-variant/30">Referencia</th>
+                          <th className="px-8 py-8 border-b border-outline-variant/30">Socio Comercial</th>
+                          <th className="px-8 py-8 border-b border-outline-variant/30">Inversión Total</th>
+                          <th className="px-8 py-8 border-b border-outline-variant/30 text-center">Estado</th>
+                          <th className="px-10 py-8 border-b border-outline-variant/30 text-right">Acción</th>
                         </tr>
-                    ) : (
-                        purchases.map(purchase => (
+                      </thead>
+                      <tbody className="divide-y divide-outline-variant/20">
+                        {loading ? (
+                          Array.from({ length: 8 }).map((_, i) => (
+                            <tr key={i} className="animate-pulse">
+                              <td colSpan={5} className="px-10 py-8"><div className="h-6 bg-surface-low rounded-xl w-full" /></td>
+                            </tr>
+                          ))
+                        ) : (
+                          purchases.map(purchase => (
                             <tr key={purchase.id} 
-                                className="group hover:bg-indigo-50/30 transition-colors cursor-pointer"
+                                className="group hover:bg-primary/[0.02] transition-all cursor-pointer"
                                 onClick={() => setSelectedId(purchase.id)}>
-                                <td className="px-8 py-5">
-                                    <span className="text-sm font-black text-indigo-600 hover:underline">
+                                <td className="px-10 py-8">
+                                    <span className="text-[11px] font-black text-primary uppercase tracking-wider bg-primary/5 px-4 py-2 rounded-xl border border-primary/10">
                                         #PO-{purchase.id.slice(0, 4).toUpperCase()}
                                     </span>
+                                    <p className="text-[9px] font-black text-on-surface-variant/40 uppercase tracking-widest mt-3 ml-1">{fmtDate(purchase.createdAt)}</p>
                                 </td>
-                                <td className="px-6 py-5">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center text-[11px] font-black text-gray-600">
+                                <td className="px-8 py-8">
+                                    <div className="flex items-center gap-5">
+                                        <div className="w-14 h-14 bg-primary text-on-primary rounded-[20px] flex items-center justify-center text-xl font-black shadow-lg shadow-primary/10 transition-transform group-hover:rotate-6 group-hover:scale-110">
                                             {purchase.supplier?.name?.[0].toUpperCase()}
                                         </div>
                                         <div>
-                                            <p className="text-sm font-black text-gray-900">{purchase.supplier?.name}</p>
+                                            <p className="text-base font-black text-foreground tracking-tight group-hover:text-primary transition-colors">{purchase.supplier?.name}</p>
+                                            <p className="text-[10px] text-on-surface-variant font-black uppercase tracking-widest opacity-60">RUC: {purchase.supplier?.dniRuc}</p>
                                         </div>
                                     </div>
                                 </td>
-                                <td className="px-6 py-5">
-                                    <p className="text-sm font-black text-gray-900">{fmtCurrency(Number(purchase.total))}</p>
+                                <td className="px-8 py-8">
+                                    <p className="text-lg font-black text-foreground tracking-tighter">{fmtCurrency(Number(purchase.total))}</p>
+                                    <p className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.2em] mt-1 opacity-60">Procesado</p>
                                 </td>
-                                <td className="px-6 py-5">
-                                    <p className="text-sm font-medium text-gray-500">{fmtDate(purchase.createdAt)}</p>
-                                </td>
-                                <td className="px-6 py-5 text-center">
+                                <td className="px-8 py-8 text-center">
                                     <StatusBadge status={purchase.status} />
                                 </td>
-                                <td className="px-8 py-5 text-right" onClick={e => e.stopPropagation()}>
+                                <td className="px-10 py-8 text-right" onClick={e => e.stopPropagation()}>
                                     <button 
                                         onClick={() => setSelectedId(purchase.id)}
-                                        className="p-2 bg-gray-50 hover:bg-gray-200 rounded-xl text-gray-400 hover:text-gray-900 transition-all"
+                                        className="w-12 h-12 bg-surface-low hover:bg-primary text-on-surface-variant hover:text-on-primary rounded-2xl border border-outline-variant/30 hover:border-primary transition-all active:scale-95 shadow-sm inline-flex items-center justify-center"
                                     >
-                                        <Eye className="w-4 h-4" />
+                                        <Eye className="w-5 h-5" />
                                     </button>
                                 </td>
                             </tr>
-                        ))
-                    )}
-                </tbody>
-            </table>
+                          ))
+                        )}
+                      </tbody>
+                  </table>
+               </div>
 
-            {/* Pagination */}
-            <div className="px-8 py-5 bg-white border-t border-gray-100 flex items-center justify-between">
-                <p className="text-xs font-black text-gray-400 uppercase tracking-widest">
-                    Mostrando {(page-1)*LIMIT + 1} a {Math.min(page*LIMIT, total)} de {total} órdenes
-                </p>
-                <div className="flex items-center gap-2">
-                    <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page === 1}
-                        className="w-10 h-10 rounded-xl border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all">
+               {/* Standardized Pagination */}
+               <div className="px-10 py-8 bg-surface-low/30 border-t border-outline-variant/30 flex flex-col sm:flex-row items-center justify-between gap-6">
+                  <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest opacity-60">
+                      Página {page} de {totalPages} <span className="mx-2">•</span> {total} Órdenes Registradas
+                  </p>
+                  <div className="flex items-center gap-3">
+                      <button 
+                        onClick={() => setPage(p => Math.max(1, p-1))} 
+                        disabled={page === 1}
+                        className="w-12 h-12 rounded-2xl border border-outline-variant/30 bg-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-low disabled:opacity-30 transition-all active:scale-90 shadow-sm"
+                      >
                         <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                        const p = Math.max(1, Math.min(page - 2, totalPages - 4)) + i;
-                        return (
-                            <button key={p} onClick={() => setPage(p)}
-                                className={`w-10 h-10 rounded-xl text-sm font-black transition-all ${p === page ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-100' : 'text-gray-500 hover:bg-gray-50'}`}>
-                                {p}
-                            </button>
-                        );
-                    })}
-                    <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                        className="w-10 h-10 rounded-xl border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all">
+                      </button>
+                      <div className="flex items-center gap-2">
+                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                            const p = Math.max(1, Math.min(page - 2, totalPages - 4)) + i;
+                            if (p < 1 || p > totalPages) return null;
+                            return (
+                                <button key={p} onClick={() => setPage(p)}
+                                    className={`w-12 h-12 rounded-2xl text-xs font-black transition-all active:scale-90 shadow-sm ${p === page ? 'bg-primary text-on-primary shadow-xl shadow-primary/20' : 'bg-card border border-outline-variant/30 text-on-surface-variant hover:border-primary/40'}`}>
+                                    {p}
+                                </button>
+                            );
+                        })}
+                      </div>
+                      <button 
+                        onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
+                        disabled={page === totalPages}
+                        className="w-12 h-12 rounded-2xl border border-outline-variant/30 bg-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-low disabled:opacity-30 transition-all active:scale-90 shadow-sm"
+                      >
                         <ChevronRight className="w-5 h-5" />
-                    </button>
-                </div>
+                      </button>
+                  </div>
+               </div>
             </div>
           </div>
         </main>
@@ -366,3 +465,4 @@ export default function PurchasesPage() {
     </div>
   );
 }
+
