@@ -554,6 +554,11 @@ export const deleteRole = async (id: string) => {
   return response.data;
 };
 
+export const toggleRoleStatus = async (id: string) => {
+  const response = await api.patch(`/roles/${id}/status`);
+  return response.data;
+};
+
 export const getPermissions = async () => {
   const response = await api.get('/roles/permissions');
   return response.data;
