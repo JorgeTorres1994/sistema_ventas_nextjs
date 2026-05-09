@@ -99,7 +99,7 @@ const TicketPrintModal = ({ saleId, onClose }: TicketPrintModalProps) => {
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-300" onClick={onClose} />
             
-            <div className="relative bg-white rounded-[40px] shadow-2xl w-full max-w-xl overflow-hidden flex flex-col md:flex-row animate-in zoom-in-95 duration-300">
+            <div className="relative bg-card rounded-[40px] shadow-2xl w-full max-w-xl overflow-hidden flex flex-col md:flex-row animate-in zoom-in-95 duration-300">
                 {/* Preview Section */}
                 <div className="flex-1 bg-gray-100 p-8 flex items-center justify-center overflow-y-auto max-h-[80vh]">
                     {loading ? (
@@ -110,7 +110,7 @@ const TicketPrintModal = ({ saleId, onClose }: TicketPrintModalProps) => {
                     ) : (
                         <div 
                             id="ticket-content" 
-                            className="bg-white shadow-xl p-8 w-[80mm] min-h-[120mm] text-[#111827] font-mono text-[11px] leading-relaxed"
+                            className="bg-card shadow-xl p-8 w-[80mm] min-h-[120mm] text-foreground font-mono text-[11px] leading-relaxed border border-outline-variant/30"
                             style={{ boxShadow: '0 0 20px rgba(0,0,0,0.05)' }}
                         >
                             {sale ? (
@@ -183,12 +183,12 @@ const TicketPrintModal = ({ saleId, onClose }: TicketPrintModalProps) => {
                 </div>
 
                 {/* Actions Section */}
-                <div className="w-full md:w-64 p-8 border-l border-gray-50 flex flex-col justify-between bg-white">
+                <div className="w-full md:w-64 p-8 border-l border-outline-variant flex flex-col justify-between bg-card">
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
                             <h3 className="font-black text-gray-900 uppercase tracking-widest text-xs">Acciones</h3>
-                            <button onClick={onClose} className="p-2 hover:bg-gray-50 rounded-xl transition-all">
-                                <X className="w-5 h-5 text-gray-300" />
+                            <button onClick={onClose} className="p-2 hover:bg-surface-low rounded-xl transition-all">
+                                <X className="w-5 h-5 text-on-surface-variant/40" />
                             </button>
                         </div>
                         
@@ -227,7 +227,7 @@ const TicketPrintModal = ({ saleId, onClose }: TicketPrintModalProps) => {
                         </div>
                     </div>
 
-                    <div className="pt-8 border-t border-gray-50">
+                    <div className="pt-8 border-t border-outline-variant/30">
                         <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest text-center">Nexus Genesis v2.0</p>
                     </div>
                 </div>

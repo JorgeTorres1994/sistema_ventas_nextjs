@@ -127,14 +127,14 @@ export default function ProductForm({ initialData, isEdit }: ProductFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="h-full flex flex-col">
-      <div className="flex-1 overflow-y-auto p-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-5xl">
+    <form onSubmit={handleSubmit} className="h-full flex flex-col bg-card">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-8 scrollbar-hide">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10 max-w-6xl mx-auto">
           
           {/* Left Column: Image & Tips */}
           <div className="col-span-1 space-y-6">
-             <div>
-                <h3 className="text-sm font-black text-gray-900 mb-4">Imagen del Producto</h3>
+             <div className="bg-surface-low/50 rounded-[32px] p-6 border border-outline-variant/30">
+                <h3 className="text-xs font-black text-on-surface-variant uppercase tracking-widest mb-6">Imagen del Producto</h3>
                 
                 <input 
                   type="file" 
@@ -146,66 +146,71 @@ export default function ProductForm({ initialData, isEdit }: ProductFormProps) {
 
                 <div 
                   onClick={() => fileInputRef.current?.click()}
-                  className={`w-full aspect-square bg-indigo-50/30 border-2 border-dashed ${formData.imageUrl ? 'border-transparent' : 'border-indigo-100 hover:border-indigo-300'} rounded-3xl flex flex-col items-center justify-center cursor-pointer transition-all relative overflow-hidden group`}
+                  className={`w-full aspect-square sm:aspect-auto sm:h-64 bg-card border-2 border-dashed ${formData.imageUrl ? 'border-transparent' : 'border-outline-variant hover:border-primary/40'} rounded-[24px] flex flex-col items-center justify-center cursor-pointer transition-all relative overflow-hidden group shadow-inner`}
                 >
                   {uploading ? (
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+                      <p className="text-[10px] font-black text-primary uppercase tracking-widest">Subiendo...</p>
+                    </div>
                   ) : formData.imageUrl ? (
                     <img src={formData.imageUrl} alt="Vista previa" className="w-full h-full object-cover" />
                   ) : (
-                    <>
-                      <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mb-4 text-gray-400 group-hover:text-indigo-600 transition-colors">
+                    <div className="text-center px-6">
+                      <div className="w-14 h-14 bg-surface-low rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4 text-on-surface-variant/40 group-hover:text-primary transition-colors">
                         <Upload className="w-6 h-6" />
                       </div>
-                      <p className="text-sm font-black text-gray-700 text-center px-6">Click para subir imagen del producto</p>
-                      <p className="text-[10px] font-bold text-gray-400 mt-2">PNG, JPG o WEBP (Máx 5MB)</p>
-                    </>
+                      <p className="text-sm font-black text-foreground mb-1">Subir Imagen</p>
+                      <p className="text-[9px] font-bold text-on-surface-variant/40 uppercase tracking-widest leading-relaxed">PNG, JPG o WEBP<br/>Hasta 5MB</p>
+                    </div>
                   )}
                   {formData.imageUrl && (
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <p className="text-white font-bold text-sm">Cambiar Imagen</p>
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                      <p className="text-white font-black text-xs uppercase tracking-widest bg-primary/20 px-4 py-2 rounded-xl border border-white/20">Cambiar Imagen</p>
                     </div>
                   )}
                 </div>
 
-                <button 
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full mt-4 py-3 bg-white border border-gray-100 shadow-sm rounded-xl text-sm font-black text-gray-700 hover:bg-gray-50 flex items-center justify-center gap-2 transition-all"
-                >
-                   <Upload className="w-4 h-4" /> Subir Nueva
-                </button>
-
-                <div className="flex items-center gap-4 my-4">
-                  <div className="h-px bg-gray-100 flex-1"></div>
-                  <span className="text-xs font-bold text-gray-400">O USA URL</span>
-                  <div className="h-px bg-gray-100 flex-1"></div>
+                <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                  <button 
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex-1 py-3.5 bg-card border border-outline-variant rounded-2xl text-[10px] font-black text-on-surface-variant uppercase tracking-widest hover:bg-surface-low transition-all flex items-center justify-center gap-2 active:scale-95 shadow-sm"
+                  >
+                     <Upload className="w-4 h-4" /> Subir Nueva
+                  </button>
                 </div>
 
-                <div className="relative">
-                  <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                <div className="flex items-center gap-4 my-6">
+                  <div className="h-px bg-outline-variant/30 flex-1"></div>
+                  <span className="text-[9px] font-black text-on-surface-variant/30 uppercase tracking-widest">O USA URL</span>
+                  <div className="h-px bg-outline-variant/30 flex-1"></div>
+                </div>
+
+                <div className="relative group">
+                  <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/30 group-focus-within:text-primary transition-colors" />
                   <input
                     type="url"
                     placeholder="https://ejemplo.com/imagen.jpg"
                     value={formData.imageUrl}
                     onChange={(e) => setFormData({...formData, imageUrl: e.target.value})}
-                    className="w-full pl-11 pr-4 py-3 bg-white border border-gray-100 shadow-sm rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition-all outline-none text-sm font-medium text-gray-900"
+                    className="w-full pl-12 pr-4 py-4 bg-card border border-outline-variant rounded-2xl focus:border-primary/40 transition-all outline-none text-sm font-bold text-foreground placeholder:text-on-surface-variant/20 shadow-sm"
                   />
                 </div>
              </div>
 
-             <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-               <h4 className="text-sm font-black text-gray-900 flex items-center gap-2 mb-4">
-                 <Info className="w-4 h-4 text-gray-400" /> Consejos Rápidos
+             <div className="bg-primary/5 rounded-[32px] p-6 border border-primary/10 hidden sm:block">
+               <h4 className="text-[10px] font-black text-primary uppercase tracking-widest flex items-center gap-2 mb-4">
+                 <Info className="w-4 h-4" /> Recomendaciones
                </h4>
-               <ul className="space-y-3">
-                 <li className="flex items-start gap-2 text-xs font-semibold text-gray-600">
-                   <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
-                   Use imágenes de alta resolución con fondos limpios.
+               <ul className="space-y-4">
+                 <li className="flex items-start gap-3 text-xs font-bold text-on-surface-variant/80">
+                   <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                   Fondos limpios y alta resolución.
                  </li>
-                 <li className="flex items-start gap-2 text-xs font-semibold text-gray-600">
-                   <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
-                   Descripciones detalladas mejoran la búsqueda.
+                 <li className="flex items-start gap-3 text-xs font-bold text-on-surface-variant/80">
+                   <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                   Descripciones técnicas precisas.
                  </li>
                </ul>
              </div>
@@ -215,89 +220,101 @@ export default function ProductForm({ initialData, isEdit }: ProductFormProps) {
           <div className="col-span-1 lg:col-span-2 space-y-8">
              
              {/* Header Status Toggle */}
-             <div className="flex items-center justify-between pb-6 border-b border-gray-100">
-                <div>
-                   <h2 className="text-xl font-black text-gray-900">Estado del Producto</h2>
-                   <p className="text-xs font-medium text-gray-500 mt-1">Visibilidad de este producto en su catálogo</p>
+             <div className="bg-surface-low/30 rounded-[32px] p-6 sm:p-8 border border-outline-variant/30">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                  <div>
+                     <h2 className="text-xl font-black text-foreground tracking-tight">Estado de Comercialización</h2>
+                     <p className="text-xs font-bold text-on-surface-variant mt-1">Control de visibilidad en el punto de venta</p>
+                  </div>
+                  <button 
+                    type="button" 
+                    onClick={() => setFormData({...formData, isActive: !formData.isActive})}
+                    className="flex items-center gap-4 bg-card px-5 py-3 rounded-2xl border border-outline-variant shadow-sm active:scale-95 transition-all self-start sm:self-auto"
+                  >
+                    <div className="relative">
+                      {formData.isActive ? (
+                        <div className="w-10 h-6 bg-emerald-500 rounded-full flex items-center justify-end px-1 transition-colors">
+                           <div className="w-4 h-4 bg-white rounded-full shadow-sm" />
+                        </div>
+                      ) : (
+                        <div className="w-10 h-6 bg-on-surface-variant/20 rounded-full flex items-center justify-start px-1 transition-colors">
+                           <div className="w-4 h-4 bg-white rounded-full shadow-sm" />
+                        </div>
+                      )}
+                    </div>
+                    <span className={`text-[10px] font-black uppercase tracking-widest ${formData.isActive ? 'text-emerald-500' : 'text-on-surface-variant'}`}>
+                      {formData.isActive ? 'Activo' : 'Pausado'}
+                    </span>
+                  </button>
                 </div>
-                <button 
-                  type="button" 
-                  onClick={() => setFormData({...formData, isActive: !formData.isActive})}
-                  className="flex items-center gap-3"
-                >
-                  {formData.isActive ? (
-                    <ToggleRight className="w-10 h-10 text-indigo-600" />
-                  ) : (
-                    <ToggleLeft className="w-10 h-10 text-gray-300" />
-                  )}
-                  <span className={`text-sm font-black ${formData.isActive ? 'text-indigo-600' : 'text-gray-400'}`}>
-                    {formData.isActive ? 'Activo' : 'Inactivo'}
-                  </span>
-                </button>
              </div>
 
              {/* Basic Info */}
-             <div className="space-y-6">
+             <div className="bg-card space-y-6">
                 <div>
-                  <label className="block text-sm font-black text-gray-900 mb-2">Nombre del Producto <span className="text-rose-500">*</span></label>
+                  <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-widest mb-3">Nombre del Producto <span className="text-rose-500">*</span></label>
                   <input
                     type="text"
                     required
                     placeholder="ej. Reloj Minimalista de Titanio"
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="w-full px-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition-all outline-none font-medium text-gray-900"
+                    className="w-full px-6 py-4 bg-surface-low border border-transparent rounded-[20px] focus:bg-card focus:border-primary/40 transition-all outline-none font-black text-foreground text-sm shadow-inner placeholder:text-on-surface-variant/20"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-black text-gray-900 mb-2">Descripción</label>
+                  <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-widest mb-3">Descripción Técnica</label>
                   <textarea
                     rows={4}
-                    placeholder="Describa las características clave, materiales y valor de este producto..."
+                    placeholder="Detalle los materiales, dimensiones y características..."
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    className="w-full px-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition-all outline-none font-medium text-gray-900 resize-y"
+                    className="w-full px-6 py-4 bg-surface-low border border-transparent rounded-[20px] focus:bg-card focus:border-primary/40 transition-all outline-none font-bold text-foreground text-sm shadow-inner placeholder:text-on-surface-variant/20 resize-none"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-black text-gray-900 mb-2">Categoría</label>
-                    <div className="relative">
+                    <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-widest mb-3">Categoría</label>
+                    <div className="relative group">
                       <select
                         value={formData.categoryId}
                         onChange={(e) => setFormData({...formData, categoryId: e.target.value})}
-                        className="w-full px-4 py-3 appearance-none bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition-all outline-none font-medium text-gray-900"
+                        className="w-full px-6 py-4 appearance-none bg-surface-low border border-transparent rounded-[20px] focus:bg-card focus:border-primary/40 transition-all outline-none font-black text-foreground text-sm shadow-inner cursor-pointer"
                       >
                         <option value="">Seleccionar Categoría</option>
                         {categories.map((cat) => (
                           <option key={cat.id} value={cat.id}>{cat.name}</option>
                         ))}
                       </select>
-                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                      <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40 pointer-events-none group-focus-within:text-primary" />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-black text-gray-900 mb-2">Marca (Opcional)</label>
+                    <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-widest mb-3">Marca Corporativa</label>
                     <input
                       type="text"
                       placeholder="ej. Sony, Nike"
-                      className="w-full px-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition-all outline-none font-medium text-gray-900"
+                      className="w-full px-6 py-4 bg-surface-low border border-transparent rounded-[20px] focus:bg-card focus:border-primary/40 transition-all outline-none font-black text-foreground text-sm shadow-inner placeholder:text-on-surface-variant/20"
                     />
                   </div>
                 </div>
              </div>
 
              {/* Inventory & Pricing */}
-             <div className="pt-6 border-t border-gray-100 space-y-6">
-                <h3 className="text-lg font-black text-gray-900">Inventario y Precios</h3>
+             <div className="bg-surface-low/20 rounded-[40px] p-6 sm:p-10 border border-outline-variant/30 space-y-8">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+                    <Save className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl font-black text-foreground tracking-tight">Finanzas e Inventario</h3>
+                </div>
                 
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-black text-gray-900 mb-2">Precio de Venta <span className="text-rose-500">*</span></label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Precio de Venta (S/) <span className="text-rose-500">*</span></label>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">S/</span>
                       <input
                         type="number"
                         step="0.01"
@@ -306,19 +323,18 @@ export default function ProductForm({ initialData, isEdit }: ProductFormProps) {
                         placeholder="0.00"
                         value={formData.price}
                         onChange={(e) => setFormData({...formData, price: e.target.value})}
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition-all outline-none font-bold text-gray-900"
+                        className="w-full px-6 py-4 bg-card border border-outline-variant rounded-[20px] focus:border-primary/40 transition-all outline-none font-black text-foreground text-lg shadow-sm"
                       />
                     </div>
                     {Number(margin) > 0 && (
-                      <div className="mt-3 inline-block bg-blue-50 text-blue-600 px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest">
-                        Margen Estimado: {margin}%
+                      <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-lg text-[9px] font-black uppercase tracking-widest">
+                         Margen: {margin}%
                       </div>
                     )}
                   </div>
-                  <div>
-                    <label className="block text-sm font-black text-gray-900 mb-2">Precio de Compra</label>
+                  <div className="space-y-3">
+                    <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Costo de Adquisición (S/)</label>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">S/</span>
                       <input
                         type="number"
                         step="0.01"
@@ -326,14 +342,14 @@ export default function ProductForm({ initialData, isEdit }: ProductFormProps) {
                         placeholder="0.00"
                         value={formData.purchasePrice}
                         onChange={(e) => setFormData({...formData, purchasePrice: e.target.value})}
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition-all outline-none font-bold text-gray-900"
+                        className="w-full px-6 py-4 bg-card border border-outline-variant rounded-[20px] focus:border-primary/40 transition-all outline-none font-black text-foreground text-lg shadow-sm"
                       />
                     </div>
                   </div>
                 </div>
 
-                <div>
-                    <label className="block text-sm font-black text-gray-900 mb-2">Stock Disponible <span className="text-rose-500">*</span></label>
+                <div className="space-y-3">
+                    <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Unidades en Almacén <span className="text-rose-500">*</span></label>
                     <input
                       type="number"
                       min="0"
@@ -341,11 +357,11 @@ export default function ProductForm({ initialData, isEdit }: ProductFormProps) {
                       placeholder="0"
                       value={formData.stock}
                       onChange={(e) => setFormData({...formData, stock: e.target.value})}
-                      className="w-1/2 px-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition-all outline-none font-bold text-gray-900"
+                      className="w-full sm:w-1/2 px-6 py-4 bg-card border border-outline-variant rounded-[20px] focus:border-primary/40 transition-all outline-none font-black text-foreground text-lg shadow-sm"
                     />
                     {isEdit && (
-                      <p className="text-xs font-semibold text-gray-400 mt-2">
-                        Cambiar este valor manualmente creará un registro de ajuste de inventario.
+                      <p className="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest mt-3">
+                        El ajuste manual impactará directamente el Kardex.
                       </p>
                     )}
                 </div>
@@ -356,26 +372,40 @@ export default function ProductForm({ initialData, isEdit }: ProductFormProps) {
       </div>
 
       {/* Bottom Action Bar */}
-      <div className="px-8 py-5 bg-white border-t border-gray-100 flex items-center justify-between shrink-0 sticky bottom-0 z-10">
-        <div className="flex items-center gap-2 text-xs font-bold text-gray-400 flex-1">
-          {isEdit ? 'Última actualización reciente' : 'Cambios sin guardar'}
+      <div className="px-6 py-6 sm:px-10 sm:py-8 bg-card border-t border-outline-variant/30 flex flex-col sm:flex-row items-center justify-between gap-6 shrink-0 relative z-20 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)]">
+        <div className="hidden sm:flex items-center gap-3 text-[10px] font-black text-on-surface-variant/30 uppercase tracking-widest">
+          {isEdit ? (
+            <>
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              Sincronizado con inventario
+            </>
+          ) : (
+             <>
+               <div className="w-2 h-2 rounded-full bg-amber-500" />
+               Borrador temporal
+             </>
+          )}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
           <button 
             type="button"
             onClick={() => router.back()}
             disabled={loading}
-            className="px-6 py-3 bg-white border border-gray-200 rounded-xl font-black text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors disabled:opacity-50"
+            className="flex-1 sm:flex-none px-8 py-4 bg-surface-low border border-outline-variant/50 rounded-[22px] text-[11px] font-black text-on-surface-variant uppercase tracking-widest hover:bg-card transition-all disabled:opacity-50 active:scale-95 shadow-sm"
           >
             Cancelar
           </button>
           <button 
             type="submit"
             disabled={loading}
-            className="px-8 py-3 bg-indigo-600 border border-transparent rounded-xl font-black text-sm text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all flex items-center gap-2 disabled:opacity-50"
+            className="flex-1 sm:flex-none px-10 py-4 bg-primary text-on-primary rounded-[22px] text-[11px] font-black uppercase tracking-widest hover:opacity-90 shadow-xl shadow-primary/20 transition-all flex items-center justify-center gap-3 disabled:opacity-50 active:scale-95"
           >
-            {loading && <div className="w-4 h-4 rounded-full border-2 border-white/50 border-t-white animate-spin" />}
-            Guardar Producto
+            {loading ? (
+              <div className="w-5 h-5 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin" />
+            ) : (
+              <Save className="w-5 h-5" />
+            )}
+            {isEdit ? 'Actualizar Producto' : 'Guardar Producto'}
           </button>
         </div>
       </div>

@@ -69,7 +69,7 @@ const RecentOrders = ({ orders, isLoading }: RecentOrdersProps) => {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-xl p-6 border border-[#E5E7EB] shadow-sm flex-1 animate-pulse">
+      <div className="bg-card rounded-xl p-6 border border-outline-variant shadow-sm flex-1 animate-pulse">
         <div className="w-48 h-6 bg-gray-200 rounded mb-6"></div>
         <div className="space-y-4">
           {[1, 2, 3, 4, 5].map((i) => (
@@ -87,10 +87,10 @@ const RecentOrders = ({ orders, isLoading }: RecentOrdersProps) => {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm flex-1 mt-6 overflow-hidden">
-      <div className="p-6 border-b border-[#E5E7EB] flex justify-between items-center">
-        <h2 className="text-xl font-bold text-[#111827]">Ventas Recientes</h2>
-        <Link href="/dashboard/sales" className="text-sm font-medium text-blue-600 hover:text-blue-700 transition">
+    <div className="bg-card rounded-xl border border-outline-variant shadow-sm flex-1 mt-6 overflow-hidden">
+      <div className="p-6 border-b border-outline-variant flex justify-between items-center">
+        <h2 className="text-xl font-bold text-foreground">Ventas Recientes</h2>
+        <Link href="/dashboard/sales" className="text-sm font-medium text-primary hover:text-primary/80 transition">
           Ver Todo
         </Link>
       </div>
@@ -98,49 +98,49 @@ const RecentOrders = ({ orders, isLoading }: RecentOrdersProps) => {
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
-              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">ID de Orden</th>
-              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Cliente</th>
-              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Producto</th>
-              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Monto</th>
-              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Estado</th>
-              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Fecha</th>
-              <th className="py-3 px-6 text-xs font-semibold text-[#6B7280] uppercase tracking-wider text-center">Acción</th>
+            <tr className="bg-surface-low border-b border-outline-variant">
+              <th className="py-3 px-6 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">ID de Orden</th>
+              <th className="py-3 px-6 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Cliente</th>
+              <th className="py-3 px-6 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Producto</th>
+              <th className="py-3 px-6 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Monto</th>
+              <th className="py-3 px-6 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Estado</th>
+              <th className="py-3 px-6 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Fecha</th>
+              <th className="py-3 px-6 text-xs font-semibold text-on-surface-variant uppercase tracking-wider text-center">Acción</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#E5E7EB]">
+          <tbody className="divide-y divide-outline-variant">
             {orders.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-8 text-center text-[#6B7280] text-sm">
+                <td colSpan={7} className="py-8 text-center text-on-surface-variant text-sm">
                   No se encontraron ventas recientes.
                 </td>
               </tr>
             ) : orders.map((order, idx) => (
-              <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                <td className="py-4 px-6 text-[15px] font-medium text-[#111827]">{(order as any).displayId || order.id}</td>
-                <td className="py-4 px-6 text-[15px] text-[#4B5563]">{order.customer}</td>
-                <td className="py-4 px-6 text-[15px] text-[#4B5563]">{order.product}</td>
-                <td className="py-4 px-6 text-[15px] font-semibold text-[#111827]">{formatCurrency(order.amount)}</td>
+              <tr key={idx} className="hover:bg-surface-low transition-colors">
+                <td className="py-4 px-6 text-[15px] font-medium text-foreground">{(order as any).displayId || order.id}</td>
+                <td className="py-4 px-6 text-[15px] text-secondary">{order.customer}</td>
+                <td className="py-4 px-6 text-[15px] text-secondary">{order.product}</td>
+                <td className="py-4 px-6 text-[15px] font-semibold text-foreground">{formatCurrency(order.amount)}</td>
                 <td className="py-4 px-6">
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                     order.status === 'PAID' || order.status === 'COMPLETED' 
-                      ? 'bg-blue-50 text-blue-700' 
+                      ? 'bg-blue-50/20 text-blue-500' 
                       : order.status === 'PENDING'
-                      ? 'bg-amber-50 text-amber-700'
-                      : 'bg-gray-100 text-gray-700'
+                      ? 'bg-amber-50/20 text-amber-500'
+                      : 'bg-surface-low text-on-surface-variant'
                   }`}>
                     {order.status === 'PAID' || order.status === 'COMPLETED' ? 'Completado' : 
                      order.status === 'PENDING' ? 'Pendiente' : 
                      order.status === 'CANCELLED' ? 'Cancelado' : order.status}
                   </span>
                 </td>
-                <td className="py-4 px-6 text-[15px] text-[#6B7280]">{formatDate(order.date)}</td>
+                <td className="py-4 px-6 text-[15px] text-on-surface-variant">{formatDate(order.date)}</td>
                 <td className="py-4 px-6 text-center">
                   <div className="flex items-center justify-center gap-2">
                     <button 
                       onClick={() => handlePrint(order.id)}
                       title="Imprimir y Gestionar Venta"
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-all active:scale-90 flex items-center justify-center group"
+                      className="p-2 text-primary hover:bg-primary/10 rounded-xl transition-all active:scale-90 flex items-center justify-center group"
                     >
                       <Printer className="w-5 h-5" />
                     </button>

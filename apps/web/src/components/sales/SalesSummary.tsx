@@ -25,20 +25,20 @@ const SummaryCard = ({
   iconBg, 
   iconColor 
 }: SummaryCardProps) => (
-  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
+  <div className="bg-card rounded-2xl p-6 shadow-sm border border-outline-variant flex flex-col justify-between transition-all hover:border-primary/20">
     <div className="flex justify-between items-start mb-4">
-      <div className={`w-12 h-12 rounded-xl ${iconBg} flex items-center justify-center`}>
+      <div className={`w-12 h-12 rounded-xl ${iconBg} flex items-center justify-center border border-outline-variant/10 shadow-inner`}>
         <Icon className={`w-6 h-6 ${iconColor}`} />
       </div>
-      <div className={`px-2 py-1 rounded-md text-xs font-bold ${
-        isNegative ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'
+      <div className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${
+        isNegative ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20' : 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
       }`}>
         {change}
       </div>
     </div>
     <div>
-      <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">{title}</p>
-      <h3 className="text-2xl font-black text-gray-900 leading-none">{value}</h3>
+      <p className="text-[10px] font-black text-on-surface-variant/60 uppercase tracking-[0.2em] mb-1">{title}</p>
+      <h3 className="text-2xl font-black text-foreground leading-none tracking-tighter">{value}</h3>
     </div>
   </div>
 );
