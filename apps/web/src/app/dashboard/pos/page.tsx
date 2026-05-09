@@ -29,8 +29,11 @@ interface CartItem {
   quantity: number;
 }
 
+import { LayoutGrid, ShoppingCart } from 'lucide-react';
+
 export default function PosPage() {
   const { settings } = useSettings();
+  const [activeTab, setActiveTab] = useState<'products' | 'cart'>('products');
   
   // Products & Global search state
   const [products, setProducts] = useState<Product[]>([]);
@@ -253,45 +256,73 @@ export default function PosPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
+    <div className="flex h-screen bg-background overflow-hidden font-sans transition-colors">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden relative">
+      <div className="flex-1 flex flex-col lg:ml-64 w-full lg:w-[calc(100%-256px)] overflow-hidden relative">
         <PosTopBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         
-        <main className="flex-1 flex overflow-hidden">
-          <PosProductGrid 
-            products={products} 
-            isLoading={isLoading} 
-            onAddToCart={handleAddToCart}
-            selectedCategoryId={selectedCategoryId}
-            setSelectedCategoryId={setSelectedCategoryId}
-            categories={categories}
-          />
+        <main className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+          {/* Mobile Tab View Logic */}
+          <div className={`flex-1 overflow-hidden ${activeTab === 'products' ? 'block' : 'hidden lg:block'}`}>
+            <PosProductGrid 
+              products={products} 
+              isLoading={isLoading} 
+              onAddToCart={handleAddToCart}
+              selectedCategoryId={selectedCategoryId}
+              setSelectedCategoryId={setSelectedCategoryId}
+              categories={categories}
+            />
+          </div>
           
-          <PosCartPanel 
-            cart={cart}
-            paymentMethod={paymentMethod}
-            setPaymentMethod={setPaymentMethod}
-            documentType={documentType}
-            setDocumentType={setDocumentType}
-            selectedCustomerId={selectedCustomerId}
-            setSelectedCustomerId={setSelectedCustomerId}
-            couponCode={couponCode}
-            setCouponCode={setCouponCode}
-            onApplyCoupon={handleApplyCoupon}
-            appliedDiscount={appliedDiscount}
-            subtotal={subtotal}
-            taxAmount={taxAmount}
-            finalTotal={finalTotal}
-            onClearCart={handleClearCart}
-            onUpdateQuantity={handleUpdateQuantity}
-            onRemoveItem={handleRemoveItem}
-            onCompleteSale={handleCompleteSale}
-            onGenerateQuotation={handleGenerateQuotation}
-            isProcessing={isProcessing}
-          />
+          <div className={`w-full lg:w-[420px] lg:flex-none shrink-0 ${activeTab === 'cart' ? 'flex flex-1' : 'hidden lg:flex'} flex-col h-full overflow-hidden`}>
+            <PosCartPanel 
+              cart={cart}
+              paymentMethod={paymentMethod}
+              setPaymentMethod={setPaymentMethod}
+              documentType={documentType}
+              setDocumentType={setDocumentType}
+              selectedCustomerId={selectedCustomerId}
+              setSelectedCustomerId={setSelectedCustomerId}
+              couponCode={couponCode}
+              setCouponCode={setCouponCode}
+              onApplyCoupon={handleApplyCoupon}
+              appliedDiscount={appliedDiscount}
+              subtotal={subtotal}
+              taxAmount={taxAmount}
+              finalTotal={finalTotal}
+              onClearCart={handleClearCart}
+              onUpdateQuantity={handleUpdateQuantity}
+              onRemoveItem={handleRemoveItem}
+              onCompleteSale={handleCompleteSale}
+              onGenerateQuotation={handleGenerateQuotation}
+              isProcessing={isProcessing}
+            />
+          </div>
         </main>
+
+        {/* Mobile Tab Bar */}
+        <div className="lg:hidden flex border-t border-outline-variant bg-white shrink-0 z-50">
+          <button 
+            onClick={() => setActiveTab('products')}
+            className={`flex-1 py-4 text-xs font-black uppercase tracking-widest flex flex-col items-center gap-1 ${activeTab === 'products' ? 'text-primary bg-primary/5' : 'text-on-surface-variant'}`}
+          >
+            <LayoutGrid className="w-5 h-5" />
+            Catálogo
+          </button>
+          <button 
+            onClick={() => setActiveTab('cart')}
+            className={`flex-1 py-4 text-xs font-black uppercase tracking-widest flex flex-col items-center gap-1 relative ${activeTab === 'cart' ? 'text-primary bg-primary/5' : 'text-on-surface-variant'}`}
+          >
+            <ShoppingCart className="w-5 h-5" />
+            {cart.length > 0 && (
+              <span className="absolute top-3 right-1/3 w-4 h-4 bg-rose-500 text-on-primary rounded-full text-[8px] flex items-center justify-center animate-pulse">
+                {cart.length}
+              </span>
+            )}
+            Carrito
+          </button>
+        </div>
       </div>
     </div>
   );
