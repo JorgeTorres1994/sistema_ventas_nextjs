@@ -103,12 +103,12 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen bg-gray-50 overflow-hidden">
+      <div className="flex h-screen bg-background overflow-hidden">
         <Sidebar />
-        <div className="flex-1 flex flex-col ml-64">
+        <div className="flex-1 flex flex-col lg:ml-64">
           <TopBar />
           <div className="flex-1 flex items-center justify-center">
-            <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
+            <Loader2 className="w-12 h-12 text-primary animate-spin" />
           </div>
         </div>
       </div>
@@ -124,64 +124,68 @@ export default function ProfilePage() {
     : null;
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
+    <div className="flex h-screen bg-background overflow-hidden font-sans transition-colors">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 overflow-hidden">
+      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden">
         <TopBar />
-        <main className="flex-1 overflow-y-auto p-8 bg-gray-50">
-          <div className="max-w-4xl mx-auto w-full">
-            <header className="mb-8">
-              <h1 className="text-3xl font-black text-gray-900 tracking-tight">Mi Perfil</h1>
-              <p className="text-gray-500 font-bold mt-1 uppercase text-xs tracking-widest leading-relaxed">Configuraciones de identidad y seguridad corporativa</p>
+        <main className="flex-1 overflow-y-auto p-4 lg:p-8 bg-background scrollbar-hide">
+          <div className="max-w-4xl mx-auto w-full pb-20">
+            <header className="mb-6 sm:mb-12">
+              <nav className="flex flex-wrap items-center gap-2 text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-2 sm:mb-3">
+                <span>Cuenta</span><span>/</span>
+                <span className="text-on-surface-variant">Seguridad</span>
+              </nav>
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tighter">Gestión de Identidad</h1>
+              <p className="text-on-surface-variant font-bold mt-1 sm:mt-2 uppercase text-[9px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.3em] opacity-40">Protocolos de seguridad y personalización Nexus</p>
             </header>
 
-            <form onSubmit={handleSave} className="space-y-8 pb-12">
-              <section className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-700 relative">
-                  <div className="absolute -bottom-16 left-8 flex items-end gap-6">
-                    <div className="relative group">
-                      <div className="w-32 h-32 rounded-3xl bg-white p-1.5 shadow-xl">
-                        <div className="w-full h-full rounded-2xl bg-gray-100 overflow-hidden flex items-center justify-center relative border border-gray-50">
-                          {displayAvatar ? (
-                            <img src={displayAvatar} alt="Avatar" className="w-full h-full object-cover" />
-                          ) : (
-                            <span className="text-4xl font-black text-gray-300 uppercase">{userInitial}</span>
-                          )}
-                          {uploading && (
-                            <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center">
-                              <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
-                            </div>
-                          )}
-                        </div>
+            <form onSubmit={handleSave} className="space-y-8 sm:space-y-12">
+              <section className="bg-card rounded-[32px] sm:rounded-[48px] shadow-sm border border-outline-variant overflow-hidden">
+                <div className="h-24 sm:h-40 bg-gradient-to-r from-primary to-indigo-900"></div>
+                
+                <div className="px-6 sm:px-12 -mt-16 sm:-mt-20 relative z-10 flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-8 text-center sm:text-left">
+                  <div className="relative group">
+                    <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-[32px] sm:rounded-[44px] bg-card p-1.5 sm:p-2 shadow-2xl ring-2 sm:ring-4 ring-background/10">
+                      <div className="w-full h-full rounded-[26px] sm:rounded-[36px] bg-surface-low overflow-hidden flex items-center justify-center relative border border-outline-variant/30">
+                        {displayAvatar ? (
+                          <img src={displayAvatar} alt="Avatar" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-4xl sm:text-5xl font-black text-on-surface-variant/20 uppercase">{userInitial}</span>
+                        )}
+                        {uploading && (
+                          <div className="absolute inset-0 bg-background/60 backdrop-blur-md flex items-center justify-center">
+                            <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 text-primary animate-spin" />
+                          </div>
+                        )}
                       </div>
-                      <label className={`absolute bottom-2 -right-2 w-10 h-10 bg-white rounded-xl shadow-lg border border-gray-100 flex items-center justify-center transition-all group-hover:scale-110 active:scale-95 ${!isAdmin ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-gray-50'}`}>
-                        <Camera className="w-5 h-5 text-blue-600" />
-                        <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} disabled={!isAdmin} />
-                      </label>
                     </div>
-                    <div className="mb-2">
-                      <h2 className="text-2xl font-black text-gray-900">{user?.name}</h2>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="px-2 py-0.5 bg-blue-50 rounded-md text-[10px] font-black text-blue-600 uppercase tracking-wider border border-blue-100">
-                          {String(user?.role?.name || user?.role || 'Usuario')}
-                        </span>
-                        <span className="text-gray-400 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
-                          <ShieldCheck className="w-3.5 h-3.5 text-blue-500" /> Cuenta Verificada
-                        </span>
-                      </div>
+                    <label className={`absolute bottom-1 right-1 sm:bottom-3 sm:-right-3 w-10 h-10 sm:w-12 sm:h-12 bg-card rounded-[16px] sm:rounded-[20px] shadow-xl border border-outline-variant flex items-center justify-center transition-all group-hover:scale-110 group-hover:rotate-6 active:scale-95 ${!isAdmin ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-surface-low hover:text-primary'}`}>
+                      <Camera className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                      <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} disabled={!isAdmin} />
+                    </label>
+                  </div>
+                  <div className="pb-2 sm:pb-4">
+                    <h2 className="text-2xl sm:text-3xl font-black text-foreground tracking-tighter mb-1.5 sm:mb-2">{user?.name}</h2>
+                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3">
+                      <span className="px-3 py-1 bg-primary/10 rounded-xl text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-[0.2em] border border-primary/20">
+                        {String(user?.role?.name || user?.role || 'Usuario')}
+                      </span>
+                      <span className="text-on-surface-variant/40 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] flex items-center gap-1 sm:gap-2">
+                        <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" /> Identidad Verificada
+                      </span>
                     </div>
                   </div>
                 </div>
-
-                <div className="pt-24 p-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    <div className="space-y-8">
-                      <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                        <User className="w-4 h-4 text-blue-600" /> Información de Cuenta
+                
+                <div className="p-6 sm:p-8 lg:p-12 pt-10 sm:pt-16">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 lg:gap-20">
+                    <div className="space-y-6 sm:space-y-10">
+                      <h3 className="text-[9px] sm:text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] sm:tracking-[0.4em] flex items-center gap-2 sm:gap-3">
+                        <User className="w-4 h-4 sm:w-5 sm:h-5 text-primary" /> Credenciales de Operador
                       </h3>
-                      <div className="space-y-6">
-                        <div>
-                          <label className="block text-[11px] font-black text-gray-400 uppercase tracking-wider mb-2.5 ml-1">Nombre Completo</label>
+                      <div className="space-y-5 sm:space-y-8">
+                        <div className="space-y-2 sm:space-y-3">
+                          <label className="block text-[9px] sm:text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] ml-2">Nombre de Usuario</label>
                           <div className="relative">
                             <input
                               type="text"
@@ -189,56 +193,56 @@ export default function ProfilePage() {
                               value={formData.name}
                               onChange={handleInputChange}
                               disabled={!isAdmin}
-                              className={`w-full px-5 py-4 border border-transparent rounded-[20px] focus:outline-none transition-all font-bold text-gray-700 shadow-sm ${!isAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-gray-50 focus:bg-white focus:border-blue-500'}`}
-                              placeholder="Ingrese su nombre"
+                              className={`w-full px-5 sm:px-8 py-3.5 sm:py-5 border border-transparent rounded-[16px] sm:rounded-[24px] focus:outline-none transition-all font-black text-foreground shadow-inner text-sm ${!isAdmin ? 'bg-surface-low cursor-not-allowed opacity-40' : 'bg-surface-low focus:bg-card focus:border-primary/30'}`}
+                              placeholder="Su nombre de acceso"
                             />
                           </div>
                         </div>
-                        <div>
-                          <label className="block text-[11px] font-black text-gray-400 uppercase tracking-wider mb-2.5 ml-1">Email Institucional</label>
+                        <div className="space-y-2 sm:space-y-3">
+                          <label className="block text-[9px] sm:text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] ml-2">Correo Electrónico Principal</label>
                           <div className="relative">
                             <input
                               type="email"
                               value={formData.email}
                               disabled
-                              className="w-full pl-5 pr-12 py-4 bg-gray-100 border border-transparent rounded-[20px] font-bold text-gray-400 cursor-not-allowed outline-none"
+                              className="w-full pl-5 sm:pl-8 pr-12 sm:pr-16 py-3.5 sm:py-5 bg-surface-low border border-transparent rounded-[16px] sm:rounded-[24px] font-black text-on-surface-variant/40 cursor-not-allowed outline-none shadow-inner text-sm"
                             />
-                            <Lock className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                            <Lock className="absolute right-5 sm:right-8 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-on-surface-variant/20" />
                           </div>
-                          <p className="text-[10px] text-gray-400 mt-3 ml-2 font-medium flex items-center gap-1.5">
-                            <AlertCircle className="w-3 h-3" /> El email se mantiene vinculado a la cuenta raíz.
+                          <p className="text-[8px] sm:text-[9px] text-on-surface-variant/40 mt-3 sm:mt-4 ml-2 sm:ml-3 font-black uppercase tracking-widest flex items-center gap-1.5 sm:gap-2">
+                            <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" /> El correo está bloqueado por el administrador del sistema.
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="space-y-8">
-                      <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                        <Lock className="w-4 h-4 text-indigo-600" /> Autenticación
+                    <div className="space-y-6 sm:space-y-10">
+                      <h3 className="text-[9px] sm:text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] sm:tracking-[0.4em] flex items-center gap-2 sm:gap-3">
+                        <Lock className="w-4 h-4 sm:w-5 h-5 text-indigo-500" /> Seguridad y Cifrado
                       </h3>
-                      <div className="space-y-6">
-                        <div>
-                          <label className="block text-[11px] font-black text-gray-400 uppercase tracking-wider mb-2.5 ml-1">Nueva Contraseña</label>
+                      <div className="space-y-5 sm:space-y-8">
+                        <div className="space-y-2 sm:space-y-3">
+                          <label className="block text-[9px] sm:text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] ml-2">Nueva Frase de Acceso</label>
                           <input
                             type="password"
                             name="password"
-                            placeholder="••••••••"
+                            placeholder="••••••••••••"
                             value={formData.password}
                             onChange={handleInputChange}
                             disabled={!isAdmin}
-                            className={`w-full px-5 py-4 border border-transparent rounded-[20px] focus:outline-none transition-all font-bold text-gray-700 shadow-sm ${!isAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-gray-50 focus:bg-white focus:border-blue-500'}`}
+                            className={`w-full px-5 sm:px-8 py-3.5 sm:py-5 border border-transparent rounded-[16px] sm:rounded-[24px] focus:outline-none transition-all font-black text-foreground shadow-inner text-sm ${!isAdmin ? 'bg-surface-low cursor-not-allowed opacity-40' : 'bg-surface-low focus:bg-card focus:border-primary/30'}`}
                           />
                         </div>
-                        <div>
-                          <label className="block text-[11px] font-black text-gray-400 uppercase tracking-wider mb-2.5 ml-1">Confirmar Contraseña</label>
+                        <div className="space-y-2 sm:space-y-3">
+                          <label className="block text-[9px] sm:text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] ml-2">Confirmación de Frase</label>
                           <input
                             type="password"
                             name="confirmPassword"
-                            placeholder="••••••••"
+                            placeholder="••••••••••••"
                             value={formData.confirmPassword}
                             onChange={handleInputChange}
                             disabled={!isAdmin}
-                            className={`w-full px-5 py-4 border border-transparent rounded-[20px] focus:outline-none transition-all font-bold text-gray-700 shadow-sm ${!isAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-gray-50 focus:bg-white focus:border-blue-500'}`}
+                            className={`w-full px-5 sm:px-8 py-3.5 sm:py-5 border border-transparent rounded-[16px] sm:rounded-[24px] focus:outline-none transition-all font-black text-foreground shadow-inner text-sm ${!isAdmin ? 'bg-surface-low cursor-not-allowed opacity-40' : 'bg-surface-low focus:bg-card focus:border-primary/30'}`}
                           />
                         </div>
                       </div>
@@ -246,21 +250,21 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <div className="bg-gray-50/50 p-8 px-10 border-t border-gray-100 flex items-center justify-between">
+                <div className="bg-surface-low/30 p-6 sm:p-8 lg:p-12 border-t border-outline-variant/30 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0">
                   <button
                     type="button"
                     onClick={() => window.location.reload()}
-                    className="px-6 py-3 text-gray-400 font-black text-[10px] uppercase tracking-[0.2em] hover:text-rose-600 transition-all flex items-center gap-2"
+                    className="w-full sm:w-auto justify-center px-6 sm:px-8 py-3.5 sm:py-4 text-on-surface-variant/40 font-black text-[10px] sm:text-[11px] uppercase tracking-[0.2em] hover:text-rose-500 transition-all flex items-center gap-2 sm:gap-3 active:scale-95"
                   >
-                    <RefreshCw className="w-4 h-4" /> Descartar
+                    <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" /> Descartar
                   </button>
                   <button
                     type="submit"
                     disabled={saving || !isAdmin}
-                    className={`px-12 py-4 text-white font-black text-xs uppercase tracking-[0.2em] rounded-[22px] shadow-xl transition-all flex items-center gap-3 ${(!isAdmin || saving) ? 'bg-gray-400 cursor-not-allowed shadow-none' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-100 active:scale-95'}`}
+                    className={`w-full sm:w-auto justify-center px-8 sm:px-14 py-3.5 sm:py-5 text-on-primary font-black text-[10px] sm:text-[11px] uppercase tracking-[0.2em] sm:tracking-[0.3em] rounded-[16px] sm:rounded-[24px] shadow-2xl transition-all flex items-center gap-3 sm:gap-4 active:scale-95 shrink-0 ${(!isAdmin || saving) ? 'bg-on-surface-variant/20 cursor-not-allowed shadow-none' : 'bg-primary hover:opacity-90 shadow-primary/30'}`}
                   >
-                    {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : (!isAdmin ? <Lock className="w-5 h-5" /> : <Save className="w-5 h-5" />)}
-                    {isAdmin ? 'Actualizar Perfil' : 'Solo Lectura'}
+                    {saving ? <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin shrink-0" /> : (!isAdmin ? <Lock className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" /> : <Save className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />)}
+                    {isAdmin ? 'Sincronizar Identidad' : 'Acceso Restringido'}
                   </button>
                 </div>
             </section>
@@ -271,3 +275,4 @@ export default function ProfilePage() {
     </div>
   );
 }
+

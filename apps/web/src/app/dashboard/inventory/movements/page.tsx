@@ -3,24 +3,30 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
+import TopBar from '@/components/layout/TopBar';
 import {
   ArrowLeft, Download, Plus, ChevronLeft, ChevronRight,
   Package, TrendingUp, TrendingDown, BarChart3, Calendar, Filter,
-  ArrowDownCircle, ArrowUpCircle
+  ArrowDownCircle, ArrowUpCircle, Activity
 } from 'lucide-react';
 import { getInventoryMovements } from '@/lib/api';
+import { toast } from 'sonner';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 // ── Type Badge ────────────────────────────────────────────────────────────────
 function TypeBadge({ type }: { type: string }) {
   if (type === 'IN')
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-50 text-emerald-700 border border-emerald-100 uppercase tracking-widest">
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> ENTRADA
+      <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 uppercase tracking-widest">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> ENTRADA
       </span>
     );
   return (
-    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-rose-50 text-rose-700 border border-rose-100 uppercase tracking-widest">
-      <span className="w-1.5 h-1.5 rounded-full bg-rose-500" /> SALIDA
+    <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[10px] font-black bg-rose-500/10 text-rose-500 border border-rose-500/20 uppercase tracking-widest">
+      <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" /> SALIDA
     </span>
   );
 }
@@ -28,16 +34,16 @@ function TypeBadge({ type }: { type: string }) {
 // ── Reason Badge ──────────────────────────────────────────────────────────────
 function ReasonBadge({ reason }: { reason: string }) {
   const map: Record<string, { label: string; color: string }> = {
-    SALE:            { label: 'Venta a Cliente',     color: 'bg-blue-50 text-blue-600 border-blue-100' },
-    PURCHASE:        { label: 'Orden de Compra',    color: 'bg-indigo-50 text-indigo-600 border-indigo-100' },
-    ADJUSTMENT:      { label: 'Ajuste Stock',  color: 'bg-amber-50 text-amber-600 border-amber-100' },
-    SALE_CANCELLED:  { label: 'Venta Anulada',    color: 'bg-gray-50 text-gray-500 border-gray-100' },
-    RETURN:          { label: 'Devolución',   color: 'bg-teal-50 text-teal-600 border-teal-100' },
-    DAMAGE:          { label: 'Daño / Desmedro',  color: 'bg-rose-50 text-rose-600 border-rose-100' },
+    SALE:            { label: 'Venta a Cliente',     color: 'bg-primary/10 text-primary border-primary/20' },
+    PURCHASE:        { label: 'Orden de Compra',    color: 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20' },
+    ADJUSTMENT:      { label: 'Ajuste Stock',  color: 'bg-amber-500/10 text-amber-500 border-amber-500/20' },
+    SALE_CANCELLED:  { label: 'Venta Anulada',    color: 'bg-surface-low text-on-surface-variant border-outline-variant/30' },
+    RETURN:          { label: 'Devolución',   color: 'bg-teal-500/10 text-teal-500 border-teal-500/20' },
+    DAMAGE:          { label: 'Daño / Desmedro',  color: 'bg-rose-500/10 text-rose-500 border-rose-500/20' },
   };
-  const cfg = map[reason] ?? { label: reason, color: 'bg-gray-50 text-gray-500 border-gray-100' };
+  const cfg = map[reason] ?? { label: reason, color: 'bg-surface-low text-on-surface-variant border-outline-variant/30' };
   return (
-    <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black border uppercase tracking-widest ${cfg.color}`}>
+    <span className={`px-2.5 py-1.5 rounded-xl text-[9px] font-black border uppercase tracking-widest ${cfg.color}`}>
       {cfg.label}
     </span>
   );
@@ -82,286 +88,454 @@ export default function MovementHistoryPage() {
   const formatTime = (iso: string) =>
     new Date(iso).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: false });
 
-  return (
-    <div className="flex h-screen bg-[#F8F9FC] overflow-hidden font-sans text-slate-900">
-      <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-y-auto">
+  const handleExportPDF = async () => {
+    if (movements.length === 0) {
+      toast.error('No hay movimientos para exportar');
+      return;
+    }
 
-        {/* Header */}
-        <header className="px-10 py-8 bg-white/50 backdrop-blur-md border-b border-gray-100 flex items-start justify-between sticky top-0 z-20">
+    const toastId = toast.loading('Procesando imágenes y generando PDF...');
+
+    try {
+      const doc = new jsPDF('l', 'mm', 'a4');
+      
+      // Helper to convert image URL to base64
+      const getBase64Image = (url: string): Promise<string | null> => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.setAttribute('crossOrigin', 'anonymous');
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return resolve(null);
+            ctx.drawImage(img, 0, 0);
+            resolve(canvas.toDataURL('image/jpeg', 0.8));
+          };
+          img.onerror = () => resolve(null);
+          img.src = url;
+        });
+      };
+
+      // Pre-load images
+      const imagePromises = movements.map(async (mv) => {
+        if (mv.product?.imageUrl) {
+          return { id: mv.id, base64: await getBase64Image(mv.product.imageUrl) };
+        }
+        return { id: mv.id, base64: null };
+      });
+
+      const images = await Promise.all(imagePromises);
+      const imageMap = new Map(images.map(img => [img.id, img.base64]));
+      
+      // Header
+      doc.setFontSize(22);
+      doc.setTextColor(40, 40, 40);
+      doc.text('Historial de Movimientos de Stock', 14, 20);
+      
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Generado el: ${format(new Date(), "d 'de' MMMM, yyyy HH:mm", { locale: es })}`, 14, 28);
+      
+      const tableData = movements.map(mv => [
+        '', // Space for image
+        `${format(new Date(mv.createdAt), 'dd/MM/yyyy')} ${formatTime(mv.createdAt)}`,
+        mv.product?.name ?? '—',
+        mv.type === 'IN' ? 'ENTRADA' : 'SALIDA',
+        mv.reason ?? 'AJUSTE',
+        `${mv.type === 'IN' ? '+' : '-'}${mv.quantity}`,
+        mv.referenceId?.substring(0,10).toUpperCase() ?? 'MANUAL'
+      ]);
+
+      autoTable(doc, {
+        startY: 35,
+        head: [['Foto', 'Fecha/Hora', 'Producto', 'Tipo', 'Motivo', 'Cantidad', 'Referencia']],
+        body: tableData,
+        theme: 'grid',
+        headStyles: { 
+          fillColor: [37, 99, 235], 
+          textColor: 255, 
+          fontSize: 9, 
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        styles: { 
+          fontSize: 8, 
+          cellPadding: 4,
+          valign: 'middle'
+        },
+        columnStyles: {
+          0: { cellWidth: 20, halign: 'center' },
+          5: { halign: 'center', fontStyle: 'bold' },
+          6: { halign: 'right' }
+        },
+        didDrawCell: (data) => {
+          if (data.section === 'body' && data.column.index === 0) {
+            const mvId = movements[data.row.index].id;
+            const base64 = imageMap.get(mvId);
+            if (base64) {
+              const x = data.cell.x + 2;
+              const y = data.cell.y + 2;
+              doc.addImage(base64, 'JPEG', x, y, 16, 16);
+            }
+          }
+        },
+        bodyStyles: {
+          minCellHeight: 20
+        }
+      });
+
+      // Preview in new tab
+      const blobUrl = doc.output('bloburl');
+      window.open(blobUrl, '_blank');
+      
+      toast.success('Previsualización generada', { id: toastId });
+    } catch (error) {
+      console.error(error);
+      toast.error('Error al generar el PDF', { id: toastId });
+    }
+  };
+
+  return (
+    <div className="flex h-screen bg-background overflow-hidden font-sans text-foreground transition-colors">
+      <Sidebar />
+      <div className="flex-1 flex flex-col lg:ml-64 w-full overflow-hidden">
+        <TopBar />
+
+        {/* Optimized Header for all screens */}
+        <header className="px-6 py-6 lg:px-10 lg:py-10 bg-card border-b border-outline-variant/30 flex flex-col lg:flex-row lg:items-center justify-between gap-6 shrink-0">
           <div>
-            <nav className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">
-              <button onClick={() => router.push('/dashboard/inventory')} className="flex items-center gap-1 hover:text-indigo-600 transition-colors">
-                <ArrowLeft className="w-3 h-3" /> Inventario
+            <nav className="flex items-center gap-2 text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] mb-3 opacity-60">
+              <button onClick={() => router.push('/dashboard/inventory')} className="flex items-center gap-1.5 hover:text-primary transition-colors">
+                <ArrowLeft className="w-3.5 h-3.5" /> INVENTARIO
               </button>
-              <span className="opacity-30">/</span>
-              <span className="text-indigo-600">Historial de Movimientos</span>
+              <span className="text-primary font-black">/ HISTORIAL</span>
             </nav>
-            <h1 className="text-4xl font-black text-gray-900 tracking-tight leading-none">Movimientos de Stock</h1>
+            <h1 className="text-3xl lg:text-5xl font-black text-foreground tracking-tighter leading-none">Movimientos</h1>
           </div>
+
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-6 py-3.5 bg-white border border-gray-200 rounded-2xl text-sm font-black text-gray-600 hover:bg-gray-50 transition-colors shadow-sm">
-              <Download className="w-4 h-4" /> Exportar Datos
-            </button>
-            <button
+             <button 
+              onClick={handleExportPDF}
+              className="p-4 bg-surface-low border border-outline-variant/30 rounded-2xl text-on-surface-variant hover:text-primary hover:border-primary transition-all active:scale-95 shadow-sm">
+                <Download className="w-5 h-5" />
+             </button>
+             <button 
               onClick={() => router.push('/dashboard/inventory')}
-              className="flex items-center gap-2 px-6 py-3.5 bg-indigo-600 rounded-2xl text-sm font-black text-white hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all">
-              <Plus className="w-4 h-4" /> Ajuste Manual
+              className="flex-1 lg:flex-none flex items-center justify-center gap-3 px-8 py-4.5 bg-primary rounded-[22px] text-[11px] font-black uppercase tracking-widest text-on-primary hover:opacity-90 shadow-xl shadow-primary/20 transition-all active:scale-95">
+              <Plus className="w-5 h-5" /> 
+              <span>Ajuste Manual</span>
             </button>
           </div>
         </header>
 
-        <main className="flex-1 p-10 space-y-10">
+        <main className="flex-1 p-4 lg:p-10 space-y-8 lg:space-y-12 overflow-y-auto scroll-smooth pb-20">
 
-          {/* Filters */}
-          <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 p-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Premium Filter Bar - Responsive Layout */}
+          <div className="bg-card rounded-[40px] shadow-sm border border-outline-variant/30 p-6 lg:p-10">
+            <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-8">
               
-              {/* Date Range */}
-              <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-1.5">
-                  <Calendar className="w-3 h-3" /> Rango de Fechas
+              {/* Date Range Group */}
+              <div className="space-y-4 flex-1">
+                <label className="text-[10px] font-black text-on-surface-variant/40 uppercase tracking-[0.3em] ml-1 flex items-center gap-2 h-5">
+                  <Calendar className="w-3.5 h-3.5" /> RANGO DE FECHAS
                 </label>
-                <div className="flex items-center gap-3">
-                  <input type="date" value={startDate} onChange={e => { setStartDate(e.target.value); setPage(1); }}
-                    className="flex-1 px-4 py-3 bg-gray-50 rounded-xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-100 border-none appearance-none" />
-                  <span className="text-gray-300 font-black">→</span>
-                  <input type="date" value={endDate} onChange={e => { setEndDate(e.target.value); setPage(1); }}
-                    className="flex-1 px-4 py-3 bg-gray-50 rounded-xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-100 border-none appearance-none" />
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="relative group">
+                    <input 
+                      type="date" 
+                      value={startDate} 
+                      onChange={e => { setStartDate(e.target.value); setPage(1); }}
+                      className="w-full h-[54px] pl-5 pr-4 bg-surface-low border-2 border-outline-variant/20 rounded-[20px] text-[11px] font-black text-foreground focus:border-primary transition-all outline-none shadow-sm" 
+                    />
+                  </div>
+                  <div className="relative group">
+                    <input 
+                      type="date" 
+                      value={endDate} 
+                      onChange={e => { setEndDate(e.target.value); setPage(1); }}
+                      className="w-full h-[54px] pl-5 pr-4 bg-surface-low border-2 border-outline-variant/20 rounded-[20px] text-[11px] font-black text-foreground focus:border-primary transition-all outline-none shadow-sm" 
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Movement Type */}
-              <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-1.5">
-                  <Filter className="w-3 h-3" /> Tipo de Movimiento
-                </label>
-                <select value={type} onChange={e => { setType(e.target.value); setPage(1); }}
-                  className="w-full px-5 py-3.5 bg-gray-50 rounded-xl text-sm font-black text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-100 border-none cursor-pointer">
-                  <option value="">Todos los Tipos</option>
-                  <option value="IN">ENTRADAS — Ingreso de Stock</option>
-                  <option value="OUT">SALIDAS — Salida de Stock</option>
-                </select>
-              </div>
-
-              {/* Reason */}
-              <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-1.5">
-                  <Filter className="w-3 h-3" /> Motivo del Ajuste
-                </label>
-                <select value={reason} onChange={e => { setReason(e.target.value); setPage(1); }}
-                  className="w-full px-5 py-3.5 bg-gray-50 rounded-xl text-sm font-black text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-100 border-none cursor-pointer">
-                  <option value="">Todos los Motivos</option>
-                  <option value="SALE">Venta a Cliente</option>
-                  <option value="PURCHASE">Orden de Compra</option>
-                  <option value="ADJUSTMENT">Ajuste Manual</option>
-                  <option value="SALE_CANCELLED">Venta Anulada</option>
-                  <option value="RETURN">Devolución</option>
-                  <option value="DAMAGE">Daño / Desmedro</option>
-                </select>
-              </div>
-            </div>
-
-            {(type || reason || startDate || endDate) && (
-              <div className="mt-6 pt-6 border-t border-gray-50 flex items-center gap-3">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Filtros Activos:</span>
-                <div className="flex flex-wrap gap-2">
-                  {type && <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black">{type}</span>}
-                  {reason && <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-tight">{reason}</span>}
-                  {startDate && <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black">Desde {startDate}</span>}
-                  {endDate && <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black">Hasta {endDate}</span>}
+              {/* Selectors Group */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6 flex-[1.5]">
+                <div className="space-y-4">
+                  <label className="text-[10px] font-black text-on-surface-variant/40 uppercase tracking-[0.3em] ml-1 h-5 flex items-center gap-2">
+                    <Filter className="w-3.5 h-3.5" /> NATURALEZA
+                  </label>
+                  <div className="relative group">
+                    <select 
+                      value={type} 
+                      onChange={e => { setType(e.target.value); setPage(1); }}
+                      className="w-full h-[54px] pl-6 pr-10 bg-surface-low border-2 border-outline-variant/20 rounded-[20px] text-[11px] font-black uppercase tracking-widest text-foreground focus:border-primary transition-all outline-none shadow-sm appearance-none cursor-pointer"
+                    >
+                      <option value="">TODOS LOS FLUJOS</option>
+                      <option value="IN">ENTRADAS</option>
+                      <option value="OUT">SALIDAS</option>
+                    </select>
+                    <ChevronRight className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none opacity-20 rotate-90 w-4 h-4" />
+                  </div>
                 </div>
-                <button onClick={() => { setType(''); setReason(''); setStartDate(''); setEndDate(''); setPage(1); }}
-                  className="ml-auto text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline transition-all">
-                  Limpiar Todo
+
+                <div className="space-y-4">
+                  <label className="text-[10px] font-black text-on-surface-variant/40 uppercase tracking-[0.3em] ml-1 h-5 flex items-center gap-2">
+                    <Activity className="w-3.5 h-3.5" /> JUSTIFICACIÓN
+                  </label>
+                  <div className="relative group">
+                    <select 
+                      value={reason} 
+                      onChange={e => { setReason(e.target.value); setPage(1); }}
+                      className="w-full h-[54px] pl-6 pr-10 bg-surface-low border-2 border-outline-variant/20 rounded-[20px] text-[11px] font-black uppercase tracking-widest text-foreground focus:border-primary transition-all outline-none shadow-sm appearance-none cursor-pointer"
+                    >
+                      <option value="">TODAS LAS RAZONES</option>
+                      <option value="SALE">VENTA A CLIENTE</option>
+                      <option value="PURCHASE">ORDEN DE COMPRA</option>
+                      <option value="ADJUSTMENT">AJUSTE MANUAL</option>
+                      <option value="SALE_CANCELLED">VENTA ANULADA</option>
+                      <option value="RETURN">DEVOLUCIÓN</option>
+                      <option value="DAMAGE">DAÑO / DESMEDRO</option>
+                    </select>
+                    <ChevronRight className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none opacity-20 rotate-90 w-4 h-4" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Reset Action */}
+              <div className="pt-4 lg:pt-0">
+                <button 
+                  onClick={() => { setType(''); setReason(''); setStartDate(''); setEndDate(''); setPage(1); }}
+                  className="w-full lg:w-auto h-[54px] px-8 bg-surface-low border-2 border-outline-variant/20 rounded-[20px] text-[10px] font-black text-on-surface-variant hover:text-rose-500 hover:border-rose-500/20 transition-all uppercase tracking-widest active:scale-95"
+                >
+                  Limpiar Filtros
                 </button>
               </div>
-            )}
+            </div>
           </div>
 
-          {/* Movement Table */}
-          <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
+          {/* Movements Data Container */}
+          <div className="bg-card rounded-[40px] shadow-sm border border-outline-variant/30 overflow-hidden">
             
-            <div className="px-8 py-4 bg-gray-50/50 border-b border-gray-50 flex items-center justify-between">
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                Mostrando {total === 0 ? 0 : (page - 1) * LIMIT + 1}–{Math.min(page * LIMIT, total)} de {total} movimientos
+            <div className="px-6 py-6 lg:px-10 lg:py-8 bg-surface-low/30 border-b border-outline-variant/10 flex items-center justify-between">
+              <p className="text-sm font-bold text-on-surface-variant/60 tracking-tight">
+                Mostrando <span className="text-foreground">{(page - 1) * LIMIT + 1}–{Math.min(page * LIMIT, total)}</span> de <span className="text-foreground">{total}</span> movimientos
               </p>
+              <div className="hidden sm:flex items-center gap-2.5">
+                 <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                 <span className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest opacity-60">Sincronizado</span>
+              </div>
             </div>
 
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-gray-50/20 border-b border-gray-100">
-                  <th className="px-10 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Fecha y Hora</th>
-                  <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Producto</th>
-                  <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Tipo</th>
-                  <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Motivo</th>
-                  <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Cantidad</th>
-                  <th className="px-10 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Referencia</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {loading ? (
-                  Array.from({ length: 6 }).map((_, i) => (
-                    <tr key={i}>
-                      {Array.from({ length: 6 }).map((_, j) => (
-                        <td key={j} className="px-8 py-6">
-                          <div className="h-4 bg-gray-100 rounded-full animate-pulse" />
-                        </td>
-                      ))}
-                    </tr>
-                  ))
-                ) : movements.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="py-24 text-center">
-                      <BarChart3 className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                      <p className="font-black text-gray-400 uppercase tracking-widest text-sm">No se encontraron movimientos</p>
-                      <p className="text-sm font-medium text-gray-300 mt-1">Intente ajustar sus criterios de búsqueda</p>
-                    </td>
-                  </tr>
-                ) : (
-                  movements.map(mv => (
-                    <tr key={mv.id} className="hover:bg-gray-50/50 transition-colors group">
-                      {/* Date */}
-                      <td className="px-10 py-6">
-                        <p className="text-sm font-black text-gray-900 leading-tight">{formatDate(mv.createdAt)}</p>
-                        <p className="text-[11px] text-gray-400 font-mono mt-0.5">{formatTime(mv.createdAt)}</p>
-                      </td>
-                      {/* Product */}
-                      <td className="px-6 py-6">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-xl bg-gray-50 flex-shrink-0 flex items-center justify-center overflow-hidden border border-gray-100">
-                            {mv.product?.imageUrl ? (
-                              <img src={mv.product.imageUrl} alt={mv.product.name} className="w-full h-full object-cover" />
-                            ) : (
-                              <Package className="w-5 h-5 text-gray-300" />
-                            )}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-sm font-black text-gray-900 truncate max-w-[200px] leading-tight">{mv.product?.name ?? '—'}</p>
-                            {mv.product?.category && (
-                              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">{mv.product.category.name}</p>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                      {/* Type */}
-                      <td className="px-6 py-6"><TypeBadge type={mv.type} /></td>
-                      {/* Reason */}
-                      <td className="px-6 py-6"><ReasonBadge reason={mv.reason ?? 'ADJUSTMENT'} /></td>
-                      {/* Quantity */}
-                      <td className="px-6 py-6">
-                        <div className="flex items-baseline gap-1">
-                          <span className={`text-xl font-black ${mv.type === 'IN' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                            {mv.type === 'IN' ? '+' : '-'}{mv.quantity}
-                          </span>
-                          <span className="text-[10px] text-gray-400 font-black uppercase">unid.</span>
-                        </div>
-                      </td>
-                      {/* Reference */}
-                      <td className="px-10 py-6">
-                        <span className="text-[10px] font-black text-gray-400 font-mono bg-gray-50 px-2 py-1 rounded-lg">
-                          REF-{mv.referenceId?.substring(0,8).toUpperCase() ?? 'MANUAL'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+            {/* MOBILE CARD VIEW (Visible only on small screens) */}
+            <div className="md:hidden divide-y divide-outline-variant/10">
+              {loading ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="p-6 space-y-4 animate-pulse">
+                    <div className="flex justify-between"><div className="h-4 bg-surface-low rounded w-1/3" /><div className="h-4 bg-surface-low rounded w-1/4" /></div>
+                    <div className="h-12 bg-surface-low rounded-2xl w-full" />
+                  </div>
+                ))
+              ) : movements.map(mv => (
+                <div key={mv.id} className="p-6 space-y-5 hover:bg-primary/[0.02] transition-colors">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-xs font-black text-foreground">{formatDate(mv.createdAt)}</p>
+                      <p className="text-[10px] font-medium text-on-surface-variant opacity-40 uppercase tracking-widest">{formatTime(mv.createdAt)}</p>
+                    </div>
+                    <TypeBadge type={mv.type} />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-surface-low border border-outline-variant/30 flex items-center justify-center overflow-hidden">
+                      {mv.product?.imageUrl ? <img src={mv.product.imageUrl} className="w-full h-full object-cover" /> : <Package className="w-5 h-5 opacity-20" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-black text-foreground truncate">{mv.product?.name ?? '—'}</p>
+                      <div className="mt-1"><ReasonBadge reason={mv.reason ?? 'ADJUSTMENT'} /></div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between pt-2">
+                    <div className="flex items-baseline gap-1.5">
+                      <span className={`text-2xl font-black ${mv.type === 'IN' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                        {mv.type === 'IN' ? '+' : '-'}{mv.quantity}
+                      </span>
+                      <span className="text-[10px] font-black opacity-20 uppercase tracking-widest">unid</span>
+                    </div>
+                    <span className="text-[9px] font-black text-on-surface-variant/40 uppercase tracking-widest border border-outline-variant/30 px-3 py-1.5 rounded-lg bg-surface-low">
+                      #{mv.referenceId?.substring(0,6).toUpperCase() ?? 'MANUAL'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-            {/* Pagination */}
-            <div className="px-10 py-5 bg-white border-t border-gray-100 flex items-center justify-between">
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Página {page} de {totalPages}</p>
-              <div className="flex items-center gap-2">
+            {/* DESKTOP TABLE VIEW (Hidden on mobile) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left">
+                  <thead>
+                    <tr className="bg-surface-low/10">
+                      <th className="px-10 py-7 text-[10px] font-black text-on-surface-variant uppercase tracking-[0.25em] border-b border-outline-variant/30">Registro Temporal</th>
+                      <th className="px-6 py-7 text-[10px] font-black text-on-surface-variant uppercase tracking-[0.25em] border-b border-outline-variant/30">Producto / SKU</th>
+                      <th className="px-6 py-7 text-[10px] font-black text-on-surface-variant uppercase tracking-[0.25em] border-b border-outline-variant/30 text-center">Naturaleza</th>
+                      <th className="px-6 py-7 text-[10px] font-black text-on-surface-variant uppercase tracking-[0.25em] border-b border-outline-variant/30">Justificación</th>
+                      <th className="px-6 py-7 text-[10px] font-black text-on-surface-variant uppercase tracking-[0.25em] border-b border-outline-variant/30">Magnitud</th>
+                      <th className="px-10 py-7 text-right text-[10px] font-black text-on-surface-variant uppercase tracking-[0.25em] border-b border-outline-variant/30">Referencia</th>
+                    </tr>
+                  </thead>
+                <tbody className="divide-y divide-outline-variant/10">
+                  {loading ? (
+                    Array.from({ length: 6 }).map((_, i) => (
+                      <tr key={i}><td colSpan={6} className="px-10 py-10"><div className="h-10 bg-surface-low rounded-2xl animate-pulse" /></td></tr>
+                    ))
+                  ) : movements.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-32 text-center">
+                        <BarChart3 className="w-16 h-16 text-on-surface-variant/10 mx-auto mb-6" />
+                        <p className="font-black text-on-surface-variant/40 uppercase tracking-widest text-xs">Sin registros que mostrar</p>
+                      </td>
+                    </tr>
+                  ) : (
+                    movements.map(mv => (
+                      <tr key={mv.id} className="hover:bg-primary/[0.02] transition-all group">
+                        <td className="px-10 py-8">
+                          <p className="text-[14px] font-black text-foreground leading-none mb-1.5">{formatDate(mv.createdAt)}</p>
+                          <p className="text-[10px] text-on-surface-variant font-black uppercase tracking-widest opacity-40">{formatTime(mv.createdAt)}</p>
+                        </td>
+                        <td className="px-6 py-8">
+                          <div className="flex items-center gap-5">
+                            <div className="w-14 h-14 rounded-[20px] bg-card border border-outline-variant/30 flex-shrink-0 flex items-center justify-center overflow-hidden group-hover:border-primary/30 transition-colors shadow-sm">
+                              {mv.product?.imageUrl ? <img src={mv.product.imageUrl} className="w-full h-full object-cover" /> : <Package className="w-6 h-6 text-on-surface-variant/20" />}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[14px] font-black text-foreground truncate max-w-[220px] leading-tight mb-1">{mv.product?.name ?? '—'}</p>
+                              <p className="text-[9px] text-primary font-black uppercase tracking-widest opacity-60">{mv.product?.category?.name ?? 'General'}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-8 text-center"><TypeBadge type={mv.type} /></td>
+                        <td className="px-6 py-8"><ReasonBadge reason={mv.reason ?? 'ADJUSTMENT'} /></td>
+                        <td className="px-6 py-8">
+                          <div className="flex items-baseline gap-1.5">
+                            <span className={`text-2xl font-black tracking-tighter ${mv.type === 'IN' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                              {mv.type === 'IN' ? '+' : '-'}{mv.quantity}
+                            </span>
+                            <span className="text-[10px] text-on-surface-variant font-black uppercase opacity-20">UNID</span>
+                          </div>
+                        </td>
+                        <td className="px-10 py-8 text-right">
+                          <span className="text-[9px] font-black text-on-surface-variant uppercase tracking-widest px-4 py-2 bg-surface-low border border-outline-variant/30 rounded-xl group-hover:border-primary/20 transition-all">
+                            {mv.referenceId?.substring(0,10).toUpperCase() ?? 'MANUAL'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Premium Pagination Footer */}
+            <div className="px-6 py-8 lg:px-10 lg:py-10 bg-surface-low/10 border-t border-outline-variant/30 flex flex-col sm:flex-row items-center justify-between gap-8">
+              <div className="flex items-center gap-2 order-2 sm:order-1">
+                 <p className="text-xs font-black text-on-surface-variant/40 uppercase tracking-widest">Página {page} de {totalPages}</p>
+              </div>
+              <div className="flex items-center gap-3 order-1 sm:order-2">
                 <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-                  className="w-10 h-10 rounded-xl border border-gray-100 flex items-center justify-center hover:bg-gray-50 disabled:opacity-40 transition-all text-gray-400">
-                  <ChevronLeft className="w-5 h-5" />
+                  className="w-14 h-14 rounded-2xl border-2 border-outline-variant/20 bg-card text-on-surface-variant hover:bg-surface-low disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 shadow-sm flex items-center justify-center">
+                  <ChevronLeft className="w-6 h-6" />
                 </button>
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  const p = Math.max(1, Math.min(page - 2, totalPages - 4)) + i;
-                  return (
-                    <button key={p} onClick={() => setPage(p)}
-                      className={`w-10 h-10 rounded-xl text-xs font-black transition-all ${p === page ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-gray-500 hover:bg-gray-50'}`}>
-                      {p}
-                    </button>
-                  );
-                })}
+                <div className="hidden lg:flex items-center gap-2.5">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    const p = Math.max(1, Math.min(page - 2, totalPages - 4)) + i;
+                    if (p < 1 || p > totalPages) return null;
+                    return (
+                      <button key={p} onClick={() => setPage(p)}
+                        className={`w-12 h-12 rounded-2xl border-2 font-black text-[11px] transition-all active:scale-90 ${
+                          page === p ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'border-outline-variant/20 bg-card text-on-surface-variant hover:bg-surface-low'
+                        }`}>
+                        {p}
+                      </button>
+                    );
+                  })}
+                </div>
                 <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                  className="w-10 h-10 rounded-xl border border-gray-100 flex items-center justify-center hover:bg-gray-50 disabled:opacity-40 transition-all text-gray-400">
-                  <ChevronRight className="w-5 h-5" />
+                  className="w-14 h-14 rounded-2xl border-2 border-outline-variant/20 bg-card text-on-surface-variant hover:bg-surface-low disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 shadow-sm flex items-center justify-center">
+                  <ChevronRight className="w-6 h-6" />
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Insights & Recent Activity */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          {/* Insights & Recent Activity - More Compact */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
 
-            {/* Inventory Insights Card */}
-            <div className="lg:col-span-2 bg-indigo-600 rounded-[32px] p-10 border border-indigo-700 relative overflow-hidden group">
+            {/* Main Insight Card - Optimized Size */}
+            <div className="lg:col-span-2 bg-primary rounded-[40px] p-8 lg:p-10 shadow-2xl shadow-primary/20 relative overflow-hidden group min-h-[320px] flex flex-col justify-between">
               <div className="relative z-10">
-                <h3 className="text-2xl font-black text-white mb-3">Perspectiva Estratégica</h3>
-                <p className="text-indigo-100 font-medium mb-12 max-w-sm opacity-80">
-                  Visibilidad total del flujo de mercancías. Monitoree las tendencias de entrada y salida para optimizar su reabastecimiento proactivo.
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center">
+                    <BarChart3 className="w-4 h-4 text-white" />
+                  </div>
+                  <h3 className="text-xl lg:text-2xl font-black text-white tracking-tight">Inteligencia de Flujo</h3>
+                </div>
+                <p className="text-[13px] text-on-primary font-medium max-w-md opacity-80 leading-relaxed">
+                  Balance estratégico entre ingresos y egresos para determinar la salud financiera de su stock.
                 </p>
-                <div className="flex items-end gap-16">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <ArrowDownCircle className="w-5 h-5 text-emerald-400" />
-                      <span className="text-[10px] font-black text-indigo-200 uppercase tracking-[0.2em]">Ingresos Totales</span>
-                    </div>
-                    <p className="text-5xl font-black text-white">
-                      {insights.totalIn >= 1000 ? `${(insights.totalIn / 1000).toFixed(1)}k` : insights.totalIn}
-                    </p>
+              </div>
+              
+              <div className="relative z-10 grid grid-cols-2 gap-8 lg:gap-16 mt-8">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2.5 opacity-70">
+                    <ArrowDownCircle className="w-4 h-4 text-emerald-400" />
+                    <span className="text-[9px] font-black text-on-primary uppercase tracking-[0.2em]">Ingresos Brutos</span>
                   </div>
-                  <div className="w-px h-16 bg-white/10" />
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <ArrowUpCircle className="w-5 h-5 text-rose-400" />
-                      <span className="text-[10px] font-black text-indigo-200 uppercase tracking-[0.2em]">Salidas Totales</span>
-                    </div>
-                    <p className="text-5xl font-black text-white">
-                      {insights.totalOut >= 1000 ? `${(insights.totalOut / 1000).toFixed(1)}k` : insights.totalOut}
-                    </p>
+                  <p className="text-4xl lg:text-5xl font-black text-white tracking-tighter">
+                    {insights.totalIn.toLocaleString('es-PE')}
+                  </p>
+                </div>
+                <div className="space-y-2 border-l border-white/10 pl-8 lg:pl-16">
+                  <div className="flex items-center gap-2.5 opacity-70">
+                    <ArrowUpCircle className="w-4 h-4 text-rose-400" />
+                    <span className="text-[9px] font-black text-on-primary uppercase tracking-[0.2em]">Egresos Totales</span>
                   </div>
+                  <p className="text-4xl lg:text-5xl font-black text-white tracking-tighter">
+                    {insights.totalOut.toLocaleString('es-PE')}
+                  </p>
                 </div>
               </div>
-              <TrendingUp className="absolute -bottom-10 -right-10 w-64 h-64 text-white opacity-[0.03] group-hover:scale-110 transition-transform duration-700 select-none pointer-events-none" />
+              <TrendingUp className="absolute -bottom-16 -right-16 w-64 h-64 text-white opacity-[0.03] group-hover:scale-110 transition-transform duration-1000 select-none pointer-events-none" />
             </div>
 
-            {/* Recent Activity Mini-List */}
-            <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100 flex flex-col">
-              <h3 className="text-xs font-black text-gray-900 mb-8 flex items-center justify-between uppercase tracking-widest">
-                Actividad Reciente
-                <BarChart3 className="w-4 h-4 text-gray-200" />
-              </h3>
+            {/* Sidebar Activity Feed - More Compact */}
+            <div className="bg-card rounded-[40px] p-8 lg:p-10 shadow-sm border border-outline-variant/30 flex flex-col group min-h-[320px]">
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-[11px] font-black text-foreground uppercase tracking-[0.2em]">Últimos Registros</h3>
+                <Activity className="w-4 h-4 text-primary opacity-40 group-hover:opacity-100 transition-all" />
+              </div>
               <div className="space-y-6 flex-1">
-                {movements.slice(0, 5).map(mv => (
-                  <div key={mv.id} className="flex items-center gap-4">
-                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${mv.type === 'IN' ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.3)]'}`} />
+                {movements.slice(0, 4).map(mv => (
+                  <div key={mv.id} className="flex items-center gap-4 hover:translate-x-1 transition-transform">
+                    <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${mv.type === 'IN' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' : 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.4)]'}`} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-black text-gray-800 truncate leading-none mb-1">
-                        {mv.type === 'IN' ? 'Ingreso de Stock' : 'Salida de Stock'}
-                      </p>
-                      <p className="text-[10px] text-gray-400 font-bold truncate uppercase">{mv.product?.name ?? '—'}</p>
+                      <p className="text-[10px] font-black text-foreground uppercase tracking-tight truncate">{mv.product?.name ?? '—'}</p>
+                      <p className="text-[9px] text-on-surface-variant font-medium opacity-40 uppercase tracking-widest">{mv.type === 'IN' ? 'Entrada' : 'Salida'}</p>
                     </div>
-                    <span className={`text-xs font-black flex-shrink-0 ${mv.type === 'IN' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    <span className={`text-sm font-black ${mv.type === 'IN' ? 'text-emerald-500' : 'text-rose-500'}`}>
                       {mv.type === 'IN' ? '+' : '-'}{mv.quantity}
                     </span>
                   </div>
                 ))}
                 {movements.length === 0 && !loading && (
-                  <div className="text-center py-6">
-                    <p className="text-xs text-gray-200 font-black uppercase">Sin registros recientes</p>
+                  <div className="text-center py-8">
+                    <p className="text-[10px] text-on-surface-variant font-black uppercase tracking-widest opacity-30">Sin logs recientes</p>
                   </div>
                 )}
-                {loading && Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="h-10 bg-gray-50 rounded-xl animate-pulse" />
-                ))}
               </div>
               <button onClick={() => { setType(''); setReason(''); setPage(1); }}
-                className="mt-8 w-full py-3.5 bg-gray-50 hover:bg-indigo-50 hover:text-indigo-600 rounded-2xl text-[10px] font-black text-gray-500 uppercase tracking-widest transition-all">
-                Ver Todos los Logs
+                className="mt-8 w-full py-4 bg-surface-low hover:bg-primary/5 hover:text-primary rounded-[22px] text-[9px] font-black text-on-surface-variant uppercase tracking-[0.2em] transition-all border border-outline-variant/30 active:scale-95">
+                Ver Todo el Historial
               </button>
             </div>
           </div>
@@ -371,3 +545,4 @@ export default function MovementHistoryPage() {
     </div>
   );
 }
+

@@ -8,25 +8,28 @@ export default function NewProductPage() {
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
+      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden">
         {/* Top Header */}
-        <header className="px-8 py-6 bg-white border-b border-gray-100 flex items-center justify-between shrink-0">
+        <header className="px-4 py-4 sm:px-8 sm:py-6 bg-card border-b border-outline-variant/30 flex items-center justify-between shrink-0">
           <div>
-            <nav className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
-              <span>Gestión de Inventario</span>
+            <nav className="flex items-center gap-2 text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1 sm:mb-2">
+              <span className="hidden sm:inline">Inventario</span>
+              <span className="hidden sm:inline">/</span>
+              <span className="text-on-surface-variant">Productos</span>
               <span>/</span>
-              <span>Productos</span>
-              <span>/</span>
-              <span className="text-gray-900">Agregar Nuevo Producto</span>
+              <span className="text-on-surface-variant">Nuevo Registro</span>
             </nav>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none">Agregar Nuevo Producto</h1>
+            <h1 className="text-xl sm:text-3xl font-black text-foreground tracking-tight leading-none">Agregar Nuevo Producto</h1>
           </div>
         </header>
 
-        <main className="flex-1 overflow-hidden bg-white m-8 rounded-3xl shadow-sm border border-gray-100">
-           <ProductForm isEdit={false} />
+        <main className="flex-1 overflow-hidden bg-background sm:p-8">
+           <div className="h-full bg-card sm:rounded-[40px] sm:border sm:border-outline-variant sm:shadow-sm overflow-hidden">
+              <ProductForm isEdit={false} />
+           </div>
         </main>
       </div>
     </div>
   );
 }
+

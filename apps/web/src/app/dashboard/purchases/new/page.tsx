@@ -3,10 +3,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
+import TopBar from '@/components/layout/TopBar';
 import { 
     ArrowLeft, Building2, Truck, ChevronDown, 
     Package, Trash2, Plus, FileText, X, 
-    Search, Info, Loader2 
+    Search, Info, Loader2, Calendar, 
+    DollarSign, ChevronRight, Save
 } from 'lucide-react';
 import { 
     getSuppliers, 
@@ -141,319 +143,359 @@ export default function NewPurchasePage() {
   };
 
   return (
-    <div className="flex h-screen bg-[#F0F4F8] overflow-hidden font-sans">
+    <div className="flex h-screen bg-background overflow-hidden font-sans text-foreground transition-colors">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-y-auto">
+      <div className="flex-1 flex flex-col lg:ml-64 w-full overflow-hidden">
+        <TopBar />
         
-        <header className="px-10 py-6 bg-transparent flex items-center justify-between sticky top-0 z-30 transition-all">
-          <div className="flex items-center gap-6">
+        <header className="px-4 lg:px-10 py-6 border-b border-outline-variant/30 flex flex-col sm:flex-row items-center justify-between gap-6 sticky top-0 z-30 bg-background/80 backdrop-blur-xl">
+          <div className="flex items-center gap-6 w-full sm:w-auto">
             <button 
               onClick={() => router.push('/dashboard/purchases')}
-              className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center hover:bg-gray-50 transition-all text-gray-400"
+              className="w-12 h-12 rounded-2xl border border-outline-variant/30 hover:bg-surface-low flex items-center justify-center transition-all active:scale-90 shadow-sm"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-black text-gray-900 tracking-tight">Nueva Orden de Compra</h1>
-              <span className="text-sm font-bold text-gray-400 bg-white/50 px-3 py-1 rounded-full border border-gray-100 italic">
-                Borrador #PO-AUTO
-              </span>
+            <div>
+              <nav className="flex items-center gap-2 text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] mb-1">
+                <span>Abastecimiento</span><span>/</span>
+                <span className="text-primary">Nueva Orden</span>
+              </nav>
+              <h1 className="text-2xl lg:text-3xl font-black text-foreground tracking-tighter">Generar Compra</h1>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
              <button 
                 onClick={() => handleSubmit(false)}
-                className="px-6 py-2.5 text-sm font-bold text-gray-600 hover:text-gray-900 transition-colors"
+                className="flex-1 sm:flex-none h-[52px] px-8 bg-surface-low border border-outline-variant/30 rounded-[20px] text-[11px] font-black uppercase tracking-widest text-on-surface-variant hover:bg-card transition-all active:scale-95"
                 disabled={submitting}
              >
-                Guardar Borrador
+                Borrador
              </button>
              <button 
                 onClick={() => handleSubmit(true)}
                 disabled={submitting}
-                className="px-8 py-2.5 bg-[#0052FF] text-white rounded-xl font-black text-sm shadow-xl shadow-blue-100 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+                className="flex-1 sm:flex-none h-[52px] px-10 bg-primary text-on-primary rounded-[20px] font-black text-[11px] uppercase tracking-widest shadow-2xl shadow-primary/30 hover:opacity-90 transition-all flex items-center justify-center gap-3 active:scale-95"
              >
-                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirmar Compra'}
+                {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
+                Confirmar
              </button>
           </div>
         </header>
 
-        <main className="px-10 py-4 max-w-7xl mx-auto w-full space-y-8 pb-32">
-          
-          <div className="grid grid-cols-12 gap-8">
-            <div className="col-span-12 lg:col-span-7 bg-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100/50 p-8 relative overflow-hidden group">
-               <div className="absolute top-0 left-0 w-1.5 h-full bg-[#0052FF] opacity-80" />
-               <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[2px] mb-6 flex items-center gap-2">
-                 <Building2 className="w-4 h-4 text-blue-600" /> Selección de Proveedor
-               </h2>
-               <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Empresa Proveedora</label>
-                    <div className="relative group">
-                      <select 
-                        value={selectedSupplierId}
-                        onChange={e => setSelectedSupplierId(e.target.value)}
-                        className="w-full pl-5 pr-10 py-4 bg-[#F5F8FA] border-2 border-transparent focus:border-blue-100 rounded-2xl text-sm font-bold text-gray-900 appearance-none focus:outline-none transition-all"
-                      >
-                        <option value="">Seleccione un proveedor...</option>
-                        {suppliers.map(s => (
-                          <option key={s.id} value={s.id}>{s.name}</option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">ID del Proveedor</label>
-                    <input 
-                      readOnly
-                      placeholder="Identificador"
-                      value={selectedSupplier ? `SUP-${selectedSupplier.id.slice(0,8).toUpperCase()}` : ''}
-                      className="w-full px-5 py-4 bg-[#EBF0F5] border-2 border-transparent rounded-2xl text-sm font-black text-gray-500 font-mono outline-none cursor-default"
-                    />
-                  </div>
-               </div>
-            </div>
-
-            <div className="col-span-12 lg:col-span-5 bg-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 p-8">
-               <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[2px] mb-6 flex items-center gap-2">
-                 <Truck className="w-4 h-4 text-blue-600" /> Detalles Logísticos
-               </h2>
-               <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-1.5">
-                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Fecha Emisión</label>
-                    <div className="relative">
-                      <input 
-                        type="date"
-                        value={orderDate}
-                        onChange={e => setOrderDate(e.target.value)}
-                        className="w-full px-5 py-3.5 bg-[#F5F8FA] border-2 border-transparent focus:border-blue-100 rounded-xl text-sm font-bold text-gray-900 focus:outline-none text-center"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Entrega Estimada</label>
-                    <input 
-                        type="date"
-                        value={expectedDelivery}
-                        onChange={e => setExpectedDelivery(e.target.value)}
-                        className="w-full px-5 py-3.5 bg-[#F5F8FA] border-2 border-transparent focus:border-blue-100 rounded-xl text-sm font-bold text-gray-900 focus:outline-none text-center"
-                    />
-                  </div>
-               </div>
-            </div>
-          </div>
-
-          <section className="bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.03)] border border-gray-100 overflow-hidden">
-            <div className="px-10 py-6 border-b border-gray-50 flex items-center justify-between bg-white sticky top-0 z-20">
-              <div>
-                <h2 className="text-base font-black text-gray-900">Artículos de la Compra</h2>
-                <p className="text-xs text-gray-400 font-bold mt-0.5">Agregue productos y especifique cantidades para registrar stock.</p>
-              </div>
-              <button 
-                onClick={() => setIsSearchOpen(true)}
-                className="px-5 py-2.5 bg-[#A8C7FF] text-[#001D4A] rounded-xl font-black text-sm hover:bg-[#8DABFF] transition-all flex items-center gap-2"
-              >
-                <Plus className="w-5 h-5" /> Agregar Producto
-              </button>
-            </div>
-
-            <div className="overflow-x-auto">
-               <table className="w-full text-left min-w-[800px]">
-                 <thead>
-                   <tr className="bg-gray-50/30 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50">
-                     <th className="px-10 py-5">Detalles del Producto</th>
-                     <th className="px-6 py-5 text-center">SKU</th>
-                     <th className="px-6 py-5 text-center">Cantidad</th>
-                     <th className="px-6 py-5 text-center">Costo Unit.</th>
-                     <th className="px-10 py-5 text-right w-48">Monto Total</th>
-                   </tr>
-                 </thead>
-                 <tbody className="divide-y divide-gray-50">
-                   {items.length === 0 ? (
-                     <tr>
-                       <td colSpan={5} className="py-24 text-center">
-                          <div className="w-16 h-16 bg-blue-50/50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-50">
-                            <Package className="w-8 h-8 text-blue-200" />
-                          </div>
-                          <p className="text-sm font-black text-gray-900 mb-1">La lista de compra está vacía</p>
-                          <p className="text-xs text-gray-400 font-bold">Busque y agregue productos para iniciar el abastecimiento.</p>
-                       </td>
-                     </tr>
-                   ) : (
-                     items.map(item => (
-                       <tr key={item.productId} className="group hover:bg-gray-50/30 transition-colors">
-                         <td className="px-10 py-6">
-                            <div className="flex items-center gap-4">
-                               <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center border border-gray-100 shadow-sm text-gray-300">
-                                  {item.imageUrl ? <img src={item.imageUrl} className="w-full h-full object-cover" /> : <Package className="w-6 h-6" />}
-                               </div>
-                               <div>
-                                  <p className="text-sm font-black text-gray-900 group-hover:text-blue-600 transition-colors">{item.name}</p>
-                                  <p className="text-[10px] text-gray-400 font-medium leading-tight max-w-[240px] truncate">{item.description}</p>
-                               </div>
-                            </div>
-                         </td>
-                         <td className="px-6 py-6 text-center">
-                            <span className="px-3 py-1 bg-[#E4E9FC] text-[#475467] rounded-md text-[10px] font-black tracking-widest uppercase">
-                               {item.sku}
-                            </span>
-                         </td>
-                         <td className="px-6 py-6 font-bold">
-                            <div className="flex items-center justify-center">
-                               <input 
-                                  type="number"
-                                  min="1"
-                                  value={item.quantity}
-                                  onChange={e => updateItem(item.productId, 'quantity', parseInt(e.target.value) || 0)}
-                                  className="w-16 py-2 px-1 bg-[#F1F3F9] border-none rounded-lg text-sm font-black text-gray-900 text-center focus:ring-2 focus:ring-blue-100 transition-all outline-none"
-                                />
-                            </div>
-                         </td>
-                         <td className="px-6 py-6 text-center font-bold text-gray-500 text-sm">
-                            {fmtCurrency(item.costPrice)}
-                         </td>
-                         <td className="px-10 py-6 text-right relative group/row">
-                            <p className="text-sm font-black text-gray-900">{fmtCurrency(item.quantity * item.costPrice)}</p>
-                            <button 
-                                onClick={() => removeItem(item.productId)}
-                                className="absolute -right-2 top-1/2 -translate-y-1/2 p-2 text-gray-300 hover:text-red-500 opacity-0 group-hover/row:opacity-100 transition-all"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                            </button>
-                         </td>
-                       </tr>
-                     ))
-                   )}
-                 </tbody>
-               </table>
-            </div>
+        <main className="flex-1 overflow-y-auto p-4 lg:p-10 pb-32 bg-background">
+          <div className="max-w-7xl mx-auto space-y-8 lg:space-y-12">
             
-            <div className="p-10 bg-white grid grid-cols-12 gap-12 border-t border-gray-50">
-               <div className="col-span-12 lg:col-span-7 space-y-3">
-                  <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-blue-600" /> Notas de la Orden
-                  </h3>
-                  <textarea 
-                    placeholder="Notas internas para el equipo de logística..."
-                    value={notes}
-                    onChange={e => setNotes(e.target.value)}
-                    rows={5}
-                    className="w-full bg-[#F5F8FA] border-2 border-transparent focus:border-blue-50 rounded-2xl p-5 text-sm font-medium text-gray-700 focus:outline-none transition-all resize-none shadow-inner"
-                  />
-               </div>
-
-               <div className="col-span-12 lg:col-span-5 space-y-4 pr-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <p className="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Subtotal</p>
-                    <p className="font-black text-gray-900">{fmtCurrency(subtotal)}</p>
+            {/* Form Sections Grid */}
+            <div className="grid grid-cols-12 gap-8 lg:gap-12">
+              
+              {/* Supplier Selection */}
+              <div className="col-span-12 lg:col-span-7 space-y-6">
+                <div className="bg-card rounded-[40px] border border-outline-variant/30 shadow-sm p-6 lg:p-10 relative overflow-hidden group">
+                  <div className="absolute top-0 left-0 w-2 h-full bg-primary opacity-20" />
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="w-12 h-12 bg-primary/10 rounded-[20px] flex items-center justify-center border border-primary/20">
+                      <Building2 className="w-6 h-6 text-primary" />
+                    </div>
+                    <h2 className="text-lg font-black text-foreground tracking-tight">Socio Comercial</h2>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <p className="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Costo de Envío</p>
-                    <div className="flex items-center gap-1">
-                      <span className="text-gray-400 font-bold">S/</span>
-                      <input 
-                        type="number" 
-                        value={shippingCost} 
-                        onChange={e => setShippingCost(parseFloat(e.target.value) || 0)}
-                        className="w-16 bg-transparent text-right font-black text-gray-900 focus:outline-none focus:border-b border-blue-200"
-                      />
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] ml-1">Proveedor de Suministros</label>
+                      <div className="relative group">
+                        <select 
+                          value={selectedSupplierId}
+                          onChange={e => setSelectedSupplierId(e.target.value)}
+                          className="w-full h-[60px] pl-6 pr-12 bg-surface-low border-2 border-transparent focus:border-primary/30 rounded-[24px] text-sm font-bold text-foreground appearance-none focus:outline-none focus:bg-card transition-all shadow-inner"
+                        >
+                          <option value="">Seleccione proveedor...</option>
+                          {suppliers.map(s => (
+                            <option key={s.id} value={s.id}>{s.name}</option>
+                          ))}
+                        </select>
+                        <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant/40 pointer-events-none transition-transform group-focus-within:rotate-180" />
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] ml-1">Referencia Fiscal</label>
+                      <div className="w-full h-[60px] px-6 bg-surface-low border-2 border-transparent rounded-[24px] flex items-center text-sm font-black text-on-surface-variant/60 font-mono shadow-inner italic">
+                        {selectedSupplier ? `ID: ${selectedSupplier.dniRuc}` : 'Pendiente de selección'}
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <p className="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Impuesto (IGV 18%)</p>
-                    <p className="font-black text-gray-900">{fmtCurrency(taxAmount)}</p>
+                </div>
+              </div>
+
+              {/* Logistics Details */}
+              <div className="col-span-12 lg:col-span-5 space-y-6">
+                <div className="bg-card rounded-[40px] border border-outline-variant/30 shadow-sm p-6 lg:p-10">
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="w-12 h-12 bg-emerald-500/10 rounded-[20px] flex items-center justify-center border border-emerald-500/20">
+                      <Truck className="w-6 h-6 text-emerald-500" />
+                    </div>
+                    <h2 className="text-lg font-black text-foreground tracking-tight">Cronograma</h2>
                   </div>
                   
-                  <div className="pt-6 border-t border-gray-50 mt-4 flex items-center justify-between">
-                     <p className="text-sm font-black text-gray-900 uppercase tracking-[2px]">Total Final</p>
-                     <p className="text-3xl font-black text-[#0052FF] animate-in fade-in zoom-in duration-500">
-                        {fmtCurrency(grandTotal)}
-                     </p>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] ml-1">Fecha Emisión</label>
+                      <div className="relative group">
+                        <Calendar className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-40 group-focus-within:opacity-100 transition-opacity" />
+                        <input 
+                          type="date"
+                          value={orderDate}
+                          onChange={e => setOrderDate(e.target.value)}
+                          className="w-full h-[60px] pl-14 pr-6 bg-surface-low border-2 border-transparent focus:border-primary/30 rounded-[24px] text-xs font-black text-foreground focus:outline-none focus:bg-card transition-all shadow-inner"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] ml-1">Entrega Est.</label>
+                      <div className="relative group">
+                        <Truck className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500 opacity-40 group-focus-within:opacity-100 transition-opacity" />
+                        <input 
+                          type="date"
+                          value={expectedDelivery}
+                          onChange={e => setExpectedDelivery(e.target.value)}
+                          className="w-full h-[60px] pl-14 pr-6 bg-surface-low border-2 border-transparent focus:border-emerald-500/30 rounded-[24px] text-xs font-black text-foreground focus:outline-none focus:bg-card transition-all shadow-inner"
+                        />
+                      </div>
+                    </div>
                   </div>
-               </div>
+                </div>
+              </div>
             </div>
-          </section>
 
-          <div className="flex items-center justify-center gap-4 pt-4">
-             <button 
-                onClick={() => router.push('/dashboard/purchases')}
-                className="px-10 py-4 border-2 border-transparent hover:bg-gray-100 rounded-2xl text-sm font-black text-gray-400 transition-all flex items-center gap-3"
-             >
-                <X className="w-5 h-5" /> Descartar Orden
-             </button>
-             <button 
-                onClick={() => handleSubmit(true)}
-                disabled={submitting}
-                className="px-12 py-4 bg-[#0052FF] text-white rounded-2xl font-black text-lg shadow-2xl shadow-blue-200 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50"
-             >
-                {submitting ? <Loader2 className="w-6 h-6 animate-spin" /> : 'Registrar Orden de Compra'}
-             </button>
+            {/* Items Table Section */}
+            <section className="bg-card rounded-[48px] border border-outline-variant/30 shadow-sm overflow-hidden min-h-[400px]">
+              <div className="px-6 lg:px-10 py-8 border-b border-outline-variant/20 flex flex-col sm:flex-row items-center justify-between gap-6 bg-card/50 backdrop-blur-sm sticky top-0 z-20">
+                <div>
+                  <h2 className="text-xl font-black text-foreground tracking-tight">Artículos de Abastecimiento</h2>
+                  <p className="text-xs text-on-surface-variant font-medium mt-1">Total de ítems: {items.length}</p>
+                </div>
+                <button 
+                  onClick={() => setIsSearchOpen(true)}
+                  className="w-full sm:w-auto h-[56px] px-8 bg-primary/10 text-primary rounded-[20px] font-black text-[11px] uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-3 active:scale-95 border border-primary/20"
+                >
+                  <Plus className="w-5 h-5" /> Agregar Ítem
+                </button>
+              </div>
+
+              <div className="overflow-x-auto scrollbar-hide">
+                 <table className="w-full text-left border-collapse min-w-[800px]">
+                   <thead>
+                     <tr className="bg-surface-low/30 text-[10px] font-black text-on-surface-variant tracking-[0.3em] uppercase">
+                       <th className="px-10 py-6 border-b border-outline-variant/10">Descripción del Producto</th>
+                       <th className="px-6 py-6 border-b border-outline-variant/10 text-center">SKU</th>
+                       <th className="px-6 py-6 border-b border-outline-variant/10 text-center w-40">Cantidad</th>
+                       <th className="px-6 py-6 border-b border-outline-variant/10 text-right w-40">Costo Unit.</th>
+                       <th className="px-10 py-6 border-b border-outline-variant/10 text-right w-48">Total</th>
+                     </tr>
+                   </thead>
+                   <tbody className="divide-y divide-outline-variant/10">
+                     {items.length === 0 ? (
+                       <tr>
+                         <td colSpan={5} className="py-24 text-center">
+                            <div className="w-20 h-20 bg-surface-low rounded-[32px] flex items-center justify-center mx-auto mb-6 border border-outline-variant/30">
+                              <Package className="w-10 h-10 text-on-surface-variant/20" />
+                            </div>
+                            <p className="text-sm font-black text-foreground uppercase tracking-widest mb-1">Lista de compra vacía</p>
+                            <p className="text-xs font-bold text-on-surface-variant opacity-60">Escanee o busque productos para iniciar el registro.</p>
+                         </td>
+                       </tr>
+                     ) : (
+                       items.map(item => (
+                         <tr key={item.productId} className="group hover:bg-primary/[0.02] transition-colors relative">
+                           <td className="px-10 py-8">
+                              <div className="flex items-center gap-5">
+                                 <div className="w-16 h-16 bg-surface-low rounded-[20px] overflow-hidden flex-shrink-0 flex items-center justify-center border border-outline-variant/30 shadow-sm transition-transform group-hover:scale-105">
+                                    {item.imageUrl ? <img src={item.imageUrl} className="w-full h-full object-cover" /> : <Package className="w-8 h-8 text-on-surface-variant/20" />}
+                                 </div>
+                                 <div>
+                                    <p className="text-base font-black text-foreground tracking-tight group-hover:text-primary transition-colors">{item.name}</p>
+                                    <p className="text-[10px] text-on-surface-variant font-black uppercase tracking-widest opacity-40 mt-1 max-w-[280px] truncate">{item.description}</p>
+                                 </div>
+                              </div>
+                           </td>
+                           <td className="px-6 py-8 text-center">
+                              <span className="px-3 py-1.5 bg-surface-low border border-outline-variant/30 rounded-lg text-[9px] font-black tracking-widest uppercase text-on-surface-variant">
+                                 {item.sku}
+                              </span>
+                           </td>
+                           <td className="px-6 py-8">
+                              <div className="flex items-center justify-center">
+                                 <input 
+                                    type="number"
+                                    min="1"
+                                    value={item.quantity}
+                                    onChange={e => updateItem(item.productId, 'quantity', parseInt(e.target.value) || 0)}
+                                    className="w-24 h-[44px] bg-surface-low border-2 border-transparent focus:border-primary/20 rounded-xl text-sm font-black text-foreground text-center focus:outline-none transition-all"
+                                  />
+                              </div>
+                           </td>
+                           <td className="px-6 py-8 text-right">
+                              <div className="flex items-center justify-end gap-1">
+                                <span className="text-[10px] font-black text-on-surface-variant opacity-40 uppercase">S/</span>
+                                <input 
+                                  type="number"
+                                  step="0.01"
+                                  value={item.costPrice}
+                                  onChange={e => updateItem(item.productId, 'costPrice', parseFloat(e.target.value) || 0)}
+                                  className="w-28 h-[44px] bg-surface-low border-2 border-transparent focus:border-primary/20 rounded-xl text-sm font-black text-foreground text-right focus:outline-none transition-all"
+                                />
+                              </div>
+                           </td>
+                           <td className="px-10 py-8 text-right relative group/row">
+                              <p className="text-lg font-black text-foreground tracking-tighter">{fmtCurrency(item.quantity * item.costPrice)}</p>
+                              <button 
+                                  onClick={() => removeItem(item.productId)}
+                                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-rose-500/10 text-rose-500 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-rose-500 hover:text-white transition-all active:scale-90"
+                              >
+                                  <Trash2 className="w-5 h-5" />
+                              </button>
+                           </td>
+                         </tr>
+                       ))
+                     )}
+                   </tbody>
+                 </table>
+              </div>
+              
+              {/* Summary Area */}
+              <div className="p-8 lg:p-12 bg-card grid grid-cols-12 gap-12 border-t border-outline-variant/20">
+                 <div className="col-span-12 lg:col-span-7 space-y-4">
+                    <h3 className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] flex items-center gap-3 ml-1">
+                      <FileText className="w-4 h-4 text-primary" /> Observaciones del Pedido
+                    </h3>
+                    <textarea 
+                      placeholder="Indique requerimientos específicos, condiciones de pago o detalles logísticos relevantes..."
+                      value={notes}
+                      onChange={e => setNotes(e.target.value)}
+                      rows={4}
+                      className="w-full bg-surface-low border-2 border-transparent focus:border-primary/20 rounded-[32px] p-6 text-sm font-medium text-foreground focus:outline-none transition-all resize-none shadow-inner"
+                    />
+                 </div>
+
+                 <div className="col-span-12 lg:col-span-5 space-y-6">
+                    <div className="bg-surface-low rounded-[32px] p-8 space-y-4 shadow-inner border border-outline-variant/10">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[9px] font-black text-on-surface-variant uppercase tracking-widest opacity-40">Subtotal Neto</p>
+                        <p className="text-base font-black text-foreground tracking-tight">{fmtCurrency(subtotal)}</p>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <p className="text-[9px] font-black text-on-surface-variant uppercase tracking-widest opacity-40">Costos de Envío / Logística</p>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-black text-on-surface-variant opacity-40 uppercase">S/</span>
+                          <input 
+                            type="number" 
+                            value={shippingCost} 
+                            onChange={e => setShippingCost(parseFloat(e.target.value) || 0)}
+                            className="w-24 bg-transparent text-right font-black text-foreground focus:outline-none border-b border-outline-variant/30 focus:border-primary transition-all h-[32px]"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <p className="text-[9px] font-black text-on-surface-variant uppercase tracking-widest opacity-40">Impuestos (IGV 18%)</p>
+                        <p className="text-base font-bold text-foreground tracking-tight">{fmtCurrency(taxAmount)}</p>
+                      </div>
+                      
+                      <div className="pt-6 border-t border-outline-variant/30 mt-4 flex items-center justify-between">
+                         <p className="text-xs font-black text-foreground uppercase tracking-[0.3em]">Total Inversión</p>
+                         <p className="text-4xl font-black text-primary tracking-tighter animate-in fade-in zoom-in duration-500">
+                            {fmtCurrency(grandTotal)}
+                         </p>
+                      </div>
+                    </div>
+                 </div>
+              </div>
+            </section>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-10">
+               <button 
+                  onClick={() => router.push('/dashboard/purchases')}
+                  className="w-full sm:w-auto h-[64px] px-12 bg-surface-low border border-outline-variant/30 rounded-[24px] font-black text-[11px] uppercase tracking-widest text-on-surface-variant hover:bg-card transition-all active:scale-95"
+               >
+                  Descartar Orden
+               </button>
+               <button 
+                  onClick={() => handleSubmit(true)}
+                  disabled={submitting}
+                  className="w-full sm:w-auto h-[64px] px-16 bg-primary text-on-primary rounded-[24px] font-black text-xs uppercase tracking-widest shadow-2xl shadow-primary/30 hover:opacity-90 transition-all flex items-center justify-center gap-4 active:scale-95 disabled:opacity-50"
+               >
+                  {submitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <Save className="w-6 h-6" />}
+                  Registrar Operación
+               </button>
+            </div>
           </div>
         </main>
       </div>
 
+      {/* Modernized Product Search Modal */}
       {isSearchOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setIsSearchOpen(false)}>
-           <div className="w-full max-w-2xl bg-white rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
-              <div className="p-8 border-b border-gray-50 flex items-center justify-between">
-                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center">
-                       <Search className="w-6 h-6 text-blue-600" />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 lg:p-6 bg-black/60 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setIsSearchOpen(false)}>
+           <div className="w-full max-w-2xl bg-card rounded-[48px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 border border-outline-variant/30" onClick={e => e.stopPropagation()}>
+              <div className="px-8 lg:px-12 py-10 border-b border-outline-variant/20 flex items-center justify-between bg-surface-low/30">
+                 <div className="flex items-center gap-6">
+                    <div className="w-14 h-14 bg-primary/10 rounded-[24px] flex items-center justify-center border border-primary/20 shadow-inner">
+                       <Search className="w-7 h-7 text-primary" />
                     </div>
                     <div>
-                       <h3 className="text-xl font-black text-gray-900 leading-tight">Agregar Artículo</h3>
-                       <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-0.5">Búsqueda en Inventario Global</p>
+                       <h3 className="text-2xl font-black text-foreground tracking-tight leading-none">Buscar Artículos</h3>
+                       <p className="text-[10px] text-on-surface-variant font-black uppercase tracking-[0.3em] mt-3 opacity-60">Base de Datos Global de Almacén</p>
                     </div>
                  </div>
-                 <button onClick={() => setIsSearchOpen(false)} className="w-10 h-10 rounded-xl hover:bg-gray-100 flex items-center justify-center text-gray-300 hover:text-gray-900 transition-all">
+                 <button onClick={() => setIsSearchOpen(false)} className="w-12 h-12 rounded-2xl hover:bg-surface-low flex items-center justify-center text-on-surface-variant/40 hover:text-foreground transition-all border border-outline-variant/30">
                     <X className="w-6 h-6" />
                  </button>
               </div>
-              <div className="p-8 space-y-6">
+              <div className="p-8 lg:p-12 space-y-8">
                  <div className="relative group">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-blue-600 transition-colors" />
+                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant/20 group-focus-within:text-primary transition-colors" />
                     <input 
                        autoFocus
-                       placeholder="Nombre del producto, categoría o SKU..."
+                       placeholder="Nombre del producto, categoría o código SKU..."
                        value={productQuery}
                        onChange={e => setProductQuery(e.target.value)}
-                       className="w-full pl-14 pr-6 py-4.5 bg-[#F5F8FA] border-2 border-transparent focus:border-blue-100 rounded-2xl text-sm font-bold text-gray-900 focus:outline-none transition-all shadow-inner"
+                       className="w-full h-[64px] pl-16 pr-8 bg-surface-low border-2 border-transparent focus:border-primary/30 rounded-[28px] text-base font-bold text-foreground focus:outline-none focus:bg-card transition-all shadow-inner"
                     />
                  </div>
                  
-                 <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                 <div className="space-y-4 max-h-[400px] overflow-y-auto pr-4 custom-scrollbar min-h-[200px]">
                     {searchingProducts ? (
-                       <div className="py-20 flex flex-col items-center justify-center text-gray-300 gap-4">
-                          <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
-                          <p className="text-xs font-black uppercase tracking-widest animate-pulse">Escaneando Almacén...</p>
+                       <div className="py-24 flex flex-col items-center justify-center text-on-surface-variant/20 gap-6">
+                          <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                          <p className="text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">Sincronizando Inventario...</p>
                        </div>
                     ) : searchResults.length === 0 ? (
-                       <div className="py-16 text-center text-gray-300 flex flex-col items-center gap-4 bg-gray-50/50 rounded-3xl border border-dashed border-gray-100">
-                          <Info className="w-12 h-12 opacity-30" />
-                          <p className="text-sm font-bold">{productQuery.length < 2 ? 'Busque artículos para comprar' : 'No se encontraron coincidencias'}</p>
+                       <div className="py-20 text-center flex flex-col items-center gap-6 bg-surface-low/50 rounded-[40px] border border-dashed border-outline-variant/30">
+                          <div className="w-20 h-20 bg-card rounded-full flex items-center justify-center shadow-inner">
+                            <Info className="w-10 h-10 text-on-surface-variant/20" />
+                          </div>
+                          <p className="text-sm font-black text-on-surface-variant/40 uppercase tracking-widest">{productQuery.length < 2 ? 'Inicie la búsqueda de activos' : 'Sin coincidencias en el registro'}</p>
                        </div>
                     ) : (
                        searchResults.map(p => (
                           <button 
                              key={p.id}
-                             className="w-full text-left p-5 hover:bg-blue-50/50 rounded-2xl flex items-center gap-6 border-2 border-transparent hover:border-blue-100 transition-all group"
+                             className="w-full text-left p-6 hover:bg-primary/[0.03] rounded-[32px] flex items-center gap-6 border-2 border-transparent hover:border-primary/20 transition-all group active:scale-[0.98] bg-surface-low"
                              onClick={() => addProduct(p)}
                           >
-                             <div className="w-12 h-12 bg-gray-100 rounded-xl overflow-hidden shadow-sm flex items-center justify-center flex-shrink-0 text-gray-400">
-                                {p.imageUrl ? <img src={p.imageUrl} className="w-full h-full object-cover" /> : <Package className="w-6 h-6" />}
+                             <div className="w-16 h-16 bg-card rounded-[20px] overflow-hidden shadow-sm flex items-center justify-center flex-shrink-0 border border-outline-variant/30 group-hover:border-primary/40 transition-colors">
+                                {p.imageUrl ? <img src={p.imageUrl} className="w-full h-full object-cover" /> : <Package className="w-8 h-8 text-on-surface-variant/20" />}
                              </div>
                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-0.5">
-                                   <p className="text-sm font-black text-gray-900 truncate">{p.name}</p>
-                                   <span className="text-[8px] font-black bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded uppercase tracking-widest">{p.sku}</span>
+                                <div className="flex items-center gap-3 mb-1">
+                                   <p className="text-base font-black text-foreground tracking-tight truncate group-hover:text-primary transition-colors">{p.name}</p>
+                                   <span className="text-[9px] font-black bg-primary/10 text-primary px-2 py-1 rounded-lg uppercase tracking-widest border border-primary/10">{p.sku}</span>
                                 </div>
-                                <p className="text-[10px] text-gray-500 font-bold truncate opacity-60">{p.description || 'Artículo de Almacén'}</p>
+                                <p className="text-[10px] text-on-surface-variant font-black uppercase tracking-widest opacity-40 truncate">{p.description || 'Stock de Almacén General'}</p>
                              </div>
                              <div className="text-right">
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Precio de Compra</p>
-                                <p className="text-sm font-black text-blue-600 group-hover:scale-110 transition-transform">{fmtCurrency(p.purchasePrice || 0)}</p>
+                                <p className="text-[9px] font-black text-on-surface-variant/40 uppercase tracking-widest mb-1">Costo Estimado</p>
+                                <p className="text-lg font-black text-primary group-hover:scale-110 transition-transform tracking-tighter">{fmtCurrency(p.purchasePrice || 0)}</p>
                              </div>
+                             <ChevronRight className="w-5 h-5 text-on-surface-variant/20 group-hover:text-primary transition-all group-hover:translate-x-1" />
                           </button>
                        ))
                     )}
@@ -466,9 +508,11 @@ export default function NewPurchasePage() {
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(var(--primary-rgb), 0.1); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(var(--primary-rgb), 0.2); }
       `}</style>
     </div>
   );
 }
+
+

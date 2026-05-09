@@ -13,7 +13,8 @@ import {
   LayoutGrid,
   Download,
   AlertCircle,
-  Tag
+  Tag,
+  Hash
 } from 'lucide-react';
 import Link from 'next/link';
 import { getApiProducts, toggleProductStatus, getActiveCategories } from '@/lib/api';
@@ -87,9 +88,9 @@ export default function ProductsPage() {
   };
 
   const getStockBadge = (stock: number) => {
-    if (stock <= 0) return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-rose-50 text-rose-600 border border-rose-100 uppercase tracking-widest">Sin Stock</span>;
-    if (stock < 10) return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-50 text-amber-600 border border-amber-100 uppercase tracking-widest">Stock Bajo</span>;
-    return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest">En Stock</span>;
+    if (stock <= 0) return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-rose-500/10 text-rose-500 border border-rose-500/20 uppercase tracking-widest">Sin Stock</span>;
+    if (stock < 10) return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-500/10 text-amber-500 border border-amber-500/20 uppercase tracking-widest">Stock Bajo</span>;
+    return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 uppercase tracking-widest">En Stock</span>;
   };
 
   // PROCESO IDENTICO AL DE FACTURACION (VISTA DE IMPRESION)
@@ -198,201 +199,276 @@ export default function ProductsPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
+    <div className="flex h-screen bg-background overflow-hidden font-sans text-foreground transition-colors">
       <Sidebar />
-      
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
+      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden">
         <TopBar />
 
-        {/* Module Header */}
-        <div className="px-8 py-6 bg-white border-b border-gray-100 flex items-center justify-between shrink-0">
-          <div>
-            <nav className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">
-              <span>Gestión de Inventario</span>
-              <span>/</span>
-              <span className="text-gray-900">Productos</span>
-            </nav>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none">Productos</h1>
-            <p className="text-sm text-gray-500 mt-2 font-medium">Gestione y monitoree la disponibilidad de su stock minorista.</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button 
-              onClick={handlePrintReport}
-              className="p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors text-gray-500 border border-gray-100 shadow-sm active:scale-95"
-              title="Exportar Reporte"
-            >
-              <Download className="w-5 h-5" />
-            </button>
-            <Link href="/dashboard/products/new">
-              <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-black text-sm transition-all shadow-lg shadow-indigo-100 flex items-center gap-2">
-                Crear Producto
-              </button>
-            </Link>
-          </div>
-        </div>
-
-        <main className="flex-1 overflow-y-auto p-8 space-y-6 scroll-smooth">
-          {/* Enhanced Search Bar */}
-          <div className="relative group">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input 
-                type="text" 
-                placeholder="Buscar por nombre, SKU o descripción..." 
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-14 pr-4 py-4 bg-white border border-gray-100 rounded-2xl shadow-sm focus:ring-4 focus:ring-indigo-50/50 focus:border-indigo-600 transition-all outline-none text-sm font-medium"
-              />
-          </div>
-
-          {/* Category Scroller */}
-          <div className="relative flex items-center gap-2">
-            <button 
-              onClick={() => scroll('left')}
-              className="p-2 bg-white border border-gray-100 rounded-full shadow-sm hover:bg-gray-50 transition-all shrink-0 z-10"
-            >
-              <ChevronLeft className="w-4 h-4 text-gray-600" />
-            </button>
+        <main className="flex-1 overflow-y-auto bg-background p-4 lg:p-8 scrollbar-hide">
+          <div className="max-w-7xl mx-auto pb-20">
             
-            <div 
-              ref={scrollContainerRef}
-              className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth py-1 px-1 flex-1"
-            >
-              <button
-                onClick={() => setSelectedCategoryId(null)}
-                className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border ${
-                  selectedCategoryId === null 
-                  ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-100' 
-                  : 'bg-white border-gray-100 text-gray-400 hover:border-indigo-200 hover:text-indigo-600'
-                }`}
-              >
-                Todos los Productos
-              </button>
+            {/* Header Area */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+              <div>
+                <nav className="flex items-center gap-2 text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-2">
+                  <span>Inventario</span><span>/</span>
+                  <span className="text-on-surface-variant">Catálogo de Productos</span>
+                </nav>
+                <h1 className="text-4xl font-black tracking-tighter mb-2">Productos y Stock</h1>
+                <p className="text-sm font-medium text-on-surface-variant max-w-xl">Gestión centralizada de artículos, control de existencias y categorización comercial.</p>
+              </div>
               
-              {categories.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategoryId(cat.id)}
-                  className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border ${
-                    selectedCategoryId === cat.id 
-                    ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-100' 
-                    : 'bg-white border-gray-100 text-gray-400 hover:border-indigo-200 hover:text-indigo-600'
-                  }`}
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={handlePrintReport}
+                  className="hidden sm:flex w-14 h-14 items-center justify-center bg-surface-low border border-outline-variant/50 rounded-2xl text-on-surface-variant hover:text-primary hover:bg-primary/5 transition-all active:scale-95 shadow-sm"
+                  title="Exportar Reporte"
                 >
-                  {cat.name}
+                  <Download className="w-6 h-6" />
                 </button>
-              ))}
+                <Link href="/dashboard/products/new">
+                  <button className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-4 bg-primary text-on-primary rounded-[22px] text-[11px] font-black uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-primary/20 active:scale-95">
+                    <Plus className="w-5 h-5" /> Nuevo Producto
+                  </button>
+                </Link>
+              </div>
             </div>
 
-            <button 
-              onClick={() => scroll('right')}
-              className="p-2 bg-white border border-gray-100 rounded-full shadow-sm hover:bg-gray-50 transition-all shrink-0 z-10"
-            >
-              <ChevronRight className="w-4 h-4 text-gray-600" />
-            </button>
-          </div>
-
-          {/* Content Table */}
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden min-h-[400px]">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-gray-50/50 border-b border-gray-100">
-                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Producto</th>
-                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Categoría</th>
-                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-right">Precio</th>
-                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-center">Stock</th>
-                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-center">Estado</th>
-                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-center">Acción</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {loading ? (
-                  Array(5).fill(0).map((_, i) => (
-                    <tr key={i} className="animate-pulse">
-                      <td colSpan={6} className="px-8 py-6 h-20 bg-gray-50/20" />
-                    </tr>
-                  ))
-                ) : products.length === 0 ? (
-                   <tr>
-                     <td colSpan={6} className="px-8 py-20 text-center">
-                        <AlertCircle className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                        <p className="font-black text-gray-400 uppercase tracking-widest text-xs">No se encontraron productos</p>
-                     </td>
-                   </tr>
-                ) : products.map((product) => (
-                  <tr key={product.id} className={`group hover:bg-gray-50/50 transition-colors ${!product.isActive ? 'opacity-50' : ''}`}>
-                    <td className="px-8 py-5">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200">
-                          {product.imageUrl ? (
-                            <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
-                          ) : (
-                            <LayoutGrid className="w-6 h-6 text-gray-300" />
-                          )}
-                        </div>
-                        <div>
-                          <p className="text-sm font-black text-gray-900 leading-none">{product.name}</p>
-                          <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-wider">SKU: {product.id.substring(0, 8).toUpperCase()}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-8 py-5">
-                      <div className="flex items-center gap-1.5">
-                        <Tag className="w-3 h-3 text-indigo-400" />
-                        <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">{product.category?.name || 'General'}</span>
-                      </div>
-                    </td>
-                    <td className="px-8 py-5 text-right font-black text-gray-900 text-sm tracking-tight">
-                      S/ {Number(product.price).toFixed(2)}
-                    </td>
-                    <td className="px-8 py-5 text-center">
-                      <span className={`text-sm font-black ${product.stock < 10 ? 'text-rose-600' : 'text-gray-600'}`}>{product.stock}</span>
-                    </td>
-                    <td className="px-8 py-5 text-center">
-                      {getStockBadge(product.stock)}
-                    </td>
-                    <td className="px-8 py-5">
-                      <div className="flex items-center justify-center gap-2">
-                        <Link href={`/dashboard/products/${product.id}/edit`}>
-                          <button className="p-2 hover:bg-white border-transparent hover:border-gray-100 border rounded-xl text-gray-400 hover:text-indigo-600 shadow-sm transition-all">
-                            <Edit3 className="w-5 h-5" />
-                          </button>
-                        </Link>
-                        <button 
-                          onClick={() => handleToggleStatus(product.id)}
-                          className={`p-2 border rounded-xl shadow-sm transition-all ${
-                            product.isActive ? 'text-gray-400 hover:text-rose-600 hover:bg-rose-50' : 'text-emerald-600 bg-emerald-50 border-emerald-100'
-                          }`}
-                        >
-                          <Power className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            {/* Pagination Controls */}
-            <div className="px-8 py-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Página {page} - {products.length} de {total} registros</span>
-              <div className="flex items-center gap-2">
-                <button 
-                  disabled={page === 1}
-                  onClick={() => setPage(p => p - 1)}
-                  className="p-2 hover:bg-white border-transparent hover:border-gray-100 border rounded-xl text-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <div className="px-4 py-2 bg-white border border-gray-100 rounded-xl text-xs font-black text-indigo-600 shadow-sm">
-                   {page}
+            {/* Premium Search & Categories */}
+            <div className="bg-card rounded-[40px] border border-outline-variant shadow-sm overflow-hidden mb-8">
+              <div className="p-6 lg:p-8 border-b border-outline-variant/30 space-y-6">
+                <div className="relative group">
+                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant/30 group-focus-within:text-primary transition-colors" />
+                    <input 
+                      type="text" 
+                      placeholder="Buscar por nombre, SKU o descripción..." 
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      className="w-full pl-16 pr-6 py-4 bg-surface-low border border-transparent rounded-[24px] text-sm font-black focus:bg-card focus:border-primary/40 transition-all outline-none text-foreground shadow-inner placeholder:text-on-surface-variant/20"
+                    />
                 </div>
-                <button 
-                  disabled={page * 10 >= total}
-                  onClick={() => setPage(p => p + 1)}
-                  className="p-2 hover:bg-white border-transparent hover:border-gray-100 border rounded-xl text-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
+
+                {/* Category Scroller */}
+                <div className="flex items-center gap-3">
+                  <button onClick={() => scroll('left')} className="hidden lg:flex w-10 h-10 items-center justify-center bg-surface-low rounded-xl border border-outline-variant/50 hover:bg-card text-on-surface-variant active:scale-90 transition-all shadow-sm">
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  
+                  <div ref={scrollContainerRef} className="flex-1 flex items-center gap-3 overflow-x-auto no-scrollbar scroll-smooth px-1 py-1">
+                    <button
+                      onClick={() => setSelectedCategoryId(null)}
+                      className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border shrink-0 ${
+                        selectedCategoryId === null 
+                        ? 'bg-primary border-primary text-on-primary shadow-lg shadow-primary/20' 
+                        : 'bg-surface-low border-transparent text-on-surface-variant hover:bg-card hover:border-primary/40 hover:text-primary'
+                      }`}
+                    >
+                      Todos los Productos
+                    </button>
+                    
+                    {categories.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => setSelectedCategoryId(cat.id)}
+                        className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border shrink-0 ${
+                          selectedCategoryId === cat.id 
+                          ? 'bg-primary border-primary text-on-primary shadow-lg shadow-primary/20' 
+                          : 'bg-surface-low border-transparent text-on-surface-variant hover:bg-card hover:border-primary/40 hover:text-primary'
+                        }`}
+                      >
+                        {cat.name}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button onClick={() => scroll('right')} className="hidden lg:flex w-10 h-10 items-center justify-center bg-surface-low rounded-xl border border-outline-variant/50 hover:bg-card text-on-surface-variant active:scale-90 transition-all shadow-sm">
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Hybrid Data Display */}
+              <div className="space-y-4 lg:space-y-0">
+                {/* Mobile Cards */}
+                <div className="lg:hidden p-4 space-y-6">
+                  {loading ? (
+                    Array(3).fill(0).map((_, i) => (
+                      <div key={i} className="bg-surface-low rounded-[32px] h-48 animate-pulse"></div>
+                    ))
+                  ) : products.length === 0 ? (
+                    <div className="py-20 text-center">
+                      <LayoutGrid className="w-12 h-12 text-on-surface-variant/10 mx-auto mb-4" />
+                      <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Sin registros de productos</p>
+                    </div>
+                  ) : (
+                    products.map((product) => (
+                      <div key={product.id} className={`bg-surface-low/30 rounded-[32px] p-6 border border-outline-variant/30 shadow-sm transition-all ${!product.isActive ? 'opacity-50 grayscale' : ''}`}>
+                         <div className="flex justify-between items-start mb-6">
+                            <div className="flex items-center gap-4">
+                               <div className="w-16 h-16 rounded-[20px] bg-card flex items-center justify-center overflow-hidden border border-outline-variant/50 shadow-inner">
+                                  {product.imageUrl ? (
+                                    <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                                  ) : (
+                                    <LayoutGrid className="w-7 h-7 text-on-surface-variant/20" />
+                                  )}
+                               </div>
+                               <div>
+                                  <p className="text-base font-black text-foreground tracking-tight line-clamp-1">{product.name}</p>
+                                  <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest mt-0.5">SKU: {product.id.substring(0, 8).toUpperCase()}</p>
+                               </div>
+                            </div>
+                            <div className="text-right">
+                               <p className="text-lg font-black text-primary tracking-tighter">S/ {Number(product.price).toFixed(2)}</p>
+                               <span className="text-[9px] font-black text-on-surface-variant/40 uppercase tracking-widest">P. Unitario</span>
+                            </div>
+                         </div>
+                         
+                         <div className="grid grid-cols-2 gap-4 mb-6">
+                            <div className="bg-card/50 p-3 rounded-2xl border border-outline-variant/20">
+                               <p className="text-[9px] font-black text-on-surface-variant/40 uppercase tracking-widest mb-1">Categoría</p>
+                               <div className="flex items-center gap-1.5">
+                                  <Tag className="w-3 h-3 text-primary/60" />
+                                  <span className="text-[10px] font-black text-foreground truncate">{product.category?.name || 'General'}</span>
+                               </div>
+                            </div>
+                            <div className="bg-card/50 p-3 rounded-2xl border border-outline-variant/20">
+                               <p className="text-[9px] font-black text-on-surface-variant/40 uppercase tracking-widest mb-1">Disponibilidad</p>
+                               <div className="flex items-center justify-between">
+                                  <span className="text-xs font-black text-foreground">{product.stock} <span className="text-[9px] text-on-surface-variant">UND</span></span>
+                                  {getStockBadge(product.stock)}
+                               </div>
+                            </div>
+                         </div>
+
+                         <div className="flex gap-2">
+                            <Link href={`/dashboard/products/${product.id}/edit`} className="flex-1">
+                               <button className="w-full py-3.5 bg-surface-low text-on-surface-variant border border-outline-variant/30 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-card transition-all">
+                                  Editar Registro
+                               </button>
+                            </Link>
+                            <button 
+                              onClick={() => handleToggleStatus(product.id)}
+                              className={`flex-1 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                                product.isActive ? 'bg-rose-500/10 text-rose-600' : 'bg-emerald-500/10 text-emerald-600'
+                              }`}
+                            >
+                              {product.isActive ? 'Desactivar' : 'Reactivar'}
+                            </button>
+                         </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Desktop Table */}
+                <div className="hidden lg:block overflow-x-auto scrollbar-thin scrollbar-thumb-primary/10 scrollbar-track-transparent">
+                  <table className="w-full text-left border-collapse min-w-[1100px]">
+                    <thead>
+                      <tr className="bg-surface-low/30 border-b border-outline-variant/30">
+                        <th className="px-10 py-7 text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Información del Producto</th>
+                        <th className="px-10 py-7 text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Clasificación</th>
+                        <th className="px-10 py-7 text-[10px] font-black text-on-surface-variant uppercase tracking-widest text-right">Precio Mercado</th>
+                        <th className="px-10 py-7 text-[10px] font-black text-on-surface-variant uppercase tracking-widest text-center">Existencias</th>
+                        <th className="px-10 py-7 text-[10px] font-black text-on-surface-variant uppercase tracking-widest text-center">Estado</th>
+                        <th className="px-10 py-7 text-[10px] font-black text-on-surface-variant uppercase tracking-widest text-center">Gestión</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-outline-variant/30">
+                      {loading ? (
+                        Array(5).fill(0).map((_, i) => (
+                          <tr key={i} className="animate-pulse">
+                            <td colSpan={6} className="px-10 py-8 h-24 bg-surface-low/10"></td>
+                          </tr>
+                        ))
+                      ) : products.length === 0 ? (
+                        <tr>
+                           <td colSpan={6} className="px-10 py-32 text-center">
+                              <LayoutGrid className="w-16 h-16 text-on-surface-variant/10 mx-auto mb-6" />
+                              <p className="text-[11px] font-black text-on-surface-variant uppercase tracking-widest opacity-40">No hay registros de productos en este catálogo</p>
+                           </td>
+                        </tr>
+                      ) : (
+                        products.map(product => (
+                          <tr key={product.id} className={`hover:bg-primary/[0.02] transition-colors group ${!product.isActive ? 'opacity-50 grayscale' : ''}`}>
+                            <td className="px-10 py-8">
+                              <div className="flex items-center gap-6">
+                                <div className="w-14 h-14 rounded-2xl bg-surface-low flex items-center justify-center overflow-hidden border border-outline-variant transition-transform group-hover:scale-110 shadow-sm">
+                                  {product.imageUrl ? (
+                                    <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                                  ) : (
+                                    <LayoutGrid className="w-7 h-7 text-on-surface-variant/30" />
+                                  )}
+                                </div>
+                                <div>
+                                  <p className="text-lg font-black text-foreground tracking-tighter leading-tight">{product.name}</p>
+                                  <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] mt-1.5 flex items-center gap-1.5">
+                                     <Hash className="w-3 h-3 opacity-50" /> {product.id.substring(0, 8).toUpperCase()}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-10 py-8">
+                               <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/5 text-primary rounded-xl border border-primary/10">
+                                  <Tag className="w-3.5 h-3.5" />
+                                  <span className="text-[10px] font-black uppercase tracking-widest">{product.category?.name || 'General'}</span>
+                               </div>
+                            </td>
+                            <td className="px-10 py-8 text-right">
+                               <p className="text-xl font-black text-foreground tracking-tighter leading-none">S/ {Number(product.price).toFixed(2)}</p>
+                               <span className="text-[9px] font-black text-on-surface-variant/40 uppercase tracking-widest">Venta Unitario</span>
+                            </td>
+                            <td className="px-10 py-8 text-center">
+                               <p className={`text-xl font-black tracking-tighter ${product.stock < 10 ? 'text-rose-500' : 'text-foreground'}`}>{product.stock}</p>
+                               <span className="text-[9px] font-black text-on-surface-variant/40 uppercase tracking-widest">Unidades</span>
+                            </td>
+                            <td className="px-10 py-8 text-center">
+                               {getStockBadge(product.stock)}
+                            </td>
+                            <td className="px-10 py-8">
+                              <div className="flex items-center justify-center gap-3">
+                                <Link href={`/dashboard/products/${product.id}/edit`}>
+                                   <button className="w-11 h-11 bg-surface-low text-on-surface-variant hover:text-primary hover:bg-primary/10 border border-outline-variant/50 rounded-xl flex items-center justify-center transition-all hover:scale-110 shadow-sm">
+                                      <Edit3 className="w-4.5 h-4.5" />
+                                   </button>
+                                </Link>
+                                <button
+                                  onClick={() => handleToggleStatus(product.id)}
+                                  className={`w-11 h-11 border rounded-xl flex items-center justify-center transition-all hover:scale-110 shadow-sm ${
+                                    product.isActive 
+                                    ? 'bg-surface-low text-on-surface-variant hover:text-rose-600 hover:bg-rose-500/10 border-outline-variant/50' 
+                                    : 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 shadow-emerald-500/5'
+                                  }`}
+                                >
+                                  <Power className="w-4.5 h-4.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Premium Pagination */}
+                <div className="px-8 py-6 border-t border-outline-variant/30 flex flex-col sm:flex-row items-center justify-between bg-surface-low/30 gap-6">
+                  <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em]">Mostrando {products.length} de {total} registros</p>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+                      className="w-12 h-12 rounded-[18px] border border-outline-variant/50 flex items-center justify-center hover:bg-card text-on-surface-variant disabled:opacity-30 transition-all active:scale-90"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <div className="px-6 py-3 bg-primary text-on-primary rounded-[18px] text-xs font-black shadow-xl shadow-primary/20">
+                       Página {page}
+                    </div>
+                    <button onClick={() => setPage(p => Math.min(Math.ceil(total/10), p + 1))} disabled={page * 10 >= total}
+                      className="w-12 h-12 rounded-[18px] border border-outline-variant/50 flex items-center justify-center hover:bg-card text-on-surface-variant disabled:opacity-30 transition-all active:scale-90"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -401,3 +477,4 @@ export default function ProductsPage() {
     </div>
   );
 }
+

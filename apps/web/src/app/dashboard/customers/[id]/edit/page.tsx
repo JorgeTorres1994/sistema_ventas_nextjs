@@ -131,7 +131,7 @@ export default function EditCustomerPage() {
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-y-auto">
+      <div className="flex-1 flex flex-col lg:ml-64 w-full lg:w-[calc(100%-256px)] overflow-y-auto">
 
         <header className="px-8 py-6 bg-white border-b border-gray-100 flex items-center gap-4 sticky top-0 z-20">
           <button onClick={() => router.push('/dashboard/customers')}
@@ -147,7 +147,7 @@ export default function EditCustomerPage() {
           </div>
         </header>
 
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 lg:p-8">
           {fetchLoading ? (
             <div className="flex items-center justify-center h-64">
               <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
@@ -167,7 +167,7 @@ export default function EditCustomerPage() {
                   </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                <form onSubmit={handleSubmit} className="p-4 lg:p-8 space-y-6">
                   <div>
                     <label className="block text-sm font-black text-gray-900 mb-2">Nombre Completo <span className="text-rose-500">*</span></label>
                     <div className="relative">

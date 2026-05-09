@@ -41,22 +41,22 @@ const parseSafeDate = (d: any) => {
 };
 
 const KPICard = ({ title, value, growth, icon: Icon, isCurrency }: any) => (
-  <div className="bg-white p-10 rounded-[48px] border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.02)] flex-1 group hover:border-blue-100 transition-all relative overflow-hidden">
-    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50/30 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-700" />
+  <div className="bg-card p-10 rounded-[48px] border border-outline-variant shadow-sm flex-1 group hover:border-primary/20 transition-all relative overflow-hidden">
+    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-700 opacity-50" />
     <div className="flex items-start justify-between mb-8 relative z-10">
-       <div className="w-16 h-16 bg-gray-50 rounded-[28px] flex items-center justify-center text-gray-400 group-hover:text-blue-600 group-hover:bg-blue-50 transition-all shadow-inner">
+       <div className="w-16 h-16 bg-surface-low rounded-[28px] flex items-center justify-center text-on-surface-variant group-hover:text-primary group-hover:bg-primary/10 border border-outline-variant/50 transition-all shadow-inner">
           <Icon className="w-8 h-8" />
        </div>
        <div className={`px-4 py-2 rounded-full text-[10px] font-black tracking-widest uppercase flex items-center gap-1 ${
-           growth >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
+           growth >= 0 ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-500 border border-rose-500/20'
        }`}>
           {growth >= 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
           {Math.abs(growth)}%
        </div>
     </div>
     <div className="space-y-1 relative z-10">
-       <p className="text-[11px] font-black text-gray-400 uppercase tracking-[3px]">{title}</p>
-       <h3 className="text-4xl font-black text-gray-900 tracking-tighter">
+       <p className="text-[11px] font-black text-on-surface-variant uppercase tracking-[3px] opacity-60">{title}</p>
+       <h3 className="text-4xl font-black text-foreground tracking-tighter">
           {isCurrency ? fmtCurrency(value) : value}
        </h3>
     </div>
@@ -84,26 +84,26 @@ const ModernSelect = ({ label, value, onChange, options, icon: Icon }: any) => {
     <div className="flex-1 relative" ref={containerRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className={`relative w-full bg-white rounded-[28px] border transition-all duration-300 px-7 py-4 flex items-center justify-between group shadow-sm ${
-          isOpen ? 'border-blue-500 shadow-xl shadow-blue-50' : 'border-gray-100 hover:border-blue-200'
+        className={`relative w-full bg-card rounded-[28px] border transition-all duration-300 px-7 py-4 flex items-center justify-between group shadow-sm ${
+          isOpen ? 'border-primary shadow-2xl shadow-primary/10' : 'border-outline-variant hover:border-primary/30'
         }`}
       >
         <div className="flex items-center gap-4">
           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 ${
-            isOpen ? 'bg-blue-600 text-white rotate-[360deg]' : 'bg-blue-50 text-blue-600'
+            isOpen ? 'bg-primary text-on-primary rotate-[360deg]' : 'bg-primary/10 text-primary'
           }`}>
             <Icon className="w-5 h-5" />
           </div>
           <div className="text-left">
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-0.5">{label}</p>
-            <p className="text-[13px] font-black text-gray-900 tracking-tight">{selectedOption.label}</p>
+            <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] mb-0.5 opacity-60">{label}</p>
+            <p className="text-[13px] font-black text-foreground tracking-tight">{selectedOption.label}</p>
           </div>
         </div>
-        <ChevronDown className={`w-5 h-5 text-blue-600 transition-transform duration-500 ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-5 h-5 text-primary transition-transform duration-500 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-3 bg-white border border-gray-100 rounded-[32px] shadow-[0_30px_90px_rgba(0,0,0,0.2)] z-[100] p-3 animate-in fade-in zoom-in-95 duration-200 origin-top">
+        <div className="absolute top-full left-0 right-0 mt-4 bg-card border border-outline-variant rounded-[32px] shadow-[0_30px_90px_rgba(0,0,0,0.3)] z-[100] p-3 animate-in fade-in zoom-in-95 duration-200 origin-top backdrop-blur-md bg-card/95">
           <div className="space-y-1">
             {options.map((opt: any) => (
               <button
@@ -114,22 +114,22 @@ const ModernSelect = ({ label, value, onChange, options, icon: Icon }: any) => {
                 }}
                 className={`w-full flex items-center justify-between px-5 py-4 rounded-[22px] transition-all group ${
                   value === opt.value 
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-100' 
-                  : 'hover:bg-gray-50/80 text-gray-700'
+                  ? 'bg-primary text-on-primary shadow-xl shadow-primary/20' 
+                  : 'hover:bg-surface-low text-on-surface-variant'
                 }`}
               >
                 <div className="flex items-center gap-4">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-                    value === opt.value ? 'bg-white/20' : 'bg-gray-100 group-hover:bg-white group-hover:shadow-sm'
+                    value === opt.value ? 'bg-white/20' : 'bg-surface-low group-hover:bg-card group-hover:shadow-sm'
                   }`}>
                     {opt.icon ? <opt.icon className="w-4 h-4" /> : <Layers className="w-4 h-4" />}
                   </div>
                   <div className="text-left">
-                    <p className={`text-[12px] font-black tracking-tight ${value === opt.value ? 'text-white' : 'text-gray-900'}`}>{opt.label}</p>
-                    {opt.desc && <p className={`text-[9px] font-bold uppercase tracking-wider ${value === opt.value ? 'text-blue-100' : 'text-gray-400'}`}>{opt.desc}</p>}
+                    <p className={`text-[12px] font-black tracking-tight ${value === opt.value ? 'text-on-primary' : 'text-foreground'}`}>{opt.label}</p>
+                    {opt.desc && <p className={`text-[9px] font-bold uppercase tracking-wider ${value === opt.value ? 'text-white/60' : 'text-on-surface-variant/60'}`}>{opt.desc}</p>}
                   </div>
                 </div>
-                {value === opt.value && <Check className="w-5 h-5 text-white animate-in zoom-in duration-300" />}
+                {value === opt.value && <Check className="w-5 h-5 text-on-primary animate-in zoom-in duration-300" />}
               </button>
             ))}
           </div>
@@ -252,7 +252,7 @@ export default function ReportsPage() {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
       }, 100);
-
+      
       toast.success('Excel descargado correctamente', { id: toastId });
     } catch (e) { 
       console.error(e);
@@ -389,124 +389,172 @@ export default function ReportsPage() {
 
   if (loading && !data.summary) {
     return (
-      <div className="flex h-screen bg-[#F8F9FC] items-center justify-center">
-        <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+      <div className="flex h-screen bg-background items-center justify-center">
+        <Loader2 className="w-10 h-10 text-primary animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-[#F8F9FC] overflow-hidden font-sans">
+    <div className="flex h-screen bg-background overflow-hidden font-sans text-foreground transition-colors">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64 w-[calc(100%-256px)] overflow-hidden">
+      <div className="flex-1 flex flex-col lg:ml-64 w-full lg:w-full lg:w-[calc(100%-256px)] overflow-hidden">
         <TopBar />
 
-        {/* Action Header */}
-        <div className="px-12 pt-12 pb-8 flex items-start justify-between shrink-0">
-          <div>
-            <h1 className="text-4xl font-black text-gray-900 tracking-tighter mb-2">Análisis Estratégico</h1>
-            <p className="text-gray-400 font-medium">Gestión de Auditoría Nexus Genesis</p>
-          </div>
-          <div className="flex gap-4">
-             <button onClick={handlePrintReport} disabled={isGenerating} className="px-8 py-4 bg-white border border-gray-100 rounded-[28px] text-sm font-black text-gray-900 hover:bg-gray-50 shadow-sm flex items-center gap-3 transition-all">
-                {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Printer className="w-5 h-5 text-rose-500" />}
-                Imprimir PDF
-             </button>
-             <button onClick={exportExcel} className="px-10 py-4 bg-indigo-600 rounded-[28px] text-sm font-black text-white hover:bg-indigo-700 shadow-xl shadow-indigo-100 flex items-center gap-3 transition-all">
-                <TableIcon className="w-5 h-5" /> Excel Luxury
-             </button>
-          </div>
-        </div>
+        <main className="flex-1 overflow-y-auto scrollbar-hide pb-20 space-y-8 sm:space-y-12">
+           {/* Action Header - Responsive */}
+           <div className="px-4 sm:px-12 pt-8 sm:pt-12 pb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between shrink-0 gap-6">
+             <div>
+               <nav className="flex items-center gap-2 text-[9px] sm:text-[10px] font-black text-on-surface-variant uppercase tracking-widest mb-3">
+                 <span>Inteligencia</span><span>/</span>
+                 <span className="text-primary">Auditoría</span>
+               </nav>
+               <h1 className="text-3xl sm:text-4xl font-black tracking-tighter mb-1">Análisis Estratégico</h1>
+               <p className="text-xs sm:text-sm text-on-surface-variant font-medium">Gestión de Auditoría Nexus Genesis</p>
+             </div>
+             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                <button onClick={handlePrintReport} disabled={isGenerating} className="flex-1 sm:flex-none px-6 py-4 bg-card border border-outline-variant rounded-[24px] text-[10px] font-black text-foreground hover:bg-surface-low shadow-sm flex items-center justify-center gap-3 transition-all active:scale-95 uppercase tracking-widest">
+                   {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Printer className="w-4 h-4 text-rose-500" />}
+                   Imprimir PDF
+                </button>
+                <button onClick={exportExcel} className="flex-1 sm:flex-none px-8 py-4 bg-primary text-on-primary rounded-[24px] text-[10px] font-black uppercase tracking-widest hover:opacity-90 shadow-2xl shadow-primary/30 flex items-center justify-center gap-3 transition-all active:scale-95">
+                   <TableIcon className="w-4 h-4" /> Exportar Excel
+                </button>
+             </div>
+           </div>
 
-        <main className="flex-1 overflow-y-auto scrollbar-hide px-12 pb-20 space-y-12">
-           {/* Filters */}
-           <div className="flex gap-6 sticky top-0 z-50 bg-[#F8F9FC]/80 backdrop-blur-md py-4">
+           {/* Filters - Responsive */}
+           <div className="px-4 sm:px-12 flex flex-col lg:flex-row gap-6 py-4">
               <ModernSelect 
                 label="Periodo de Evaluación" 
                 value={period} 
                 onChange={handlePeriodChange} 
                 icon={CalendarDays} 
                 options={[
-                  { value: 'Hoy', label: 'Cierre del Día' },
-                  { value: 'Últimos 30 Días', label: 'Últimos 30 Días' },
-                  { value: 'Este Mes', label: 'Mensual Actual' },
-                  { value: 'Mes Pasado', label: 'Periodo Anterior' }
+                  { value: 'Hoy', label: 'Cierre del Día', desc: 'Sincronización en tiempo real' },
+                  { value: 'Últimos 30 Días', label: 'Últimos 30 Días', desc: 'Tendencia mensual actual' },
+                  { value: 'Este Mes', label: 'Mensual Actual', desc: 'Acumulado del periodo' },
+                  { value: 'Mes Pasado', label: 'Periodo Anterior', desc: 'Auditoría retroactiva' }
                 ]} 
               />
-              <div className="flex-1 bg-white border border-gray-100 px-8 rounded-[32px] shadow-sm flex items-center">
-                 <Search className="w-4 h-4 text-gray-300 mr-4" />
-                 <input className="bg-transparent border-none focus:ring-0 text-sm font-bold text-gray-600 w-full" placeholder="Buscar por ID, Cliente o Monto..." />
-              </div>
+              <ModernSelect 
+                label="Enfoque Analítico" 
+                value={filters.type} 
+                onChange={(val: string) => setFilters(prev => ({ ...prev, type: val }))} 
+                icon={Layers} 
+                options={[
+                  { value: 'Ingresos Consolidados', label: 'Ventas y Facturación', desc: 'Análisis de liquidez' },
+                  { value: 'Rendimiento de Productos', label: 'Ingeniería de Producto', desc: 'Rotación y márgenes' },
+                  { value: 'Flujo de Caja', label: 'Flujo de Efectivo', desc: 'Conciliación de pagos' }
+                ]} 
+              />
            </div>
 
-           {/* Metrics Grid */}
-           <div className="flex gap-10">
+           {/* Metrics Grid - Responsive */}
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10">
               <KPICard title="Facturación" value={data.summary?.totalRevenue || 0} growth={15} icon={DollarSign} isCurrency />
               <KPICard title="Beneficio" value={data.summary?.totalProfit || 0} growth={9} icon={TrendingUp} isCurrency />
-              <KPICard title="Operaciones" value={data.summary?.totalSales || 0} growth={6} icon={Activity} />
+              <div className="sm:col-span-2 lg:col-span-1">
+                <KPICard title="Operaciones" value={data.summary?.totalSales || 0} growth={6} icon={Activity} />
+              </div>
            </div>
 
-           {/* Chart visualization */}
-           <div className="bg-white p-12 rounded-[56px] border border-gray-100 shadow-sm" ref={chartAreaRef}>
-              <div className="flex items-center justify-between mb-12">
+           {/* Chart visualization - Responsive */}
+           <div className="bg-card p-6 sm:p-12 rounded-[40px] sm:rounded-[56px] border border-outline-variant shadow-sm relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8 sm:p-12 opacity-5 hidden sm:block">
+                 <BarChart3 className="w-24 h-24 sm:w-40 h-40" />
+              </div>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 sm:mb-12 relative z-10 gap-4">
                  <div>
-                    <h3 className="text-2xl font-black text-gray-900 tracking-tight">Rendimiento Operativo</h3>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Evolución de ingresos diarios</p>
+                    <h3 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">Rendimiento Operativo</h3>
+                    <p className="text-[9px] sm:text-[10px] font-black text-on-surface-variant uppercase tracking-widest mt-1 opacity-60">Evolución de ingresos diarios</p>
                  </div>
-                 <div className="bg-indigo-50 px-5 py-2.5 rounded-full flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full bg-indigo-600" />
-                    <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Moneda Nacional (S/)</span>
+                 <div className="bg-primary/10 px-4 py-2 rounded-full flex items-center gap-3 border border-primary/20 shadow-inner">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                    <span className="text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-widest">Real-time S/ Data</span>
                  </div>
               </div>
-              <div className="h-[350px]">
+              <div className="h-[250px] sm:h-[350px] relative z-10">
                 <ResponsiveContainer width="100%" height="100%">
                    <ReBarChart data={data.charts.performance}>
-                      <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#F1F5F9" />
-                      <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#94A3B8', fontSize: 10, fontWeight: 800}} />
-                      <YAxis axisLine={false} tickLine={false} tick={{fill: '#94A3B8', fontSize: 10, fontWeight: 800}} />
-                      <Tooltip cursor={{fill: '#F8FAFC'}} contentStyle={{borderRadius: '24px', border: 'none', boxShadow: '0 20px 50px rgba(0,0,0,0.1)', fontWeight: 900, padding: '20px'}} />
-                      <Bar dataKey="revenue" fill="#4F46E5" radius={[12, 12, 0, 0]} barSize={50} />
+                      <CartesianGrid strokeDasharray="8 8" vertical={false} stroke="currentColor" className="text-outline-variant/10" />
+                      <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: 'currentColor', fontSize: 10, fontWeight: 800}} className="text-on-surface-variant/40" />
+                      <YAxis axisLine={false} tickLine={false} tick={{fill: 'currentColor', fontSize: 10, fontWeight: 800}} className="text-on-surface-variant/40" />
+                      <Tooltip cursor={{fill: 'currentColor', opacity: 0.05}} contentStyle={{backgroundColor: 'var(--card)', borderRadius: '24px', border: '1px solid var(--outline-variant)', boxShadow: '0 20px 50px rgba(0,0,0,0.3)', fontWeight: 900, padding: '20px', color: 'var(--foreground)'}} />
+                      <Bar dataKey="revenue" fill="currentColor" radius={[16, 16, 0, 0]} barSize={40} className="text-primary" />
                    </ReBarChart>
                 </ResponsiveContainer>
               </div>
            </div>
 
-           {/* Data Table */}
-           <div className="bg-white p-12 rounded-[56px] border border-gray-100 shadow-sm overflow-hidden mb-12">
-              <h3 className="text-2xl font-black text-gray-900 tracking-tight mb-12">Bitácora de Transacciones</h3>
-              <table className="w-full text-left">
-                 <thead>
-                    <tr className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] border-b border-gray-100">
-                       <th className="pb-8 px-6">Identificador</th>
-                       <th className="pb-8 px-6">Cliente / Entidad</th>
-                       <th className="pb-8 px-6">Monto Bruto</th>
-                       <th className="pb-8 px-6 text-center">Estado Operativo</th>
-                    </tr>
-                 </thead>
-                 <tbody className="divide-y divide-gray-50">
-                    {data.transactions.slice(0, 10).map((t: any) => (
-                       <tr key={t.id} className="group hover:bg-indigo-50/30 transition-all">
-                          <td className="py-7 px-6 font-black text-gray-400 text-xs tracking-tighter group-hover:text-indigo-600">#{t.id?.slice(-8).toUpperCase()}</td>
-                          <td className="py-7 px-6">
-                             <div className="flex flex-col">
-                                <span className="text-base font-black text-gray-800 tracking-tight">{t.customer || 'Público General'}</span>
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{t.paymentMethod || 'Contado'}</span>
-                             </div>
-                          </td>
-                          <td className="py-7 px-6 font-black text-gray-900 text-lg tracking-tighter">{fmtCurrency(t.amount)}</td>
-                          <td className="py-7 px-6 text-center">
-                             <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm">
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                Completado
-                             </span>
-                          </td>
-                       </tr>
-                    ))}
-                 </tbody>
-              </table>
+           {/* Data Table / Cards - Responsive */}
+           <div className="bg-card p-6 sm:p-12 rounded-[40px] sm:rounded-[56px] border border-outline-variant shadow-sm overflow-hidden mb-12">
+              <div className="flex items-center justify-between mb-8 sm:mb-12">
+                <h3 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">Bitácora de Transacciones</h3>
+                <span className="text-[9px] font-black text-on-surface-variant uppercase tracking-widest opacity-40 hidden sm:block">Total {data.transactions.length}</span>
+              </div>
+
+              {/* MOBILE CARDS VIEW */}
+              <div className="sm:hidden space-y-4">
+                 {data.transactions.slice(0, 10).map((t: any) => (
+                   <div key={t.id} className="p-6 bg-surface-low rounded-[28px] border border-outline-variant/30 space-y-4">
+                      <div className="flex justify-between items-start">
+                         <span className="text-[10px] font-black text-primary font-mono tracking-tighter">#PO-{t.id?.slice(-8).toUpperCase()}</span>
+                         <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-full text-[8px] font-black uppercase tracking-widest">PAGADO</span>
+                      </div>
+                      <div>
+                         <p className="text-base font-black text-foreground tracking-tight">{t.customer || 'Público General'}</p>
+                         <p className="text-[9px] font-bold text-on-surface-variant uppercase tracking-widest opacity-60">{t.paymentMethod || 'Contado'}</p>
+                      </div>
+                      <div className="flex justify-between items-end pt-2 border-t border-outline-variant/10">
+                         <span className="text-[9px] font-black text-on-surface-variant uppercase tracking-widest opacity-40">{parseSafeDate(t.date)}</span>
+                         <span className="text-xl font-black text-foreground tracking-tighter">{fmtCurrency(t.amount)}</span>
+                      </div>
+                   </div>
+                 ))}
+              </div>
+
+              {/* DESKTOP TABLE VIEW */}
+              <div className="hidden sm:block overflow-x-auto scrollbar-hide">
+                <table className="w-full text-left">
+                  <thead>
+                      <tr className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] border-b border-outline-variant/30">
+                          <th className="pb-8 px-6">Identificador</th>
+                          <th className="pb-8 px-6">Socio Comercial</th>
+                          <th className="pb-8 px-6">Monto Bruto</th>
+                          <th className="pb-8 px-6 text-center">Estado Operativo</th>
+                      </tr>
+                  </thead>
+                  <tbody className="divide-y divide-outline-variant/30">
+                      {data.transactions.slice(0, 10).map((t: any) => (
+                        <tr key={t.id} className="group hover:bg-primary/5 transition-all cursor-pointer">
+                            <td className="py-7 px-6">
+                                <span className="text-[11px] font-black text-on-surface-variant/40 group-hover:text-primary transition-colors tracking-tighter">
+                                    #PO-{t.id?.slice(-8).toUpperCase()}
+                                </span>
+                            </td>
+                            <td className="py-7 px-6">
+                                <div className="flex flex-col">
+                                    <span className="text-base font-black text-foreground tracking-tight">{t.customer || 'Público General'}</span>
+                                    <span className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest opacity-60">{t.paymentMethod || 'Liquidación Contado'}</span>
+                                </div>
+                            </td>
+                            <td className="py-7 px-6 font-black text-foreground text-xl tracking-tighter group-hover:scale-110 transition-transform origin-left">{fmtCurrency(t.amount)}</td>
+                            <td className="py-7 px-6 text-center">
+                                <span className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shadow-inner">
+                                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                    Completado
+                                </span>
+                            </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
            </div>
         </main>
       </div>
     </div>
   );
 }
+
