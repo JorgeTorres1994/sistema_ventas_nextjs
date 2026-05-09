@@ -21,15 +21,19 @@ import {
   Receipt, 
   CreditCard,
   Tag,
-  History
+  History,
+  X,
+  ChevronLeft
 } from 'lucide-react';
 
 import { useSettings } from '../SettingsProvider';
+import { useSidebar } from './SidebarContext';
 import { logout } from '@/lib/api';
 
 const Sidebar = () => {
   const pathname = usePathname();
   const { settings } = useSettings();
+  const { isOpen, setIsOpen, isMobile, isCollapsed, toggleCollapse } = useSidebar();
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [permissions, setPermissions] = React.useState<string[]>([]);
   const [mounted, setMounted] = React.useState(false);
@@ -41,7 +45,6 @@ const Sidebar = () => {
       const userStr = localStorage.getItem('user');
       if (userStr) {
         const user = JSON.parse(userStr);
-        // Emergency sanitization
         const roleName = typeof user.role === 'object' ? user.role?.name : user.role;
         setIsAdmin(roleName === 'Administrador' || roleName === 'ADMIN');
         setPermissions(user.permissions || []);
@@ -106,39 +109,83 @@ const Sidebar = () => {
     }
   ];
 
-  // Filter groups and items
   const filteredGroups = menuGroups.map(group => ({
     ...group,
     items: group.items.filter(item => hasPermission(item.permission))
   })).filter(group => group.items.length > 0);
 
   return (
-    <aside className="w-64 border-r border-[#E5E7EB] h-screen bg-[#F9FAFB] flex flex-col justify-between fixed left-0 top-0 overflow-y-auto scrollbar-hide">
+    <>
+      {/* Maestro Backdrop for mobile */}
+      {isMobile && isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] animate-in fade-in duration-500"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      <aside className={`w-[280px] sm:w-80 border-r border-[var(--outline-variant)] h-screen bg-[var(--sidebar)]/95 backdrop-blur-2xl flex flex-col justify-between fixed left-0 top-0 overflow-y-auto overflow-x-hidden scrollbar-hide z-[110] cubic-bezier(0.4, 0, 0.2, 1) ${
+        mounted ? 'transition-all duration-300' : ''
+      } ${
+        isOpen ? 'translate-x-0 opacity-100 shadow-[20px_0_60px_rgba(0,0,0,0.4)]' : '-translate-x-full lg:translate-x-0 lg:opacity-100'
+      } ${isCollapsed ? 'lg:w-20' : 'lg:w-64'}`}>
       <div>
-        <div className={`flex items-center gap-3 p-6 mb-2 transition-opacity duration-500 ${mounted && settings ? 'opacity-100' : 'opacity-0'}`}>
-          {mounted && settings?.logoUrl ? (
-            <img 
-              src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}${settings.logoUrl}?v=${version}`} 
-              alt="Logo" 
-              className="w-10 h-10 rounded-lg object-cover" 
-            />
-          ) : (
-            <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm">
-              <Building2 className="w-6 h-6 text-blue-600/20" />
-            </div>
-          )}
-          <div className={!mounted ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}>
-            <h1 className="font-bold text-[#111827] text-md leading-tight truncate w-32" title={settings?.businessName || 'Nexus Genesis'}>
-              {settings?.businessName || 'Nexus Genesis'}
-            </h1>
-            <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest mt-0.5">Sistemas Élite</p>
-          </div>
+        {/* Mobile Header with Close Button */}
+        <div className={`flex items-center p-6 relative group ${isCollapsed ? 'lg:justify-center lg:px-0' : 'justify-between'}`}>
+           <div className={`flex items-center gap-3 transition-opacity duration-500 ${mounted && settings ? 'opacity-100' : 'opacity-0'}`}>
+              <div className="relative shrink-0">
+                 <div className="w-10 h-10 bg-primary rounded-[12px] flex items-center justify-center shadow-lg shadow-primary/20">
+                    {mounted && settings?.logoUrl ? (
+                      <img 
+                        src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}${settings.logoUrl}?v=${version}`} 
+                        alt="Logo" 
+                        className="w-full h-full object-cover rounded-[10px]" 
+                      />
+                    ) : (
+                      <Building2 className="w-5 h-5 text-on-primary" />
+                    )}
+                 </div>
+                 <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[var(--sidebar)]"></div>
+              </div>
+              <div className={`overflow-hidden ${mounted ? 'transition-all duration-300' : ''} ${isCollapsed ? 'lg:w-0 lg:opacity-0' : 'w-28 lg:w-32 opacity-100'}`}>
+                 <h1 className="font-black text-foreground text-sm tracking-tighter leading-none truncate" title={settings?.businessName || 'Nexus Genesis'}>
+                    {settings?.businessName || 'Nexus Genesis'}
+                 </h1>
+                 <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em] mt-1">Sistemas Élite</p>
+              </div>
+           </div>
+           
+           {!isMobile && (
+             <button 
+               onClick={toggleCollapse}
+               className={`hidden lg:flex items-center justify-center w-6 h-6 bg-surface-low border border-outline-variant/50 rounded-lg text-on-surface-variant hover:text-primary hover:border-primary/30 active:scale-90 absolute z-50 shadow-sm ${mounted ? 'transition-all' : ''} ${isCollapsed ? 'left-1/2 -translate-x-1/2 -bottom-3' : 'right-4 top-7'}`}
+             >
+                <ChevronLeft className={`w-3.5 h-3.5 ${mounted ? 'transition-transform duration-300' : ''} ${isCollapsed ? 'rotate-180' : ''}`} />
+             </button>
+           )}
+
+           {isMobile && (
+             <button 
+               onClick={() => setIsOpen(false)}
+               className="p-2 bg-surface-low rounded-xl text-on-surface-variant hover:text-primary transition-all active:scale-90 border border-outline-variant/30"
+             >
+                <X className="w-5 h-5" />
+             </button>
+           )}
         </div>
 
-        <nav className="px-4 pb-4 space-y-6">
+        <nav className={`px-4 pb-4 space-y-6 ${isCollapsed ? 'lg:px-2' : ''}`}>
           {filteredGroups.map((group) => (
-            <div key={group.title} className="space-y-1">
-              <h3 className="px-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] mb-2">{group.title}</h3>
+            <div key={group.title} className="space-y-2 relative">
+              {isCollapsed ? (
+                <div className="h-px w-6 bg-outline-variant opacity-20 mx-auto my-4 hidden lg:block"></div>
+              ) : (
+                <div className="px-4 flex items-center gap-3">
+                   <div className="h-px flex-1 bg-outline-variant opacity-20"></div>
+                   <h3 className="text-[9px] font-black text-on-surface-variant uppercase tracking-[0.3em] opacity-40 whitespace-nowrap">{group.title}</h3>
+                   <div className="h-px flex-1 bg-outline-variant opacity-20"></div>
+                </div>
+              )}
               <div className="space-y-1">
                 {group.items.map((item) => {
                   const fullPath = item.path === '/' ? '/dashboard' : `/dashboard${item.path}`;
@@ -146,16 +193,27 @@ const Sidebar = () => {
                     ? pathname === '/dashboard' 
                     : (item.path === '/inventory' ? pathname === fullPath : pathname?.includes(item.path));
                   return (
-                    <Link href={item.path === '/' ? '/dashboard' : `/dashboard${item.path}`} key={item.name}>
+                    <Link 
+                      href={item.path === '/' ? '/dashboard' : `/dashboard${item.path}`} 
+                      key={item.name}
+                      onClick={() => isMobile && setIsOpen(false)}
+                    >
                       <div
-                        className={`flex items-center gap-3 px-4 py-2.5 rounded-xl cursor-pointer transition-all duration-200 group ${
+                        title={isCollapsed ? item.name : undefined}
+                        className={`flex items-center gap-3 py-3 rounded-[16px] cursor-pointer group relative ${mounted ? 'transition-all duration-300' : ''} ${isCollapsed ? 'lg:justify-center px-4 lg:px-0' : 'px-4'} ${
                           isActive 
-                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' 
-                            : 'text-[#4B5563] hover:bg-white hover:text-blue-600 hover:shadow-sm'
+                            ? 'bg-primary text-on-primary shadow-lg shadow-primary/20 scale-[1.02] lg:scale-100' 
+                            : 'text-on-surface-variant hover:bg-surface-low hover:text-primary'
                         }`}
                       >
-                        <item.icon className={`w-[18px] h-[18px] transition-colors ${isActive ? 'text-white' : 'text-[#9CAA9C] group-hover:text-blue-600'}`} />
-                        <span className={`text-sm font-bold ${isActive ? 'text-white' : ''}`}>{item.name}</span>
+                        <item.icon className={`shrink-0 w-[18px] h-[18px] transition-colors ${isActive ? 'text-on-primary' : 'text-on-surface-variant group-hover:text-primary'}`} />
+                        <span className={`text-[12px] font-black uppercase tracking-tight whitespace-nowrap overflow-hidden ${mounted ? 'transition-all duration-300' : ''} ${isActive ? 'text-on-primary' : ''} ${isCollapsed ? 'lg:w-0 lg:opacity-0' : 'lg:w-auto opacity-100'}`}>{item.name}</span>
+                        {isActive && !isCollapsed && (
+                          <div className="ml-auto shrink-0 w-1.5 h-1.5 bg-white rounded-full shadow-lg shadow-white/50"></div>
+                        )}
+                        {isActive && isCollapsed && (
+                          <div className="absolute right-1 w-1 h-4 bg-white rounded-full shadow-lg shadow-white/50 hidden lg:block"></div>
+                        )}
                       </div>
                     </Link>
                   );
@@ -166,28 +224,33 @@ const Sidebar = () => {
         </nav>
       </div>
 
-      <div className="p-4 border-t border-[#E5E7EB] space-y-1">
+      <div className={`p-4 border-t border-outline-variant/30 space-y-2 bg-surface-low/50 backdrop-blur-md ${isCollapsed ? 'lg:p-4 lg:px-2' : 'lg:p-6'}`}>
         {isAdmin && (
-          <Link href="/dashboard/settings">
-            <div className={`flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-colors ${
+          <Link 
+            href="/dashboard/settings"
+            onClick={() => isMobile && setIsOpen(false)}
+          >
+            <div title={isCollapsed ? 'Configuración' : undefined} className={`flex items-center gap-3 py-3 rounded-[16px] cursor-pointer ${mounted ? 'transition-all duration-300' : ''} ${isCollapsed ? 'lg:justify-center px-4 lg:px-0' : 'px-4'} ${
               pathname === '/dashboard/settings'
-                ? 'bg-[#E0E7FF] text-blue-700 font-medium'
-                : 'text-[#4B5563] hover:bg-gray-100 hover:text-[#111827]'
+                ? 'bg-primary text-on-primary shadow-lg shadow-primary/20'
+                : 'text-on-surface-variant hover:bg-card hover:text-foreground border border-transparent hover:border-outline-variant/50'
             }`}>
-              <Settings className={`w-5 h-5 ${pathname === '/dashboard/settings' ? 'text-blue-600' : 'text-[#6B7280]'}`} />
-              <span className="text-[15px]">Configuración</span>
+              <Settings className={`shrink-0 w-5 h-5 ${pathname === '/dashboard/settings' ? 'text-on-primary' : 'text-on-surface-variant'}`} />
+              <span className={`text-[12px] font-black uppercase tracking-tight whitespace-nowrap overflow-hidden ${mounted ? 'transition-all duration-300' : ''} ${isCollapsed ? 'lg:w-0 lg:opacity-0' : 'lg:w-auto opacity-100'}`}>Configuración</span>
             </div>
           </Link>
         )}
-        <div 
+        <button 
           onClick={logout}
-          className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer text-rose-600 hover:bg-rose-50 transition-colors"
+          title={isCollapsed ? 'Cerrar Sesión' : undefined}
+          className={`w-full flex items-center gap-3 py-3 rounded-[16px] cursor-pointer text-rose-500 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/10 active:scale-95 ${mounted ? 'transition-all' : ''} ${isCollapsed ? 'lg:justify-center px-4 lg:px-0' : 'px-4'}`}
         >
-          <LogOut className="w-5 h-5 text-rose-500" />
-          <span className="text-[15px] font-medium">Cerrar Sesión</span>
-        </div>
+          <LogOut className="shrink-0 w-5 h-5" />
+          <span className={`text-[12px] font-black uppercase tracking-tight whitespace-nowrap overflow-hidden ${mounted ? 'transition-all duration-300' : ''} ${isCollapsed ? 'lg:w-0 lg:opacity-0' : 'lg:w-auto opacity-100'}`}>Cerrar Sesión</span>
+        </button>
       </div>
     </aside>
+    </>
   );
 };
 
