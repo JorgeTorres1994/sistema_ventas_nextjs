@@ -112,4 +112,14 @@ export class RolesService {
 
         return this.prisma.role.delete({ where: { id } });
     }
+
+    async toggleStatus(id: string) {
+        const role = await this.prisma.role.findUnique({ where: { id } });
+        if (!role) throw new BadRequestException('Rol no encontrado');
+
+        return this.prisma.role.update({
+            where: { id },
+            data: { isActive: !role.isActive }
+        });
+    }
 }

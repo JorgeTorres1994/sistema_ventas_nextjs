@@ -36,4 +36,9 @@ export class RolesController {
     remove(@Param('id') id: string) {
         return this.rolesService.remove(id);
     }
+
+    @Patch(':id/status')
+    toggleStatus(@Param('id') id: string) {
+        return this.rolesService.toggleStatus(id);
+    }
 }
