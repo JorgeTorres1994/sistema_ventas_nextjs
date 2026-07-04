@@ -85,17 +85,20 @@ export default function SalesPage() {
   const fetchSales = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getSales({
+      const response = await getSales({
         search,
         status: status === 'Todos' ? undefined : status,
         startDate: dateRange.start,
         endDate: dateRange.end
       });
-      setSales(data);
       
-      const total = data.reduce((acc: number, s: any) => s.status !== 'CANCELLED' ? acc + Number(s.total) : acc, 0);
-      const paidSales = data.filter((s: any) => s.status !== 'CANCELLED');
-      const cancelledCount = data.filter((s: any) => s.status === 'CANCELLED').length;
+      // Fix for BUG-12: The backend now returns { data, total, page, limit } instead of an array.
+      const salesData = Array.isArray(response) ? response : (response.data || []);
+      setSales(salesData);
+      
+      const total = salesData.reduce((acc: number, s: any) => s.status !== 'CANCELLED' ? acc + Number(s.total) : acc, 0);
+      const paidSales = salesData.filter((s: any) => s.status !== 'CANCELLED');
+      const cancelledCount = salesData.filter((s: any) => s.status === 'CANCELLED').length;
 
       setStats({
         totalRevenue: total,
