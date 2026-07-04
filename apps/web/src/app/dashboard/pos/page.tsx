@@ -1,13 +1,16 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
 import PosTopBar from '@/components/pos/PosTopBar';
 import PosProductGrid from '@/components/pos/PosProductGrid';
 import PosCartPanel from '@/components/pos/PosCartPanel';
-import { getProducts, createSale, createQuotation, getActiveCategories, validateCoupon } from '@/lib/api';
+import { getProducts, createSale, createQuotation, getActiveCategories, validateCoupon, api } from '@/lib/api';
 import { toast } from 'sonner';
 import { useSettings } from '@/components/SettingsProvider';
+import { AlertTriangle } from 'lucide-react';
+import Link from 'next/link';
 
 interface Category {
   id: string;
@@ -33,8 +36,18 @@ import { LayoutGrid, ShoppingCart } from 'lucide-react';
 
 export default function PosPage() {
   const { settings } = useSettings();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'products' | 'cart'>('products');
   
+  // BUG-10 FIX: verificar si hay caja abierta al cargar el POS
+  const [cashRegisterOpen, setCashRegisterOpen] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    api.get('/cash-registers/current')
+      .then((res: any) => setCashRegisterOpen(!!res.data))
+      .catch(() => setCashRegisterOpen(false));
+  }, []);
+
   // Products & Global search state
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -261,6 +274,22 @@ export default function PosPage() {
       
       <div className="flex-1 flex flex-col lg:ml-64 w-full lg:w-[calc(100%-256px)] overflow-hidden relative">
         <PosTopBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+
+        {/* BUG-10 FIX: Banner de advertencia si no hay caja abierta */}
+        {cashRegisterOpen === false && (
+          <div className="flex items-center gap-4 px-6 py-3 bg-amber-500/10 border-b border-amber-500/20">
+            <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+            <p className="text-xs font-black text-amber-600 uppercase tracking-widest">
+              No tienes una caja abierta. Las ventas no se podrán procesar.
+            </p>
+            <Link
+              href="/dashboard/cash"
+              className="ml-auto px-4 py-2 bg-amber-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-600 transition-all"
+            >
+              Abrir Caja
+            </Link>
+          </div>
+        )}
         
         <main className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
           {/* Mobile Tab View Logic */}

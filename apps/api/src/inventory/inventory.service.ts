@@ -201,10 +201,10 @@ export class InventoryService {
                 );
             }
 
-            // If IN, we might want to update the unit cost (Average Cost)
+            // BUG-04 FIX: proteger contra división por cero si newStock es 0
             let newUnitCost = currentUnitCost;
-            if (type === 'IN' && unitCost !== undefined) {
-                // Simplistic Average Cost Calculation: (CurrentValue + NewValue) / TotalStock
+            if (type === 'IN' && unitCost !== undefined && newStock > 0) {
+                // Average Cost Calculation: (CurrentValue + IncomingValue) / TotalNewStock
                 const newValue = quantity * unitCost;
                 newUnitCost = (currentValue + newValue) / newStock;
             }

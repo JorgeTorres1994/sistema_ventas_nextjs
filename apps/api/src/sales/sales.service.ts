@@ -124,6 +124,8 @@ export class SalesService {
                 }
 
                 // --- LOGICA DE CUPONES Y DESCUENTOS ---
+                // BUG-03 FIX: el cupón se valida con el subtotal (sin IGV) para respetar el minPurchase
+                // El descuento se aplica también sobre el subtotal antes de recalcular el total final
                 let discountAmount = 0;
                 let couponId = null;
 
@@ -135,7 +137,8 @@ export class SalesService {
                             discountAmount = Number(coupon.maxDiscount);
                         }
                     } else {
-                        discountAmount = Number(coupon.value);
+                        // FIX: descuento fijo se aplica directamente sobre el subtotal sin IGV
+                        discountAmount = Math.min(Number(coupon.value), total);
                     }
                     couponId = coupon.id;
                     await (tx as any).coupon.update({
@@ -254,6 +257,11 @@ export class SalesService {
     }
 
     async findAll(filters: any) {
+        // BUG-12 FIX: añadir paginación para evitar cargar todas las ventas en memoria
+        const page = Number(filters.page) || 1;
+        const limit = Number(filters.limit) || 50;
+        const skip = (page - 1) * limit;
+
         const where: any = {};
         if (filters.status && filters.status !== 'All') where.status = filters.status;
         if (filters.invoiceStatus && filters.invoiceStatus !== 'All') where.invoiceStatus = filters.invoiceStatus;
@@ -276,15 +284,22 @@ export class SalesService {
             ];
         }
 
-        return this.prisma.sale.findMany({
-            where,
-            include: {
-                user: { select: { name: true } },
-                customer: { select: { name: true, email: true } },
-                payments: true,
-            },
-            orderBy: { createdAt: 'desc' },
-        });
+        const [data, total] = await Promise.all([
+            this.prisma.sale.findMany({
+                where,
+                skip,
+                take: limit,
+                include: {
+                    user: { select: { name: true } },
+                    customer: { select: { name: true, email: true } },
+                    payments: true,
+                },
+                orderBy: { createdAt: 'desc' },
+            }),
+            this.prisma.sale.count({ where }),
+        ]);
+
+        return { data, total, page, limit };
     }
 
     async findOne(id: string) {
@@ -303,14 +318,22 @@ export class SalesService {
         return this.prisma.$transaction(async (tx) => {
             const sale = await tx.sale.findUnique({
                 where: { id },
-                include: { items: true, payments: true },
+                include: { items: { include: { product: true } }, payments: true, creditSale: true },
             });
             if (!sale) throw new BadRequestException('Venta no encontrada');
             if (sale.status === 'CANCELLED') throw new BadRequestException('Venta ya anulada');
 
             await tx.sale.update({ where: { id }, data: { status: 'CANCELLED' } });
 
+            // BUG-01 FIX: registrar valores de valuación completos en la reversión de stock
             for (const item of sale.items) {
+                const product = await tx.product.findUnique({ where: { id: item.productId } });
+                const currentStock = product?.stock ?? 0;
+                const unitCost = Number(product?.purchasePrice) || 0;
+                const prevValue = currentStock * unitCost;
+                const nextStock = currentStock + item.quantity;
+                const nextValue = nextStock * unitCost;
+
                 await tx.product.update({
                     where: { id: item.productId },
                     data: { stock: { increment: item.quantity } },
@@ -320,9 +343,25 @@ export class SalesService {
                         productId: item.productId,
                         type: 'IN',
                         quantity: item.quantity,
+                        unitCost,
+                        totalCost: item.quantity * unitCost,
+                        prevStock: currentStock,
+                        nextStock,
+                        prevValue,
+                        nextValue,
                         reason: 'SALE_CANCELLED',
                         referenceId: sale.id,
                     },
+                });
+            }
+
+            // BUG-11 FIX: eliminar el CreditSale asociado si la venta era a crédito
+            if ((sale as any).creditSale) {
+                await (tx as any).creditPayment.deleteMany({
+                    where: { creditSaleId: (sale as any).creditSale.id }
+                });
+                await (tx as any).creditSale.delete({
+                    where: { id: (sale as any).creditSale.id }
                 });
             }
 

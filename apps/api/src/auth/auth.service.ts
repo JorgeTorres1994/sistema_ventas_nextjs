@@ -7,7 +7,8 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-    private resetCodes = new Map<string, string>();
+    // BUG-05 FIX: almacenar códigos con timestamp de expiración (15 minutos)
+    private resetCodes = new Map<string, { code: string; expiresAt: number }>();
 
     constructor(
         private usersService: UsersService,
@@ -27,10 +28,11 @@ export class AuthService {
 
         if (isAdmin) {
             const code = Math.floor(100000 + Math.random() * 900000).toString();
-            this.resetCodes.set(email, code);
+            const expiresAt = Date.now() + 15 * 60 * 1000; // 15 minutos
+            this.resetCodes.set(email, { code, expiresAt });
             
             // Log local para respaldo
-            console.log(`\n\n=========================================\n[LOG para ${email}]:\nTu código de recuperación es: ${code}\n=========================================\n\n`);
+            console.log(`\n\n=========================================\n[LOG para ${email}]:\nTu código de recuperación es: ${code} (expira en 15 min)\n=========================================\n\n`);
             
             // Envío vía Email
             const sent = await this.emailService.sendVerificationCode(email, code);
@@ -57,9 +59,14 @@ export class AuthService {
     }
 
     async resetPassword(email: string, code: string, newPassword: string) {
-        const storedCode = this.resetCodes.get(email);
-        if (!storedCode || storedCode !== code) {
+        const stored = this.resetCodes.get(email);
+        // BUG-05 FIX: verificar que el código exista Y no haya expirado
+        if (!stored || stored.code !== code) {
             throw new UnauthorizedException('Código inválido o expirado.');
+        }
+        if (Date.now() > stored.expiresAt) {
+            this.resetCodes.delete(email);
+            throw new UnauthorizedException('El código ha expirado. Solicita uno nuevo.');
         }
 
         const user = await this.usersService.findByEmail(email);

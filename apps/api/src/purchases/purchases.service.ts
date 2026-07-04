@@ -181,4 +181,60 @@ export class PurchasesService {
 
         return purchase;
     }
+
+    // BUG-02 FIX: completar una compra PENDING — actualiza stock e invalida la deuda
+    async completePurchase(id: string) {
+        return this.prisma.$transaction(async (tx) => {
+            const purchase = await tx.purchase.findUnique({
+                where: { id },
+                include: { items: true, creditPurchase: true },
+            });
+
+            if (!purchase) throw new NotFoundException(`Compra ${id} no encontrada`);
+            if (purchase.status !== 'PENDING') {
+                throw new BadRequestException(`La compra ya está en estado ${purchase.status}`);
+            }
+
+            // Actualizar estado de la compra
+            await tx.purchase.update({ where: { id }, data: { status: 'COMPLETED' } });
+
+            // Procesar cada ítem: actualizar stock y crear movimiento
+            for (const item of purchase.items) {
+                const product = await tx.product.findUnique({ where: { id: item.productId } });
+                if (!product) throw new BadRequestException(`Producto ${item.productId} no encontrado`);
+
+                const currentStock = product.stock;
+                const currentUnitCost = Number(product.purchasePrice) || 0;
+                const currentValue = currentStock * currentUnitCost;
+                const newStock = currentStock + item.quantity;
+                const newUnitCost = newStock > 0
+                    ? (currentValue + (item.quantity * Number(item.costPrice))) / newStock
+                    : Number(item.costPrice);
+                const newValue = newStock * newUnitCost;
+
+                await tx.product.update({
+                    where: { id: item.productId },
+                    data: { stock: newStock, purchasePrice: newUnitCost },
+                });
+
+                await (tx.stockMovement as any).create({
+                    data: {
+                        productId: item.productId,
+                        type: 'IN',
+                        quantity: item.quantity,
+                        unitCost: Number(item.costPrice),
+                        totalCost: item.quantity * Number(item.costPrice),
+                        prevStock: currentStock,
+                        nextStock: newStock,
+                        prevValue: currentValue,
+                        nextValue: newValue,
+                        reason: 'PURCHASE',
+                        referenceId: purchase.id,
+                    },
+                });
+            }
+
+            return { message: 'Compra completada y stock actualizado correctamente' };
+        });
+    }
 }

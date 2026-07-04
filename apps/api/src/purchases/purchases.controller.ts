@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, UseGuards, Query } from '@nestjs/common';
 import { PurchasesService } from './purchases.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 
@@ -46,5 +46,11 @@ export class PurchasesController {
     @Get(':id')
     findOne(@Param('id') id: string) {
         return this.purchasesService.findOne(id);
+    }
+
+    // BUG-02 FIX: endpoint para completar una compra PENDING y actualizar el inventario
+    @Patch(':id/complete')
+    complete(@Param('id') id: string) {
+        return this.purchasesService.completePurchase(id);
     }
 }

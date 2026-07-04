@@ -109,6 +109,8 @@ export class CreditsService {
       if (creditSaleId) {
         const credit = await tx.creditSale.findUnique({ where: { id: creditSaleId } });
         if (!credit) throw new NotFoundException('Crédito de venta no encontrado');
+        // BUG-08 FIX: verificar que el crédito no esté ya completamente pagado
+        if (credit.status === 'PAID') throw new BadRequestException('Este crédito ya fue cancelado en su totalidad.');
         
         const newRemaining = Number(credit.remainingAmount) - amount;
         if (newRemaining < -0.01) throw new BadRequestException('El monto del abono supera la deuda');
@@ -116,13 +118,15 @@ export class CreditsService {
         updatedCredit = await tx.creditSale.update({
           where: { id: creditSaleId },
           data: {
-            remainingAmount: newRemaining,
+            remainingAmount: Math.max(0, newRemaining),
             status: newRemaining <= 0 ? 'PAID' : 'PARTIAL'
           }
         });
       } else {
         const credit = await tx.creditPurchase.findUnique({ where: { id: creditPurchaseId } });
         if (!credit) throw new NotFoundException('Crédito de compra no encontrado');
+        // BUG-08 FIX: verificar que el crédito no esté ya completamente pagado
+        if (credit.status === 'PAID') throw new BadRequestException('Esta deuda ya fue cancelada en su totalidad.');
 
         const newRemaining = Number(credit.remainingAmount) - amount;
         if (newRemaining < -0.01) throw new BadRequestException('El monto del abono supera la deuda');
@@ -130,7 +134,7 @@ export class CreditsService {
         updatedCredit = await tx.creditPurchase.update({
           where: { id: creditPurchaseId },
           data: {
-            remainingAmount: newRemaining,
+            remainingAmount: Math.max(0, newRemaining),
             status: newRemaining <= 0 ? 'PAID' : 'PARTIAL'
           }
         });
