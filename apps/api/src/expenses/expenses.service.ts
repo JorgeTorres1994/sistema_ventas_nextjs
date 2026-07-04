@@ -52,12 +52,30 @@ export class ExpensesService {
       }
     }
 
-    return this.prisma.expense.create({
-      data: {
-        ...rest,
-        category: { connect: { id: categoryId } },
-        ...(cashRegisterId && { cashRegister: { connect: { id: cashRegisterId } } }),
-      },
+    // BUG-07 FIX: usar transacción para crear el gasto Y el movimiento de caja atómicamente
+    return this.prisma.$transaction(async (tx) => {
+      const expense = await tx.expense.create({
+        data: {
+          ...rest,
+          category: { connect: { id: categoryId } },
+          ...(cashRegisterId && { cashRegister: { connect: { id: cashRegisterId } } }),
+        },
+        include: { category: true },
+      });
+
+      // Si hay caja vinculada, registrar el egreso en los movimientos de caja
+      if (cashRegisterId) {
+        await tx.cashMovement.create({
+          data: {
+            cashRegisterId,
+            type: 'OUT',
+            amount: rest.amount,
+            description: `Gasto: ${rest.description || 'Sin descripción'}`,
+          },
+        });
+      }
+
+      return expense;
     });
   }
 
