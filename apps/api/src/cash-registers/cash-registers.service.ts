@@ -97,7 +97,7 @@ export class CashRegistersService {
             throw new BadRequestException('No hay ninguna caja abierta para cerrar.');
         }
 
-        return this.prisma.cashRegister.update({
+        const closed = await this.prisma.cashRegister.update({
             where: { id: status.id },
             data: {
                 status: 'CLOSED',
@@ -107,5 +107,36 @@ export class CashRegistersService {
                 notes: notes ? `${status.notes || ''} | [CIERRE]: ${notes}` : status.notes
             }
         });
+
+        // BUG-09 FIX: informar los créditos pendientes de cobro vinculados a esta caja
+        const pendingCredits = await this.prisma.creditSale.findMany({
+            where: {
+                sale: { cashRegisterId: status.id },
+                status: { not: 'PAID' }
+            },
+            include: {
+                sale: { include: { customer: { select: { name: true } } } }
+            }
+        });
+
+        const totalPendingReceivable = pendingCredits.reduce(
+            (sum, c) => sum + Number(c.remainingAmount), 0
+        );
+
+        return {
+            register: closed,
+            summary: {
+                expectedBalance: status.currentBalance,
+                closingBalance,
+                difference: closingBalance - status.currentBalance,
+                pendingCreditsCount: pendingCredits.length,
+                totalPendingReceivable,
+                pendingCredits: pendingCredits.map(c => ({
+                    id: c.id,
+                    customer: (c.sale as any)?.customer?.name || 'Sin cliente',
+                    remaining: Number(c.remainingAmount)
+                }))
+            }
+        };
     }
 }
