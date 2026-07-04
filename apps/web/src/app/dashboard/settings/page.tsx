@@ -246,7 +246,19 @@ export default function SettingsPage() {
                                         <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 sm:gap-10">
                                             <div className="w-24 h-24 sm:w-32 sm:h-32 shrink-0 rounded-[24px] sm:rounded-[36px] bg-surface-low border-2 border-dashed border-outline-variant flex items-center justify-center overflow-hidden relative group transition-all hover:border-primary/50">
                                                 {logoPreview || formData.logoUrl ? (
-                                                    <img src={logoPreview || `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}${formData.logoUrl}`} alt="Logo" className="w-full h-full object-cover" />
+                                                    <img 
+                                                      src={logoPreview || `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}${formData.logoUrl}`} 
+                                                      alt="Logo" 
+                                                      className="w-full h-full object-cover" 
+                                                      onError={(e) => {
+                                                        e.currentTarget.style.display = 'none';
+                                                        const parent = e.currentTarget.parentElement;
+                                                        if (parent && !parent.querySelector('.fallback-icon')) {
+                                                           // Need to insert raw SVG or icon for Building2 fallback
+                                                           parent.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-on-surface-variant/30 fallback-icon"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>`;
+                                                        }
+                                                      }}
+                                                    />
                                                 ) : (
                                                     <Building2 className="w-8 h-8 sm:w-10 sm:h-10 text-on-surface-variant/20" />
                                                 )}

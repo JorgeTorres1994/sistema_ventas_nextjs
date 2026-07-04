@@ -148,9 +148,23 @@ export default function ProfilePage() {
                     <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-[32px] sm:rounded-[44px] bg-card p-1.5 sm:p-2 shadow-2xl ring-2 sm:ring-4 ring-background/10">
                       <div className="w-full h-full rounded-[26px] sm:rounded-[36px] bg-surface-low overflow-hidden flex items-center justify-center relative border border-outline-variant/30">
                         {displayAvatar ? (
-                          <img src={displayAvatar} alt="Avatar" className="w-full h-full object-cover" />
+                          <img 
+                            src={displayAvatar} 
+                            alt="Avatar" 
+                            className="w-full h-full object-cover" 
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              const parent = e.currentTarget.parentElement;
+                              if (parent && !parent.querySelector('.fallback-text')) {
+                                 const span = document.createElement('span');
+                                 span.className = 'text-4xl sm:text-5xl font-black text-on-surface-variant/20 uppercase fallback-text';
+                                 span.innerText = userInitial;
+                                 parent.appendChild(span);
+                              }
+                            }}
+                          />
                         ) : (
-                          <span className="text-4xl sm:text-5xl font-black text-on-surface-variant/20 uppercase">{userInitial}</span>
+                          <span className="text-4xl sm:text-5xl font-black text-on-surface-variant/20 uppercase fallback-text">{userInitial}</span>
                         )}
                         {uploading && (
                           <div className="absolute inset-0 bg-background/60 backdrop-blur-md flex items-center justify-center">

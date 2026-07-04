@@ -140,9 +140,18 @@ const Sidebar = () => {
                         src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}${settings.logoUrl}?v=${version}`} 
                         alt="Logo" 
                         className="w-full h-full object-cover rounded-[10px]" 
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const parent = e.currentTarget.parentElement;
+                          if (parent && !parent.querySelector('.fallback-icon')) {
+                             // Can't easily append a React component directly via DOM, so we use a simpler approach:
+                             // We'll set a state or just add an innerHTML with an SVG icon
+                             parent.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-on-primary fallback-icon"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>`;
+                          }
+                        }}
                       />
                     ) : (
-                      <Building2 className="w-5 h-5 text-on-primary" />
+                      <Building2 className="w-5 h-5 text-on-primary fallback-icon" />
                     )}
                  </div>
                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[var(--sidebar)]"></div>

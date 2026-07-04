@@ -246,9 +246,19 @@ const TopBar = () => {
                       src={`${userAvatar}${userAvatar.includes('?') ? '&' : '?'}v=${version}`} 
                       alt={user?.name} 
                       className="w-full h-full object-cover" 
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        const parent = e.currentTarget.parentElement;
+                        if (parent && !parent.querySelector('.fallback-text')) {
+                           const span = document.createElement('span');
+                           span.className = 'text-on-primary font-black text-sm uppercase fallback-text';
+                           span.innerText = user?.name?.charAt(0) || 'U';
+                           parent.appendChild(span);
+                        }
+                      }}
                     />
                   ) : (
-                    <span className="text-on-primary font-black text-sm uppercase">
+                    <span className="text-on-primary font-black text-sm uppercase fallback-text">
                       {user?.name?.charAt(0) || 'U'}
                     </span>
                   )}
@@ -280,9 +290,19 @@ const TopBar = () => {
                             src={`${userAvatar}${userAvatar.includes('?') ? '&' : '?'}v=${version}`} 
                             alt={user?.name} 
                             className="w-full h-full object-cover" 
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              const parent = e.currentTarget.parentElement;
+                              if (parent && !parent.querySelector('.fallback-text')) {
+                                 const span = document.createElement('span');
+                                 span.className = 'text-primary font-black text-lg md:text-xl uppercase fallback-text';
+                                 span.innerText = user?.name?.charAt(0) || 'U';
+                                 parent.appendChild(span);
+                              }
+                            }}
                           />
                         ) : (
-                          <span className="text-primary font-black text-lg md:text-xl uppercase">
+                          <span className="text-primary font-black text-lg md:text-xl uppercase fallback-text">
                             {user?.name?.charAt(0) || 'U'}
                           </span>
                         )}
