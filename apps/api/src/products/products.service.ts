@@ -108,16 +108,25 @@ export class ProductsService {
         },
         userId?: string
     ): Promise<Product> {
-        // Handle Stock Movement if stock changes
+        // BUG-06 FIX: registrar valores de valuación completos en el movimiento de stock
         if (data.stock !== undefined) {
             const currentProduct = await this.prisma.product.findUnique({ where: { id } });
             if (currentProduct && currentProduct.stock !== data.stock) {
                 const diff = data.stock - currentProduct.stock;
+                const unitCost = Number(currentProduct.purchasePrice) || 0;
+                const prevStock = currentProduct.stock;
+                const nextStock = data.stock;
                 await this.prisma.stockMovement.create({
                     data: {
                         productId: id,
                         type: diff > 0 ? 'IN' : 'OUT',
                         quantity: Math.abs(diff),
+                        unitCost,
+                        totalCost: Math.abs(diff) * unitCost,
+                        prevStock,
+                        nextStock,
+                        prevValue: prevStock * unitCost,
+                        nextValue: nextStock * unitCost,
                         reason: 'ADJUSTMENT',
                     }
                 });
