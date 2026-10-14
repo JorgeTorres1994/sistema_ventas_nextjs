@@ -43,7 +43,7 @@ export default function PosPage() {
   const [cashRegisterOpen, setCashRegisterOpen] = useState<boolean | null>(null);
 
   useEffect(() => {
-    api.get('/cash-registers/current')
+    api.get('/cash')
       .then((res: any) => setCashRegisterOpen(!!res.data))
       .catch(() => setCashRegisterOpen(false));
   }, []);
