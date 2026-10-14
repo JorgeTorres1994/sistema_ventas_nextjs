@@ -186,7 +186,7 @@ const TicketPrintModal = ({ saleId, onClose }: TicketPrintModalProps) => {
                 <div className="w-full md:w-64 p-8 border-l border-outline-variant flex flex-col justify-between bg-card">
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
-                            <h3 className="font-black text-gray-900 uppercase tracking-widest text-xs">Acciones</h3>
+                            <h3 className="font-black text-foreground uppercase tracking-widest text-xs">Acciones</h3>
                             <button onClick={onClose} className="p-2 hover:bg-surface-low rounded-xl transition-all">
                                 <X className="w-5 h-5 text-on-surface-variant/40" />
                             </button>
@@ -203,7 +203,7 @@ const TicketPrintModal = ({ saleId, onClose }: TicketPrintModalProps) => {
                                 onClick={() => {
                                     if (sale?.pdfUrl) window.open(sale.pdfUrl, '_blank');
                                 }}
-                                className="w-full py-4 bg-blue-50 text-blue-600 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-blue-100 transition-all flex items-center justify-center gap-3"
+                                className="w-full py-4 bg-primary/10 text-primary border border-primary/20 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-primary/20 transition-all flex items-center justify-center gap-3"
                             >
                                 <Download className="w-4 h-4" /> Exportar PDF
                             </button>
@@ -211,7 +211,7 @@ const TicketPrintModal = ({ saleId, onClose }: TicketPrintModalProps) => {
                                 onClick={() => {
                                     if (sale?.xmlUrl) window.open(sale.xmlUrl, '_blank');
                                 }}
-                                className="w-full py-4 bg-gray-50 text-gray-600 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-gray-100 transition-all flex items-center justify-center gap-3"
+                                className="w-full py-4 bg-surface-low text-on-surface-variant border border-outline-variant rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-card transition-all flex items-center justify-center gap-3"
                             >
                                 <FileText className="w-4 h-4" /> Descargar XML
                             </button>

@@ -151,23 +151,23 @@ export default function CustomerFormPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
+    <div className="flex h-screen bg-background overflow-hidden font-sans text-foreground">
       <Sidebar />
       <div className="flex-1 flex flex-col lg:lg:ml-64 w-full lg:w-full lg:w-[calc(100%-256px)] overflow-y-auto">
 
         {/* Header */}
-        <header className="px-8 py-6 bg-white border-b border-gray-100 flex items-center gap-4 sticky top-0 z-20">
+        <header className="px-8 py-6 bg-card border-b border-outline-variant flex items-center gap-4 sticky top-0 z-20">
           <button
             onClick={() => router.push('/dashboard/customers')}
-            className="w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors">
+            className="w-9 h-9 rounded-full hover:bg-surface-low flex items-center justify-center transition-colors">
             <ArrowLeft className="w-5 h-5 text-gray-500" />
           </button>
           <div>
-            <nav className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">
+            <nav className="flex items-center gap-2 text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1">
               <span>Clientes</span><span>/</span>
-              <span className="text-indigo-600">{isEditing ? 'Editar Cliente' : 'Nuevo Cliente'}</span>
+              <span className="text-primary">{isEditing ? 'Editar Cliente' : 'Nuevo Cliente'}</span>
             </nav>
-            <h1 className="text-2xl font-black text-gray-900 leading-tight">
+            <h1 className="text-2xl font-black text-foreground leading-tight">
               {isEditing ? 'Modificar Cliente' : 'Registrar Nuevo Cliente'}
             </h1>
           </div>
@@ -180,17 +180,17 @@ export default function CustomerFormPage() {
             </div>
           ) : (
             <div className="max-w-2xl mx-auto">
-              <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="bg-card rounded-3xl shadow-sm border border-outline-variant overflow-hidden">
 
                 {/* Form Header */}
-                <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-white">
+                <div className="px-8 py-6 border-b border-outline-variant bg-surface-low/50 border-b border-outline-variant">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center">
-                      <User className="w-6 h-6 text-indigo-600" />
+                    <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
+                      <User className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-black text-gray-900">{isEditing ? 'Información del Cliente' : 'Detalles de Registro'}</h2>
-                      <p className="text-sm text-gray-400 font-medium">Complete los campos correspondientes del cliente.</p>
+                      <h2 className="text-lg font-black text-foreground">{isEditing ? 'Información del Cliente' : 'Detalles de Registro'}</h2>
+                      <p className="text-sm text-on-surface-variant font-medium">Complete los campos correspondientes del cliente.</p>
                     </div>
                   </div>
                 </div>
@@ -199,17 +199,17 @@ export default function CustomerFormPage() {
 
                   {/* Name */}
                   <div>
-                    <label className="block text-sm font-black text-gray-900 mb-2">
+                    <label className="block text-sm font-black text-foreground mb-2">
                       Nombre Completo <span className="text-rose-500">*</span>
                     </label>
                     <div className="relative">
-                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40" />
                       <input
                         type="text"
                         placeholder="ej. Elena Rodriguez"
                         value={form.name}
                         onChange={set('name')}
-                        className={`w-full pl-11 pr-4 py-3 bg-gray-50 rounded-xl font-medium text-gray-900 focus:outline-none focus:ring-2 transition-all ${errors.name ? 'ring-2 ring-rose-300 bg-rose-50' : 'focus:ring-indigo-300'}`}
+                        className={`w-full pl-11 pr-4 py-3 bg-surface-low rounded-xl font-medium text-foreground border border-outline-variant focus:outline-none focus:border-primary focus:bg-card transition-all ${errors.name ? 'ring-2 ring-rose-300 bg-rose-50' : 'focus:ring-indigo-300'}`}
                       />
                     </div>
                     {errors.name && <p className="mt-1.5 text-xs font-bold text-rose-500 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.name}</p>}
@@ -217,25 +217,25 @@ export default function CustomerFormPage() {
 
                   {/* DNI */}
                   <div>
-                    <label className="block text-sm font-black text-gray-900 mb-2">
+                    <label className="block text-sm font-black text-foreground mb-2">
                       DNI / Documento Identidad <span className="text-rose-500">*</span>
                     </label>
                     <div className="flex gap-2">
                       <div className="relative flex-1">
-                        <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                        <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40" />
                         <input
                           type="text"
                           placeholder="ej. 76543210"
                           value={form.dni}
                           onChange={set('dni')}
-                          className={`w-full pl-11 pr-4 py-3 bg-gray-50 rounded-xl font-medium text-gray-900 focus:outline-none focus:ring-2 transition-all font-mono ${errors.dni ? 'ring-2 ring-rose-300 bg-rose-50' : 'focus:ring-indigo-300'}`}
+                          className={`w-full pl-11 pr-4 py-3 bg-surface-low rounded-xl font-medium text-foreground border border-outline-variant focus:outline-none focus:border-primary focus:bg-card transition-all font-mono ${errors.dni ? 'ring-2 ring-rose-300 bg-rose-50' : 'focus:ring-indigo-300'}`}
                         />
                       </div>
                       <button
                         type="button"
                         onClick={handleConsultarDocumento}
                         disabled={isSearching || (form.dni.length !== 8 && form.dni.length !== 11)}
-                        className="px-6 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-black text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-md shadow-gray-200"
+                        className="px-6 bg-primary hover:opacity-90 text-on-primary rounded-xl font-black text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg shadow-primary/20"
                       >
                         {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                         <span className="hidden sm:inline">Consultar</span>
@@ -247,29 +247,29 @@ export default function CustomerFormPage() {
                   {/* Email & Phone (2 columns) */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-black text-gray-900 mb-2">Correo Electrónico</label>
+                      <label className="block text-sm font-black text-foreground mb-2">Correo Electrónico</label>
                       <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40" />
                         <input
                           type="email"
                           placeholder="nombre@ejemplo.com"
                           value={form.email}
                           onChange={set('email')}
-                          className={`w-full pl-11 pr-4 py-3 bg-gray-50 rounded-xl font-medium text-gray-900 focus:outline-none focus:ring-2 transition-all ${errors.email ? 'ring-2 ring-rose-300 bg-rose-50' : 'focus:ring-indigo-300'}`}
+                          className={`w-full pl-11 pr-4 py-3 bg-surface-low rounded-xl font-medium text-foreground border border-outline-variant focus:outline-none focus:border-primary focus:bg-card transition-all ${errors.email ? 'ring-2 ring-rose-300 bg-rose-50' : 'focus:ring-indigo-300'}`}
                         />
                       </div>
                       {errors.email && <p className="mt-1.5 text-xs font-bold text-rose-500 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.email}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm font-black text-gray-900 mb-2">Número de Teléfono</label>
+                      <label className="block text-sm font-black text-foreground mb-2">Número de Teléfono</label>
                       <div className="relative">
-                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40" />
                         <input
                           type="text"
                           placeholder="+51 987 654 321"
                           value={form.phone}
                           onChange={set('phone')}
-                          className="w-full pl-11 pr-4 py-3 bg-gray-50 rounded-xl font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
+                          className="w-full pl-11 pr-4 py-3 bg-surface-low rounded-xl font-medium text-foreground border border-outline-variant focus:outline-none focus:border-primary focus:bg-card transition-all"
                         />
                       </div>
                     </div>
@@ -277,15 +277,15 @@ export default function CustomerFormPage() {
 
                   {/* Address */}
                   <div>
-                    <label className="block text-sm font-black text-gray-900 mb-2">Dirección Domiliciaria</label>
+                    <label className="block text-sm font-black text-foreground mb-2">Dirección Domiliciaria</label>
                     <div className="relative">
-                      <MapPin className="absolute left-4 top-3.5 w-4 h-4 text-gray-300" />
+                      <MapPin className="absolute left-4 top-3.5 w-4 h-4 text-on-surface-variant/40" />
                       <textarea
                         rows={3}
                         placeholder="Calle, ciudad, distrito..."
                         value={form.address}
                         onChange={set('address')}
-                        className="w-full pl-11 pr-4 py-3 bg-gray-50 rounded-xl font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all resize-none"
+                        className="w-full pl-11 pr-4 py-3 bg-surface-low rounded-xl font-medium text-foreground border border-outline-variant focus:outline-none focus:border-primary focus:bg-card transition-all resize-none"
                       />
                     </div>
                   </div>
@@ -293,11 +293,11 @@ export default function CustomerFormPage() {
                   {/* Actions */}
                   <div className="flex items-center gap-4 pt-2">
                     <button type="button" onClick={() => router.push('/dashboard/customers')}
-                      className="flex-1 py-3 bg-white border border-gray-200 rounded-xl font-black text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                      className="flex-1 py-3 bg-card border border-outline-variant rounded-xl font-black text-sm text-on-surface-variant hover:bg-surface-low transition-colors">
                       Cancelar
                     </button>
                     <button type="submit" disabled={loading}
-                      className="flex-1 py-3 bg-indigo-600 rounded-xl font-black text-sm text-white flex items-center justify-center gap-2 hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all disabled:opacity-50">
+                      className="flex-1 py-3 bg-primary rounded-xl font-black text-sm text-on-primary flex items-center justify-center gap-2 hover:opacity-90 shadow-lg shadow-primary/20 transition-all disabled:opacity-50">
                       {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                       {isEditing ? 'Guardar Cambios' : 'Registrar Cliente'}
                     </button>

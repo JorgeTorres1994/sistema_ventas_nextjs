@@ -141,34 +141,34 @@ function CustomerDetailDrawer({
             </div>
 
             {/* Contact Info */}
-            <div className="px-6 py-5 space-y-4 border-b border-slate-100 bg-white">
-              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Información de Contacto</h3>
-              <div className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm">
+            <div className="px-6 py-5 space-y-4 border-b border-outline-variant bg-card">
+              <h3 className="text-xs font-black text-on-surface-variant uppercase tracking-widest">Información de Contacto</h3>
+              <div className="flex items-center gap-3 p-3 bg-surface-low border border-outline-variant rounded-xl shadow-sm">
                 <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Mail className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Correo Electrónico</p>
-                  <p className="text-sm font-bold text-slate-900">{customer?.email || '—'}</p>
+                  <p className="text-[10px] font-black text-on-surface-variant/70 uppercase tracking-wider">Correo Electrónico</p>
+                  <p className="text-sm font-bold text-foreground">{customer?.email || '—'}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm">
+              <div className="flex items-center gap-3 p-3 bg-surface-low border border-outline-variant rounded-xl shadow-sm">
                 <div className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Phone className="w-4 h-4 text-emerald-500" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Número de Teléfono</p>
-                  <p className="text-sm font-bold text-slate-900">{customer?.phone || '—'}</p>
+                  <p className="text-[10px] font-black text-on-surface-variant/70 uppercase tracking-wider">Número de Teléfono</p>
+                  <p className="text-sm font-bold text-foreground">{customer?.phone || '—'}</p>
                 </div>
               </div>
               {customer?.address && (
-                <div className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm">
+                <div className="flex items-center gap-3 p-3 bg-surface-low border border-outline-variant rounded-xl shadow-sm">
                   <div className="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
                     <MapPin className="w-4 h-4 text-amber-500" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Dirección</p>
-                    <p className="text-sm font-bold text-slate-900">{customer?.address}</p>
+                    <p className="text-[10px] font-black text-on-surface-variant/70 uppercase tracking-wider">Dirección</p>
+                    <p className="text-sm font-bold text-foreground">{customer?.address}</p>
                   </div>
                 </div>
               )}

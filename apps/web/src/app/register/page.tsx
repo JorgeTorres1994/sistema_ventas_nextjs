@@ -74,12 +74,12 @@ export default function RegisterPage() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl mb-4 shadow-xl border border-gray-100 p-2 overflow-hidden">
                 <img src="/logo.png" alt="Nexus Genesis Logo" className="w-full h-full object-contain" />
               </div>
-              <h1 className="text-gray-900 font-black text-3xl tracking-tight mb-2">Nexus Genesis</h1>
+              <h1 className="text-foreground font-black text-3xl tracking-tight mb-2">Nexus Genesis</h1>
               <p className="text-gray-400 text-sm font-bold uppercase tracking-widest">Sincronía perfecta para empresas de élite.</p>
             </div>
 
             <div className="mb-8">
-              <h2 className="text-xl font-bold text-gray-900">Crear una cuenta</h2>
+              <h2 className="text-xl font-bold text-foreground">Crear una cuenta</h2>
               <p className="text-gray-400 text-sm">Únete al ecosistema y optimiza tu flujo de trabajo.</p>
             </div>
 

@@ -85,7 +85,7 @@ export default function ForgotPasswordPage() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl mb-4 shadow-xl border border-gray-100 p-2 overflow-hidden">
                 <img src="/logo.png" alt="Nexus Genesis Logo" className="w-full h-full object-contain" />
               </div>
-              <h1 className="text-gray-900 font-black text-3xl tracking-tight mb-2">Nexus Genesis</h1>
+              <h1 className="text-foreground font-black text-3xl tracking-tight mb-2">Nexus Genesis</h1>
               <p className="text-gray-400 text-sm font-bold uppercase tracking-widest">Recuperación de Acceso</p>
             </div>
 
@@ -99,7 +99,7 @@ export default function ForgotPasswordPage() {
             {step === 1 && (
               <>
                 <div className="mb-8">
-                  <h2 className="text-xl font-bold text-gray-900">¿Olvidaste tu contraseña?</h2>
+                  <h2 className="text-xl font-bold text-foreground">¿Olvidaste tu contraseña?</h2>
                   <p className="text-gray-400 text-sm">Ingresa tu correo electrónico para buscar tu cuenta.</p>
                 </div>
                 <form onSubmit={handleRequestCode} className="space-y-6">
@@ -121,7 +121,7 @@ export default function ForgotPasswordPage() {
             {step === 2 && (
               <>
                 <div className="mb-8">
-                  <h2 className="text-xl font-bold text-gray-900">Verificación de Seguridad</h2>
+                  <h2 className="text-xl font-bold text-foreground">Verificación de Seguridad</h2>
                   <p className="text-gray-400 text-sm">Ingresa el código de 6 dígitos enviado a tu dispositivo/correo y tu nueva contraseña.</p>
                 </div>
                 <form onSubmit={handleResetPassword} className="space-y-6">
@@ -172,7 +172,7 @@ export default function ForgotPasswordPage() {
                 <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
                   <CheckCircle2 className="w-8 h-8 text-green-500" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">Solicitud Enviada</h2>
+                <h2 className="text-xl font-bold text-foreground mb-2">Solicitud Enviada</h2>
                 <p className="text-gray-500 text-sm leading-relaxed mb-6">
                   {notificationMessage}
                 </p>
