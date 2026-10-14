@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { PromotionsService } from './promotions.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { PermissionsGuard } from '../auth/permissions.guard.js';
@@ -24,10 +33,7 @@ export class PromotionsController {
 
   @Get('coupons/validate')
   @RequirePermissions('pos:read')
-  validateCoupon(
-    @Query('code') code: string,
-    @Query('amount') amount: string
-  ) {
+  validateCoupon(@Query('code') code: string, @Query('amount') amount: string) {
     return this.promotionsService.validateCoupon(code, parseFloat(amount));
   }
 

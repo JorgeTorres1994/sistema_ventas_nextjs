@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma.service.js';
 
 @Injectable()
@@ -7,8 +11,18 @@ export class PromotionsService {
 
   // --- Promotions Logic ---
   async createPromotion(data: any) {
-    const { productIds, name, description, type, value, startDate, endDate, isActive, minPurchase } = data;
-    
+    const {
+      productIds,
+      name,
+      description,
+      type,
+      value,
+      startDate,
+      endDate,
+      isActive,
+      minPurchase,
+    } = data;
+
     return (this.prisma as any).promotion.create({
       data: {
         name,
@@ -20,17 +34,17 @@ export class PromotionsService {
         isActive: isActive !== undefined ? isActive : true,
         minPurchase: minPurchase ? Number(minPurchase) : 0,
         products: {
-          create: productIds?.map((id: string) => ({ productId: id })) || []
-        }
+          create: productIds?.map((id: string) => ({ productId: id })) || [],
+        },
       },
-      include: { products: true }
+      include: { products: true },
     });
   }
 
   async getAllPromotions() {
     return (this.prisma as any).promotion.findMany({
       orderBy: { createdAt: 'desc' },
-      include: { products: true }
+      include: { products: true },
     });
   }
 
@@ -40,15 +54,25 @@ export class PromotionsService {
       where: {
         isActive: true,
         startDate: { lte: now },
-        endDate: { gte: now }
+        endDate: { gte: now },
       },
-      include: { products: true }
+      include: { products: true },
     });
   }
 
   async updatePromotion(id: string, data: any) {
-    const { productIds, name, description, type, value, startDate, endDate, isActive, minPurchase } = data;
-    
+    const {
+      productIds,
+      name,
+      description,
+      type,
+      value,
+      startDate,
+      endDate,
+      isActive,
+      minPurchase,
+    } = data;
+
     const updateData: any = {};
     if (name !== undefined) updateData.name = name;
     if (description !== undefined) updateData.description = description;
@@ -60,32 +84,46 @@ export class PromotionsService {
     if (minPurchase !== undefined) updateData.minPurchase = Number(minPurchase);
 
     if (productIds) {
-      await (this.prisma as any).productPromotion.deleteMany({ where: { promotionId: id } });
+      await (this.prisma as any).productPromotion.deleteMany({
+        where: { promotionId: id },
+      });
       updateData.products = {
-        create: productIds.map((pid: string) => ({ productId: pid }))
+        create: productIds.map((pid: string) => ({ productId: pid })),
       };
     }
 
     return (this.prisma as any).promotion.update({
       where: { id },
       data: updateData,
-      include: { products: true }
+      include: { products: true },
     });
   }
 
   async togglePromotionStatus(id: string) {
-    const promo = await (this.prisma as any).promotion.findUnique({ where: { id } });
+    const promo = await (this.prisma as any).promotion.findUnique({
+      where: { id },
+    });
     if (!promo) throw new NotFoundException('Promoción no encontrada');
     return (this.prisma as any).promotion.update({
       where: { id },
-      data: { isActive: !promo.isActive }
+      data: { isActive: !promo.isActive },
     });
   }
 
   // --- Coupons Logic ---
   async createCoupon(data: any) {
-    const { code, description, type, value, minPurchase, startDate, endDate, usageLimit, isActive } = data;
-    
+    const {
+      code,
+      description,
+      type,
+      value,
+      minPurchase,
+      startDate,
+      endDate,
+      usageLimit,
+      isActive,
+    } = data;
+
     return (this.prisma as any).coupon.create({
       data: {
         code,
@@ -96,20 +134,30 @@ export class PromotionsService {
         startDate: new Date(startDate),
         endDate: new Date(endDate),
         usageLimit: usageLimit ? parseInt(usageLimit) : null,
-        isActive: isActive !== undefined ? isActive : true
-      }
+        isActive: isActive !== undefined ? isActive : true,
+      },
     });
   }
 
   async getCoupons() {
     return (this.prisma as any).coupon.findMany({
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   }
 
   async updateCoupon(id: string, data: any) {
-    const { code, description, type, value, minPurchase, startDate, endDate, usageLimit, isActive } = data;
-    
+    const {
+      code,
+      description,
+      type,
+      value,
+      minPurchase,
+      startDate,
+      endDate,
+      usageLimit,
+      isActive,
+    } = data;
+
     const updateData: any = {};
     if (code !== undefined) updateData.code = code;
     if (description !== undefined) updateData.description = description;
@@ -118,34 +166,41 @@ export class PromotionsService {
     if (minPurchase !== undefined) updateData.minPurchase = Number(minPurchase);
     if (startDate) updateData.startDate = new Date(startDate);
     if (endDate) updateData.endDate = new Date(endDate);
-    if (usageLimit !== undefined) updateData.usageLimit = usageLimit ? parseInt(usageLimit) : null;
+    if (usageLimit !== undefined)
+      updateData.usageLimit = usageLimit ? parseInt(usageLimit) : null;
     if (isActive !== undefined) updateData.isActive = isActive;
 
     return (this.prisma as any).coupon.update({
       where: { id },
-      data: updateData
+      data: updateData,
     });
   }
 
   async toggleCouponStatus(id: string) {
-    const coupon = await (this.prisma as any).coupon.findUnique({ where: { id } });
+    const coupon = await (this.prisma as any).coupon.findUnique({
+      where: { id },
+    });
     if (!coupon) throw new NotFoundException('Cupón no encontrado');
     return (this.prisma as any).coupon.update({
       where: { id },
-      data: { isActive: !coupon.isActive }
+      data: { isActive: !coupon.isActive },
     });
   }
 
   async validateCoupon(code: string, purchaseAmount: number) {
     const now = new Date();
-    const coupon = await (this.prisma as any).coupon.findUnique({ where: { code } });
+    const coupon = await (this.prisma as any).coupon.findUnique({
+      where: { code },
+    });
 
     if (!coupon || !coupon.isActive) {
       throw new NotFoundException('Cupón no válido o inactivo');
     }
 
     if (now < coupon.startDate || now > coupon.endDate) {
-      throw new BadRequestException('El cupón ha expirado o aún no está vigente');
+      throw new BadRequestException(
+        'El cupón ha expirado o aún no está vigente',
+      );
     }
 
     if (coupon.usageLimit && coupon.usageCount >= coupon.usageLimit) {
@@ -153,7 +208,9 @@ export class PromotionsService {
     }
 
     if (purchaseAmount < Number(coupon.minPurchase)) {
-      throw new BadRequestException(`El monto mínimo para este cupón es S/ ${coupon.minPurchase}`);
+      throw new BadRequestException(
+        `El monto mínimo para este cupón es S/ ${coupon.minPurchase}`,
+      );
     }
 
     return coupon;
@@ -161,9 +218,11 @@ export class PromotionsService {
 
   // --- Loyalty Logic ---
   async getCustomerPoints(customerId: string) {
-    const customer = await (this.prisma as any).customer.findUnique({ where: { id: customerId } });
+    const customer = await (this.prisma as any).customer.findUnique({
+      where: { id: customerId },
+    });
     if (!customer) throw new NotFoundException('Cliente no encontrado');
-    return (customer as any).loyaltyPoints;
+    return customer.loyaltyPoints;
   }
 
   /**
@@ -182,15 +241,21 @@ export class PromotionsService {
     return points * 0.1;
   }
 
-  async applyPointsRedemption(customerId: string, pointsToRedeem: number, tx: any) {
-    const customer = await (tx as any).customer.findUnique({ where: { id: customerId } });
-    if ((customer as any).loyaltyPoints < pointsToRedeem) {
+  async applyPointsRedemption(
+    customerId: string,
+    pointsToRedeem: number,
+    tx: any,
+  ) {
+    const customer = await tx.customer.findUnique({
+      where: { id: customerId },
+    });
+    if (customer.loyaltyPoints < pointsToRedeem) {
       throw new BadRequestException('Puntos insuficientes');
     }
 
     await tx.customer.update({
       where: { id: customerId },
-      data: { loyaltyPoints: { decrement: pointsToRedeem } }
+      data: { loyaltyPoints: { decrement: pointsToRedeem } },
     });
   }
 }

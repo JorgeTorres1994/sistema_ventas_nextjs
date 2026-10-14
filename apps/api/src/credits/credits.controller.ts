@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { CreditsService } from './credits.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { PermissionsGuard } from '../auth/permissions.guard.js';
@@ -43,14 +51,17 @@ export class CreditsController {
 
   @Post('payments')
   @RequirePermissions('credits:create')
-  recordPayment(@Body() data: {
-    amount: number;
-    paymentMethod: string;
-    notes?: string;
-    creditSaleId?: string;
-    creditPurchaseId?: string;
-    cashRegisterId?: string;
-  }) {
+  recordPayment(
+    @Body()
+    data: {
+      amount: number;
+      paymentMethod: string;
+      notes?: string;
+      creditSaleId?: string;
+      creditPurchaseId?: string;
+      cashRegisterId?: string;
+    },
+  ) {
     return this.creditsService.recordPayment(data);
   }
 }

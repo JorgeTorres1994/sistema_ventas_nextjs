@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma.service.js';
 import { SalesService } from '../sales/sales.service.js';
 
@@ -12,11 +16,11 @@ export class QuotationsService {
   async createQuotation(userId: string, data: any) {
     try {
       const { items, customerId, notes, expirationDays = 7 } = data;
-      
+
       // Generate quotation number (e.g., COT-00001)
       const count = await (this.prisma as any).quotation.count();
       const number = `COT-${(count + 1).toString().padStart(5, '0')}`;
-      
+
       const expirationDate = new Date();
       expirationDate.setDate(expirationDate.getDate() + expirationDays);
 
@@ -24,12 +28,17 @@ export class QuotationsService {
       const quotationItems: any[] = [];
 
       for (const item of items) {
-        const product = await this.prisma.product.findUnique({ where: { id: item.productId } });
-        if (!product) throw new NotFoundException(`Producto ${item.productId} no encontrado`);
-        
+        const product = await this.prisma.product.findUnique({
+          where: { id: item.productId },
+        });
+        if (!product)
+          throw new NotFoundException(
+            `Producto ${item.productId} no encontrado`,
+          );
+
         const price = Number(product.price);
         subtotal += price * item.quantity;
-        
+
         quotationItems.push({
           productId: item.productId,
           quantity: item.quantity,
@@ -74,7 +83,11 @@ export class QuotationsService {
       if (filters.search) {
         where.OR = [
           { number: { contains: filters.search, mode: 'insensitive' } },
-          { customer: { name: { contains: filters.search, mode: 'insensitive' } } },
+          {
+            customer: {
+              name: { contains: filters.search, mode: 'insensitive' },
+            },
+          },
         ];
       }
 
@@ -112,11 +125,17 @@ export class QuotationsService {
     });
   }
 
-  async convertToSale(id: string, userId: string, paymentMethod: string = 'CASH') {
+  async convertToSale(
+    id: string,
+    userId: string,
+    paymentMethod: string = 'CASH',
+  ) {
     const quotation = await this.findOne(id);
-    
+
     if (quotation.status === 'CONVERTED') {
-      throw new BadRequestException('Esta cotización ya fue convertida en venta');
+      throw new BadRequestException(
+        'Esta cotización ya fue convertida en venta',
+      );
     }
 
     if (new Date() > quotation.expirationDate) {
@@ -124,7 +143,7 @@ export class QuotationsService {
     }
 
     // Prepare items for SalesService
-    const saleItems = quotation.items.map(item => ({
+    const saleItems = quotation.items.map((item) => ({
       productId: item.productId,
       quantity: item.quantity,
     }));
@@ -136,7 +155,7 @@ export class QuotationsService {
       quotation.customerId,
       Number(quotation.total),
       paymentMethod,
-      'PAID'
+      'PAID',
     );
 
     // Update quotation status

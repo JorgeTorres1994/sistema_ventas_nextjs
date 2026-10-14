@@ -4,8 +4,8 @@ import { SettingsController } from './settings.controller.js';
 import { PrismaService } from '../prisma.service.js';
 
 @Module({
-    providers: [SettingsService, PrismaService],
-    controllers: [SettingsController],
-    exports: [SettingsService]
+  providers: [SettingsService, PrismaService],
+  controllers: [SettingsController],
+  exports: [SettingsService],
 })
-export class SettingsModule { }
+export class SettingsModule {}

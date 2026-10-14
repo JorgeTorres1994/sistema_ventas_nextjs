@@ -30,7 +30,8 @@ export default function InvoicingLogPage() {
         startDate: startDate || undefined,
         endDate: endDate || undefined
       });
-      setDocuments(data);
+      const docs = Array.isArray(data) ? data : (data?.data || []);
+      setDocuments(docs);
     } catch (error) {
       toast.error('Error al cargar logs de facturación');
     } finally {

@@ -48,7 +48,9 @@ export class ExpensesService {
         where: { id: cashRegisterId },
       });
       if (!register || register.status !== 'OPEN') {
-        throw new Error('La caja debe estar abierta para registrar un gasto desde ella');
+        throw new Error(
+          'La caja debe estar abierta para registrar un gasto desde ella',
+        );
       }
     }
 
@@ -58,7 +60,9 @@ export class ExpensesService {
         data: {
           ...rest,
           category: { connect: { id: categoryId } },
-          ...(cashRegisterId && { cashRegister: { connect: { id: cashRegisterId } } }),
+          ...(cashRegisterId && {
+            cashRegister: { connect: { id: cashRegisterId } },
+          }),
         },
         include: { category: true },
       });
@@ -115,9 +119,14 @@ export class ExpensesService {
 
   async deleteCategory(id: string) {
     // Check if there are expenses in this category
-    const count = await this.prisma.expense.count({ where: { categoryId: id } });
-    if (count > 0) throw new Error('No se puede eliminar una categoría con gastos asociados');
-    
+    const count = await this.prisma.expense.count({
+      where: { categoryId: id },
+    });
+    if (count > 0)
+      throw new Error(
+        'No se puede eliminar una categoría con gastos asociados',
+      );
+
     return this.prisma.expenseCategory.delete({
       where: { id },
     });

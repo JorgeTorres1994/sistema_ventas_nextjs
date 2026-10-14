@@ -68,4 +68,4 @@ import { CategoriesModule } from './categories/categories.module.js';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

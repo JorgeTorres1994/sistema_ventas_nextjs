@@ -11,7 +11,10 @@ export class EmailService {
   constructor(private configService: ConfigService) {
     const apiKey = this.configService.get<string>('RESEND_API_KEY');
     this.resend = new Resend(apiKey);
-    this.fromEmail = this.configService.get<string>('EMAIL_FROM', 'Nexus Genesis <onboarding@resend.dev>');
+    this.fromEmail = this.configService.get<string>(
+      'EMAIL_FROM',
+      'Nexus Genesis <onboarding@resend.dev>',
+    );
   }
 
   async sendVerificationCode(to: string, code: string): Promise<boolean> {

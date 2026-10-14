@@ -1,44 +1,64 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { RolesService } from './roles.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 
 @Controller('roles')
 @UseGuards(JwtAuthGuard)
 export class RolesController {
-    constructor(private readonly rolesService: RolesService) { }
+  constructor(private readonly rolesService: RolesService) {}
 
-    @Get()
-    findAll() {
-        return this.rolesService.findAll();
-    }
+  @Get()
+  findAll() {
+    return this.rolesService.findAll();
+  }
 
-    @Get('permissions')
-    findAllPermissions() {
-        return this.rolesService.findAllPermissions();
-    }
+  @Get('permissions')
+  findAllPermissions() {
+    return this.rolesService.findAllPermissions();
+  }
 
-    @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.rolesService.findOne(id);
-    }
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.rolesService.findOne(id);
+  }
 
-    @Post()
-    create(@Body() data: { name: string; description?: string; permissionIds: string[] }) {
-        return this.rolesService.create(data);
-    }
+  @Post()
+  create(
+    @Body()
+    data: {
+      name: string;
+      description?: string;
+      permissionIds: string[];
+    },
+  ) {
+    return this.rolesService.create(data);
+  }
 
-    @Patch(':id')
-    update(@Param('id') id: string, @Body() data: { name?: string; description?: string; permissionIds?: string[] }) {
-        return this.rolesService.update(id, data);
-    }
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body()
+    data: { name?: string; description?: string; permissionIds?: string[] },
+  ) {
+    return this.rolesService.update(id, data);
+  }
 
-    @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.rolesService.remove(id);
-    }
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.rolesService.remove(id);
+  }
 
-    @Patch(':id/status')
-    toggleStatus(@Param('id') id: string) {
-        return this.rolesService.toggleStatus(id);
-    }
+  @Patch(':id/status')
+  toggleStatus(@Param('id') id: string) {
+    return this.rolesService.toggleStatus(id);
+  }
 }

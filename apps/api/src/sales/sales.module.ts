@@ -8,9 +8,14 @@ import { PromotionsModule } from '../promotions/promotions.module.js';
 import { InvoicingModule } from '../invoicing/invoicing.module.js';
 
 @Module({
-    imports: [PrismaModule, CashRegistersModule, PromotionsModule, InvoicingModule],
-    controllers: [SalesController],
-    providers: [SalesService],
-    exports: [SalesService],
+  imports: [
+    PrismaModule,
+    CashRegistersModule,
+    PromotionsModule,
+    InvoicingModule,
+  ],
+  controllers: [SalesController],
+  providers: [SalesService],
+  exports: [SalesService],
 })
-export class SalesModule { }
+export class SalesModule {}

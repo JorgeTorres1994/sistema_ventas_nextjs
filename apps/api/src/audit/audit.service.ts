@@ -12,10 +12,11 @@ export class AuditService {
     action: string,
     description: string,
     details?: any,
-    req?: Request
+    req?: Request,
   ) {
     try {
-      const ipAddress = req?.ip || req?.headers['x-forwarded-for']?.toString() || null;
+      const ipAddress =
+        req?.ip || req?.headers['x-forwarded-for']?.toString() || null;
       const userAgent = req?.headers['user-agent'] || null;
 
       await (this.prisma as any).auditLog.create({
@@ -26,8 +27,8 @@ export class AuditService {
           description,
           details: details ? JSON.parse(JSON.stringify(details)) : null,
           ipAddress,
-          userAgent
-        }
+          userAgent,
+        },
       });
     } catch (error) {
       console.error('Error recording audit log:', error);
@@ -52,7 +53,7 @@ export class AuditService {
     if (filters.module) where.module = filters.module;
     if (filters.action) where.action = filters.action;
     if (filters.userId) where.userId = filters.userId;
-    
+
     if (filters.startDate || filters.endDate) {
       where.createdAt = {};
       if (filters.startDate) where.createdAt.gte = new Date(filters.startDate);
@@ -62,7 +63,7 @@ export class AuditService {
     if (filters.search) {
       where.OR = [
         { description: { contains: filters.search, mode: 'insensitive' } },
-        { user: { name: { contains: filters.search, mode: 'insensitive' } } }
+        { user: { name: { contains: filters.search, mode: 'insensitive' } } },
       ];
     }
 
@@ -71,14 +72,14 @@ export class AuditService {
         where,
         include: {
           user: {
-            select: { name: true, email: true, avatarUrl: true }
-          }
+            select: { name: true, email: true, avatarUrl: true },
+          },
         },
         orderBy: { createdAt: 'desc' },
         skip,
-        take: limit
+        take: limit,
       }),
-      (this.prisma as any).auditLog.count({ where })
+      (this.prisma as any).auditLog.count({ where }),
     ]);
 
     return { data, total };
@@ -90,16 +91,16 @@ export class AuditService {
       orderBy: { createdAt: 'desc' },
       include: {
         user: {
-          select: { name: true, avatarUrl: true }
-        }
-      }
+          select: { name: true, avatarUrl: true },
+        },
+      },
     });
   }
 
   async markAllAsRead() {
     return (this.prisma as any).auditLog.updateMany({
       where: { isRead: false },
-      data: { isRead: true }
+      data: { isRead: true },
     });
   }
 }

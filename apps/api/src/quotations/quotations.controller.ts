@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Param, Patch, Query, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Query,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { QuotationsService } from './quotations.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 
@@ -28,7 +38,15 @@ export class QuotationsController {
   }
 
   @Post(':id/convert')
-  convertToSale(@Param('id') id: string, @Request() req, @Body('paymentMethod') paymentMethod: string) {
-    return this.quotationsService.convertToSale(id, req.user.userId, paymentMethod);
+  convertToSale(
+    @Param('id') id: string,
+    @Request() req,
+    @Body('paymentMethod') paymentMethod: string,
+  ) {
+    return this.quotationsService.convertToSale(
+      id,
+      req.user.userId,
+      paymentMethod,
+    );
   }
 }

@@ -1,4 +1,13 @@
-import { Controller, Post, Param, UseGuards, Get, Res, Header, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Param,
+  UseGuards,
+  Get,
+  Res,
+  Header,
+  Query,
+} from '@nestjs/common';
 import type { Response } from 'express';
 import { InvoicingService } from './invoicing.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
@@ -18,18 +27,18 @@ export class InvoicingController {
   async getPreview(@Param('saleId') saleId: string) {
     // Esto es solo para que el usuario vea algo real en el demo
     return {
-      url: `http://localhost:3005/invoicing/view/${saleId}`
+      url: `http://localhost:3005/invoicing/view/${saleId}`,
     };
   }
 
   @Get('view/:saleId')
   async viewInvoice(
-    @Param('saleId') saleId: string, 
+    @Param('saleId') saleId: string,
     @Query('type') type: string,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     const sale = await this.invoicingService.getSaleDataForView(saleId);
-    
+
     if (!sale || !sale.id) {
       return res.status(404).send('Comprobante no encontrado');
     }
@@ -100,14 +109,18 @@ export class InvoicingController {
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-              ${(sale.items || []).map(item => `
+              ${(sale.items || [])
+                .map(
+                  (item) => `
                 <tr>
                   <td class="py-4 px-4 text-sm font-bold text-gray-900">${item.quantity}</td>
                   <td class="py-4 px-4 text-sm text-gray-600 uppercase font-black">${item.product?.name}</td>
                   <td class="py-4 px-4 text-sm text-gray-900 text-right font-bold">S/ ${Number(item.price).toFixed(2)}</td>
                   <td class="py-4 px-4 text-sm text-gray-900 text-right font-black">S/ ${(Number(item.price) * item.quantity).toFixed(2)}</td>
                 </tr>
-              `).join('')}
+              `,
+                )
+                .join('')}
             </tbody>
           </table>
 
@@ -125,7 +138,7 @@ export class InvoicingController {
               </div>
               <div class="flex justify-between items-center text-sm">
                 <span class="font-bold text-gray-400 uppercase">IGV (18%)</span>
-                <span class="font-black text-gray-900">S/ ${(Number(sale.total) - (Number(sale.total) / 1.18)).toFixed(2)}</span>
+                <span class="font-black text-gray-900">S/ ${(Number(sale.total) - Number(sale.total) / 1.18).toFixed(2)}</span>
               </div>
               <div class="flex justify-between items-center py-4 border-t border-gray-100">
                 <span class="font-black text-indigo-600 uppercase tracking-widest">Total Soles</span>
@@ -142,7 +155,7 @@ export class InvoicingController {
       </body>
     </html>
     `;
-    
+
     res.setHeader('Content-Type', 'text/html');
     return res.send(html);
   }

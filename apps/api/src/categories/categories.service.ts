@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma.service.js';
 
 @Injectable()
@@ -6,9 +10,13 @@ export class CategoriesService {
   constructor(private prisma: PrismaService) {}
 
   async create(data: { name: string }) {
-    const existing = await this.prisma.category.findUnique({ where: { name: data.name } });
+    const existing = await this.prisma.category.findUnique({
+      where: { name: data.name },
+    });
     if (existing) {
-      throw new ConflictException(`Ya existe una categoría con el nombre ${data.name}`);
+      throw new ConflictException(
+        `Ya existe una categoría con el nombre ${data.name}`,
+      );
     }
     return this.prisma.category.create({ data });
   }
@@ -17,15 +25,15 @@ export class CategoriesService {
     return this.prisma.category.findMany({
       orderBy: { name: 'asc' },
       include: {
-        _count: { select: { products: true } }
-      }
+        _count: { select: { products: true } },
+      },
     });
   }
 
   async findOne(id: string) {
     const category = await this.prisma.category.findUnique({
       where: { id },
-      include: { products: true }
+      include: { products: true },
     });
     if (!category) throw new NotFoundException(`Categoría no encontrada`);
     return category;
@@ -36,8 +44,13 @@ export class CategoriesService {
     if (!category) throw new NotFoundException(`Categoría no encontrada`);
 
     if (data.name && data.name !== category.name) {
-      const existing = await this.prisma.category.findUnique({ where: { name: data.name } });
-      if (existing) throw new ConflictException(`Ya existe otra categoría con el nombre ${data.name}`);
+      const existing = await this.prisma.category.findUnique({
+        where: { name: data.name },
+      });
+      if (existing)
+        throw new ConflictException(
+          `Ya existe otra categoría con el nombre ${data.name}`,
+        );
     }
 
     return this.prisma.category.update({ where: { id }, data });
@@ -46,19 +59,21 @@ export class CategoriesService {
   async findAllActive() {
     return this.prisma.category.findMany({
       where: { isActive: true },
-      orderBy: { name: 'asc' }
+      orderBy: { name: 'asc' },
     });
   }
 
   async remove(id: string) {
-    const category = await this.prisma.category.findUnique({ 
+    const category = await this.prisma.category.findUnique({
       where: { id },
-      include: { _count: { select: { products: true } } }
+      include: { _count: { select: { products: true } } },
     });
     if (!category) throw new NotFoundException(`Categoría no encontrada`);
-    
+
     if (category._count.products > 0) {
-      throw new ConflictException(`No se puede eliminar una categoría que tiene productos asociados`);
+      throw new ConflictException(
+        `No se puede eliminar una categoría que tiene productos asociados`,
+      );
     }
 
     return this.prisma.category.delete({ where: { id } });
