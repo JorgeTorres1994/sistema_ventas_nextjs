@@ -99,17 +99,22 @@ function CustomerDetailDrawer({
         </div>
 
         {loading ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-8 text-on-surface-variant gap-3">
+            <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+            <p className="text-xs font-black uppercase tracking-widest text-on-surface-variant/50">Cargando perfil...</p>
+          </div>
+        ) : customer ? (
           <div className="flex-1 overflow-y-auto bg-card">
             {/* Profile */}
             <div className="px-6 py-8 text-center border-b border-outline-variant/30 bg-card">
               <div className="flex justify-center mb-4">
                 <div className="relative">
-                  <Avatar name={customer.name} size="lg" />
+                  <Avatar name={customer?.name} size="lg" />
                   <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-card ${customer.isActive ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                 </div>
               </div>
-              <h2 className="text-xl font-black text-foreground">{customer.name}</h2>
-              <p className="text-sm text-on-surface-variant font-medium mt-0.5">DNI: {customer.dni}</p>
+              <h2 className="text-xl font-black text-foreground">{customer?.name}</h2>
+              <p className="text-sm text-on-surface-variant font-medium mt-0.5">DNI: {customer?.dni}</p>
               <div className="mt-3">
                 <StatusBadge isActive={customer.isActive} />
               </div>
@@ -144,7 +149,7 @@ function CustomerDetailDrawer({
                 </div>
                 <div>
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Correo Electrónico</p>
-                  <p className="text-sm font-bold text-slate-900">{customer.email || '—'}</p>
+                  <p className="text-sm font-bold text-slate-900">{customer?.email || '—'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm">
@@ -153,17 +158,17 @@ function CustomerDetailDrawer({
                 </div>
                 <div>
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Número de Teléfono</p>
-                  <p className="text-sm font-bold text-slate-900">{customer.phone || '—'}</p>
+                  <p className="text-sm font-bold text-slate-900">{customer?.phone || '—'}</p>
                 </div>
               </div>
-              {customer.address && (
+              {customer?.address && (
                 <div className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm">
                   <div className="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
                     <MapPin className="w-4 h-4 text-amber-500" />
                   </div>
                   <div>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Dirección</p>
-                    <p className="text-sm font-bold text-slate-900">{customer.address}</p>
+                    <p className="text-sm font-bold text-slate-900">{customer?.address}</p>
                   </div>
                 </div>
               )}
@@ -196,7 +201,11 @@ function CustomerDetailDrawer({
               </div>
             </div>
           </div>
-        ) : null}
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center p-8 text-on-surface-variant">
+            <p className="text-xs font-black uppercase tracking-widest text-on-surface-variant/50">No se encontró la información del cliente</p>
+          </div>
+        )}
 
         {/* Footer */}
         {customer && (
@@ -392,12 +401,12 @@ export default function CustomersPage() {
                          <div className="flex justify-between items-start mb-6">
                             <div className="flex items-center gap-4">
                                <div className="relative">
-                                  <Avatar name={customer.name} />
+                                  <Avatar name={customer?.name} />
                                   <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card ${customer.isActive ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                                </div>
                                <div>
-                                  <p className="text-base font-black text-foreground tracking-tight line-clamp-1">{customer.name}</p>
-                                  <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">DNI: {customer.dni}</p>
+                                  <p className="text-base font-black text-foreground tracking-tight line-clamp-1">{customer?.name}</p>
+                                  <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">DNI: {customer?.dni}</p>
                                </div>
                             </div>
                             <button className="w-10 h-10 bg-card rounded-xl flex items-center justify-center text-on-surface-variant border border-outline-variant"><MoreVertical className="w-4 h-4" /></button>
@@ -406,7 +415,7 @@ export default function CustomersPage() {
                          <div className="space-y-4 mb-6">
                             <div className="flex justify-between items-center">
                                <span className="text-[10px] font-black text-on-surface-variant/40 uppercase tracking-widest">Contacto</span>
-                               <span className="text-xs font-bold text-foreground truncate max-w-[200px]">{customer.email || 'Sin correo'}</span>
+                               <span className="text-xs font-bold text-foreground truncate max-w-[200px]">{customer?.email || 'Sin correo'}</span>
                             </div>
                             <div className="flex justify-between items-center">
                                <span className="text-[10px] font-black text-on-surface-variant/40 uppercase tracking-widest">Actividad</span>
@@ -468,11 +477,11 @@ export default function CustomersPage() {
                             <td className="px-10 py-8">
                               <div className="flex items-center gap-6">
                                 <div className="relative transition-transform group-hover:scale-110">
-                                  <Avatar name={customer.name} />
+                                  <Avatar name={customer?.name} />
                                   <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-card ${customer.isActive ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                                 </div>
                                 <div>
-                                  <p className="text-lg font-black text-foreground tracking-tighter leading-tight">{customer.name}</p>
+                                  <p className="text-lg font-black text-foreground tracking-tighter leading-tight">{customer?.name}</p>
                                   <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mt-1">{customer._count?.sales ?? 0} Ventas acumuladas</p>
                                 </div>
                               </div>
@@ -482,13 +491,13 @@ export default function CustomersPage() {
                                 <span className="text-[10px] font-black text-on-surface-variant/40 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
                                    <Hash className="w-3 h-3" /> Documento Nacional
                                 </span>
-                                <span className="text-base font-black text-foreground font-mono tracking-wider">{customer.dni}</span>
+                                <span className="text-base font-black text-foreground font-mono tracking-wider">{customer?.dni}</span>
                               </div>
                             </td>
                             <td className="px-10 py-8">
                               <div className="flex flex-col">
-                                <span className="text-sm font-black text-foreground tracking-tight">{customer.email || 'Sin correo registrado'}</span>
-                                <span className="text-[11px] text-on-surface-variant font-bold mt-1.5">{customer.phone || 'Sin teléfono'}</span>
+                                <span className="text-sm font-black text-foreground tracking-tight">{customer?.email || 'Sin correo registrado'}</span>
+                                <span className="text-[11px] text-on-surface-variant font-bold mt-1.5">{customer?.phone || 'Sin teléfono'}</span>
                               </div>
                             </td>
                             <td className="px-10 py-8">
