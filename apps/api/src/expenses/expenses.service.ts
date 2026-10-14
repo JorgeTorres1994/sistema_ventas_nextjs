@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma.service.js';
 
 @Injectable()
@@ -40,15 +44,34 @@ export class ExpensesService {
   }
 
   async create(data: any) {
-    const { categoryId, cashRegisterId, ...rest } = data;
+    const { categoryId, cashRegisterId, date, ...rest } = data;
 
-    // If it's a cash expense, we might want to check the register
-    if (cashRegisterId) {
+    // Normalizar fecha para Prisma DateTime (ISO Date)
+    let parsedDate: Date;
+    if (date) {
+      parsedDate = new Date(date);
+      if (isNaN(parsedDate.getTime())) {
+        parsedDate = new Date();
+      }
+    } else {
+      parsedDate = new Date();
+    }
+
+    // Validar cashRegisterId si no está vacío
+    const validCashRegisterId =
+      cashRegisterId &&
+      typeof cashRegisterId === 'string' &&
+      cashRegisterId.trim() !== ''
+        ? cashRegisterId.trim()
+        : null;
+
+    // Si es un gasto de caja, verificar que la caja exista y esté abierta
+    if (validCashRegisterId) {
       const register = await this.prisma.cashRegister.findUnique({
-        where: { id: cashRegisterId },
+        where: { id: validCashRegisterId },
       });
       if (!register || register.status !== 'OPEN') {
-        throw new Error(
+        throw new BadRequestException(
           'La caja debe estar abierta para registrar un gasto desde ella',
         );
       }
@@ -59,19 +82,20 @@ export class ExpensesService {
       const expense = await tx.expense.create({
         data: {
           ...rest,
+          date: parsedDate,
           category: { connect: { id: categoryId } },
-          ...(cashRegisterId && {
-            cashRegister: { connect: { id: cashRegisterId } },
+          ...(validCashRegisterId && {
+            cashRegister: { connect: { id: validCashRegisterId } },
           }),
         },
         include: { category: true },
       });
 
       // Si hay caja vinculada, registrar el egreso en los movimientos de caja
-      if (cashRegisterId) {
+      if (validCashRegisterId) {
         await tx.cashMovement.create({
           data: {
-            cashRegisterId,
+            cashRegisterId: validCashRegisterId,
             type: 'OUT',
             amount: rest.amount,
             description: `Gasto: ${rest.description || 'Sin descripción'}`,
@@ -84,9 +108,34 @@ export class ExpensesService {
   }
 
   async update(id: string, data: any) {
+    const { date, categoryId, cashRegisterId, ...rest } = data;
+    const validCashRegisterId =
+      cashRegisterId &&
+      typeof cashRegisterId === 'string' &&
+      cashRegisterId.trim() !== ''
+        ? cashRegisterId.trim()
+        : null;
+
+    let parsedDate: Date | undefined = undefined;
+    if (date) {
+      const d = new Date(date);
+      if (!isNaN(d.getTime())) {
+        parsedDate = d;
+      }
+    }
+
     return this.prisma.expense.update({
       where: { id },
-      data,
+      data: {
+        ...rest,
+        ...(parsedDate && { date: parsedDate }),
+        ...(categoryId && { category: { connect: { id: categoryId } } }),
+        ...(validCashRegisterId !== undefined && {
+          cashRegister: validCashRegisterId
+            ? { connect: { id: validCashRegisterId } }
+            : { disconnect: true },
+        }),
+      },
     });
   }
 
@@ -123,7 +172,7 @@ export class ExpensesService {
       where: { categoryId: id },
     });
     if (count > 0)
-      throw new Error(
+      throw new BadRequestException(
         'No se puede eliminar una categoría con gastos asociados',
       );
 

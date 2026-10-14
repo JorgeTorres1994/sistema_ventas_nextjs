@@ -105,7 +105,8 @@ export default function ExpensesPage() {
       const payload = {
         ...formData,
         amount: parseFloat(formData.amount),
-        cashRegisterId: formData.paymentMethod === 'CASH' ? formData.cashRegisterId : null
+        date: formData.date ? new Date(formData.date).toISOString() : new Date().toISOString(),
+        cashRegisterId: formData.paymentMethod === 'CASH' && formData.cashRegisterId ? formData.cashRegisterId : null
       };
 
       if (editingExpense) {
