@@ -207,6 +207,14 @@ body {
   background: rgba(148, 163, 184, 0.45) !important;
 }
 @media (min-width: 1024px) {
+  .lg\:ml-64 {
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  .lg\:w-\[calc\(100\%-256px\)\] {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
   html[data-sidebar-collapsed="true"] .lg\:ml-64 {
     margin-left: 5rem !important; /* 80px */
   }
