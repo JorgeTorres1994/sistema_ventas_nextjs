@@ -151,6 +151,61 @@ body {
 }
 
 /* Sidebar Collapse Overrides */
+/* Custom Sleek Enterprise Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.22);
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.45);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.25) transparent;
+}
+
+/* Scrollbar Hide Utility */
+.scrollbar-hide {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Scrollbar Thin Utility */
+.scrollbar-thin {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(148, 163, 184, 0.25) transparent !important;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px !important;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.22) !important;
+  border-radius: 9999px !important;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.45) !important;
+}
 @media (min-width: 1024px) {
   html[data-sidebar-collapsed="true"] .lg\:ml-64 {
     margin-left: 5rem !important; /* 80px */

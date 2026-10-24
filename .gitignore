@@ -37,3 +37,7 @@ Thumbs.db
 # Temporaries
 tmp
 temp
+
+# Media & Videos
+*.mp4
+video demostracion*/
