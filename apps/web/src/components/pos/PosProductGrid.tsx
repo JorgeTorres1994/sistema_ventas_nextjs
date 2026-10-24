@@ -58,7 +58,7 @@ export default function PosProductGrid({
 
         <div 
           ref={scrollContainerRef}
-          className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth py-1 flex-1"
+          className="flex items-center gap-2 overflow-x-auto scrollbar-hide no-scrollbar hide-scrollbar scroll-smooth py-1 flex-1"
         >
           <button
             onClick={() => setSelectedCategoryId('all')}

@@ -4,6 +4,7 @@ import { Search, Bell, User, LogOut, Settings as SettingsIcon, ChevronDown, Menu
 import { logout } from '@/lib/api';
 import Link from 'next/link';
 import { useSidebar } from '../layout/SidebarContext';
+import { useSettings } from '../SettingsProvider';
 
 interface PosTopBarProps {
   searchQuery: string;
@@ -12,6 +13,8 @@ interface PosTopBarProps {
 
 export default function PosTopBar({ searchQuery, setSearchQuery }: PosTopBarProps) {
   const { toggle } = useSidebar();
+  const { settings } = useSettings();
+  const [avatarError, setAvatarError] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -89,13 +92,43 @@ export default function PosTopBar({ searchQuery, setSearchQuery }: PosTopBarProp
     <header className="h-[70px] lg:h-[88px] border-b border-outline-variant bg-card/80 backdrop-blur-md flex items-center justify-between px-4 lg:px-8 w-full sticky top-0 z-30 transition-all duration-300">
       
       {/* Left Section: Menu Toggle, Search & Status */}
-      <div className="flex items-center gap-4 lg:gap-8 flex-1">
+      <div className="flex items-center gap-3 lg:gap-8 flex-1 min-w-0">
         <button 
           onClick={toggle}
-          className="lg:hidden p-2 hover:bg-surface-low rounded-xl transition-colors text-on-surface-variant"
+          className="lg:hidden p-2 hover:bg-surface-low rounded-xl transition-colors text-on-surface-variant active:scale-90 shrink-0"
         >
           <Menu className="w-6 h-6" />
         </button>
+
+        {/* Branding for Mobile Viewport */}
+        <Link href="/dashboard" className="lg:hidden flex items-center gap-2.5 active:scale-95 transition-transform group min-w-0">
+          <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-md shadow-primary/25 shrink-0 overflow-hidden relative">
+            {settings?.logoUrl ? (
+              <img 
+                src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}${settings.logoUrl}?v=${version}`} 
+                alt="Logo" 
+                className="w-full h-full object-cover" 
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  const parent = e.currentTarget.parentElement;
+                  if (parent && !parent.querySelector('.fallback-icon')) {
+                    parent.innerHTML = `<span class="text-white font-black text-xs tracking-tighter fallback-icon">NG</span>`;
+                  }
+                }}
+              />
+            ) : (
+              <span className="text-white font-black text-xs tracking-tighter fallback-icon">NG</span>
+            )}
+          </div>
+          <div className="flex flex-col min-w-0">
+            <span className="text-[13px] font-black text-foreground tracking-tight uppercase leading-none truncate max-w-[130px] sm:max-w-none">
+              {settings?.businessName || 'Nexus Genesis'}
+            </span>
+            <span className="text-[7.5px] font-black text-primary uppercase tracking-[0.25em] leading-none mt-1">
+              Terminal POS
+            </span>
+          </div>
+        </Link>
 
         <div className="hidden md:relative md:flex w-full max-w-md group">
           <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
@@ -213,11 +246,12 @@ export default function PosTopBar({ searchQuery, setSearchQuery }: PosTopBarProp
             >
               <div className="relative">
                 <div className="w-10 h-10 rounded-[16px] bg-gradient-to-tr from-primary to-primary/80 overflow-hidden border-2 border-card shadow-sm flex items-center justify-center transition-transform group-hover:scale-105">
-                  {userAvatar ? (
+                  {userAvatar && !avatarError ? (
                     <img 
                       src={`${userAvatar}${userAvatar.includes('?') ? '&' : '?'}v=${version}`} 
                       alt={user?.name} 
                       className="w-full h-full object-cover" 
+                      onError={() => setAvatarError(true)}
                     />
                   ) : (
                     <span className="text-white font-black text-sm uppercase">
